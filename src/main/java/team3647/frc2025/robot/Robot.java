@@ -4,6 +4,7 @@
 
 package team3647.frc2025.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -12,6 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,9 +30,9 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
         if (isReal()) {
-            Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+            Logger.addDataReceiver(new WPILOGWriter(RobotBase.isReal()? "/home/lvuser/logs" : "logs")); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution nlogging
         } else {
             setUseTiming(false); // Run as fast as possible
             if (isReplay) {
@@ -112,5 +114,10 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void testExit() {
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        SimulatedArena.getInstance().simulationPeriodic();
     }
 }

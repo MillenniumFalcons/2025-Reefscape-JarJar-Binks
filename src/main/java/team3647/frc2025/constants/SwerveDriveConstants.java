@@ -1,7 +1,13 @@
 package team3647.frc2025.constants;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Volts;
+
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.*;
@@ -22,6 +28,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import team3647.lib.team254.geometry.Translation2d;
 import team3647.lib.team254.swerve.SwerveDriveKinematics;
 import team3647.lib.team254.swerve.SwerveKinematicLimits;
@@ -202,6 +209,7 @@ public class SwerveDriveConstants {
                     .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
                     .withCouplingGearRatio(kCouplingGearRatio);
 
+
     // is stored as reference?
 
     // public static final SwerveDrivetrainConstants kDrivetrainConstants =
@@ -257,7 +265,7 @@ public class SwerveDriveConstants {
 
         System.out.println(error);
     }
-    double driveMOI = 
+    static double driveMOI = 
         Units.Pound.of(120).in(Units.Kilogram)* 
         (1/6) * Units.Inch.of(19).in(Units.Meter)*
         Units.Inch.of(19).in(Units.Meter);
@@ -267,10 +275,16 @@ public class SwerveDriveConstants {
             .withTrackLengthTrackWidth(Units.Inch.of(19), Units.Inches.of(19))
             .withGyro(COTS.ofPigeon2())
             .withRobotMass(Units.Pound.of(120))
-            .withSwerveModule(COTS.ofMark4i(
-                DCMotor.getKrakenX60Foc(1), 
-                DCMotor.getFalcon500Foc(1), 
-                COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof, 4))
+            .withSwerveModule(new SwerveModuleSimulationConfig(
+                DCMotor.getKrakenX60(1),
+                DCMotor.getFalcon500(1),
+                TunerConstants.FrontLeft.DriveMotorGearRatio,
+                TunerConstants.FrontLeft.SteerMotorGearRatio,
+                Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
+                Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
+                Inches.of(2),
+                KilogramSquareMeters.of(driveMOI),
+                COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof))
             .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
             
 

@@ -32,6 +32,7 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.drive.RobotDriveBase;
@@ -223,7 +224,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         //     },
         //     this // Reference to this subsystem to set requirements
         // );
-        
+        SimulatedArena.getInstance().addDriveTrainSimulation(simpleSim.getDriveTrainSimulation());
         
 
 
@@ -260,6 +261,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         this.setControl(periodicIO.masterRequest);
         simpleSim.periodic();
         Logger.recordOutput("simRobot/drive", simpleSim.getActualPoseInSimulationWorld());
+        Logger.recordOutput("simconsole", "Periodics");
         // SmartDashboard.putNumber("heading", getRawHeading());
     }
 
@@ -360,6 +362,11 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
 
     public double getPitch() {
         return periodicIO.pitch;
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        this.updateSimState(kDt, RobotController.getBatteryVoltage());
     }
 
     private void reduceCancoderStatusframes() {
@@ -535,10 +542,13 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
                 .withRotationalRate(setpoint.mChassisSpeeds.omegaRadiansPerSecond);
         periodicIO.masterRequest = periodicIO.robotCentric;
         if(RobotBase.isSimulation()){
+            
             simpleSim.runChassisSpeeds(
                 setpoint.mChassisSpeeds.real(), 
                 new Translation2d().real(), false, true);
+                
         }
+        
     }
 
     public void resetSimOdo(){
