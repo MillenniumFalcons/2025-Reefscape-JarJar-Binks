@@ -9,6 +9,8 @@ import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 // import org.photonvision.EstimatedRobotPose;
 
+import org.photonvision.EstimatedRobotPose;
+
 public class VisionMeasurement implements Comparable<VisionMeasurement> {
     public final Pose2d pose;
     public final double timestamp;
@@ -34,32 +36,32 @@ public class VisionMeasurement implements Comparable<VisionMeasurement> {
         this.name = name;
     }
 
-    // public static VisionMeasurement fromEstimatedRobotPose(
-    //         EstimatedRobotPose estimatedPose,
-    //         double ambiguityScore,
-    //         Vector<N3> stdDevs,
-    //         String name) {
-    //     return new VisionMeasurement(
-    //             estimatedPose.estimatedPose.toPose2d(),
-    //             estimatedPose.timestampSeconds,
-    //             ambiguityScore,
-    //             stdDevs,
-    //             name);
-    // }
+    public static VisionMeasurement fromEstimatedRobotPose(
+            EstimatedRobotPose estimatedPose,
+            double ambiguityScore,
+            Vector<N3> stdDevs,
+            String name) {
+        return new VisionMeasurement(
+                estimatedPose.estimatedPose.toPose2d(),
+                estimatedPose.timestampSeconds,
+                ambiguityScore,
+                stdDevs,
+                name);
+    }
 
-    // public static VisionMeasurement fromEstimatedRobotPose(
-    //         EstimatedRobotPose estimatedPose,
-    //         double timestampSeconds,
-    //         double ambiguityScore,
-    //         Vector<N3> stdDevs,
-    //         String name) {
-    //     return new VisionMeasurement(
-    //             estimatedPose.estimatedPose.toPose2d(),
-    //             timestampSeconds,
-    //             ambiguityScore,
-    //             stdDevs,
-    //             name);
-    // }
+    public static VisionMeasurement fromEstimatedRobotPose(
+            EstimatedRobotPose estimatedPose,
+            double timestampSeconds,
+            double ambiguityScore,
+            Vector<N3> stdDevs,
+            String name) {
+        return new VisionMeasurement(
+                estimatedPose.estimatedPose.toPose2d(),
+                timestampSeconds,
+                ambiguityScore,
+                stdDevs,
+                name);
+    }
 
     @Override
     public int compareTo(VisionMeasurement o) {

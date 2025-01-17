@@ -1,10 +1,12 @@
-package team3647.lib.vision;
+package team3647.lib.vision.old;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import team3647.lib.utils.NamedInt;
+import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
+import team3647.lib.vision.old.AprilTagCamera.VisionUpdate;
 
 public class Limelight implements AprilTagCamera {
 

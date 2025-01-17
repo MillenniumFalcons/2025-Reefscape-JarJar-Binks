@@ -65,6 +65,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledPeriodic() {
+		m_robotContainer.allianceChecker.periodic();
     }
 
     @Override
@@ -103,6 +104,7 @@ public class Robot extends LoggedRobot {
     public void teleopExit() {
     }
 
+
     @Override
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
@@ -120,4 +122,7 @@ public class Robot extends LoggedRobot {
     public void simulationPeriodic() {
         SimulatedArena.getInstance().simulationPeriodic();
     }
+
+	
+	
 }

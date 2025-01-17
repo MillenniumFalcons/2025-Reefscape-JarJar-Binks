@@ -272,9 +272,9 @@ public class SwerveDriveConstants {
         
         
     public static final DriveTrainSimulationConfig simConfig = DriveTrainSimulationConfig.Default()
-            .withTrackLengthTrackWidth(Units.Inch.of(19), Units.Inches.of(19))
+            .withTrackLengthTrackWidth(Units.Inch.of(27), Units.Inches.of(27))
             .withGyro(COTS.ofPigeon2())
-            .withRobotMass(Units.Pound.of(120))
+            .withRobotMass(Units.Pound.of(125))
             .withSwerveModule(new SwerveModuleSimulationConfig(
                 DCMotor.getKrakenX60(1),
                 DCMotor.getFalcon500(1),

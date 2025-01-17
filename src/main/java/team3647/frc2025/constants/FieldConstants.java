@@ -1,9 +1,12 @@
 package team3647.frc2025.constants;
 
+import static edu.wpi.first.units.Units.Centimeter;
+
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
 
 public class FieldConstants {
 
@@ -26,6 +29,11 @@ public class FieldConstants {
         new Pose2d(11.83, 4.02, kDefaultRot),
         new Pose2d(12.45, 5.09, kDefaultRot)
     );
+
+
+	public static Distance kFieldLength = Centimeter.of(1755);
+	public static Distance kFieldWidth = Centimeter.of(805);
+
 
 
 

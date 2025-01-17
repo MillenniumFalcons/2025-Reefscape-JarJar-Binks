@@ -1,9 +1,11 @@
 package team3647.frc2025.subsystems;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
@@ -12,6 +14,8 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentric;
 import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
+import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveRotation;
+import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveTranslation;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -35,6 +39,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -43,15 +48,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilogram;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Pound;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.DoubleSupplier;
 
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
+
 import org.dyn4j.collision.narrowphase.FallbackCondition;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -60,7 +72,10 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import team3647.frc2025.Util.sim.MapleSimSwerveDrivetrain;
 import team3647.frc2025.constants.SwerveDriveConstants;
+import team3647.frc2025.constants.TunerConstants;
+import team3647.frc2025.robot.Robot;
 import team3647.lib.ModifiedSignalLogger;
 import team3647.lib.PeriodicSubsystem;
 import team3647.lib.SwerveFOCRequest;
@@ -97,11 +112,20 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
 
     private SysIdRoutine m_steerSysIdRoutine;
 
-    private final DriveTrainSimulationConfig simConfig;
+	private SysIdRoutine spinSysIdRoutine;
 
-    private final SelfControlledSwerveDriveSimulation simpleSim;
+	
+	Notifier m_simNotifier;
 
-    public final SwerveDriveSimulation swerveSim;
+	private static final double kSimLoopPeriod = 0.002;
+
+    // private final DriveTrainSimulationConfig simConfig;
+// 
+    // private final SelfControlledSwerveDriveSimulation simpleSim;
+
+    // public final SwerveDriveSimulation swerveSim;
+
+	MapleSimSwerveDrivetrain simDrive;
 
     public static class PeriodicIO {
         // inputs
@@ -130,6 +154,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         public SwerveModuleState backLeftState = new SwerveModuleState();
         public SwerveModuleState backRightState = new SwerveModuleState();
 
+
         public double timestamp = 0;
 
         public Pose2d visionPose = new Pose2d();
@@ -138,6 +163,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         public ChassisSpeeds speeds = new ChassisSpeeds();
 
         public SwerveRequest masterRequest = new SwerveRequest.Idle();
+		public SysIdSwerveRotation spinSysidRequest = new SysIdSwerveRotation();
         public SwerveFOCRequest driveFOCRequest = new SwerveFOCRequest(true);
         public SwerveFOCRequest steerFOCRequest = new SwerveFOCRequest(false);
         public FieldCentric fieldCentric =
@@ -151,21 +177,23 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
             double maxSpeedMpS,
             double maxRotRadPerSec,
             double kDt,
-            DriveTrainSimulationConfig simConfig,
-            SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>... swerveModuleConstants) {
-        super(TalonFX::new, TalonFX::new, CANcoder::new, swerveDriveConstants, swerveModuleConstants);
+            // DriveTrainSimulationConfig simConfig,
+            SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>... swerveModuleConstants
+			) {
+        super(TalonFX::new, TalonFX::new, CANcoder::new, swerveDriveConstants, MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(swerveModuleConstants));
         registerTelemetry(this::setStuff);
-        this.simConfig = simConfig;
+        // this.simConfig = simConfig;
         this.maxSpeedMpS = maxSpeedMpS;
         this.maxRotRadPerSec = maxRotRadPerSec;
         this.kDt = kDt;
-        this.swerveSim = new SwerveDriveSimulation(simConfig, new Pose2d(2,2,new Rotation2d()));
+		
+        // this.swerveSim = new SwerveDriveSimulation(simConfig, new Pose2d(2,2,new Rotation2d()));
 
         this.setpointGenerator = new SwerveSetpointGenerator(SwerveDriveConstants.kDriveKinematics);
 
         this.limits = SwerveDriveConstants.kTeleopKinematicLimits;
 
-        this.simpleSim = new SelfControlledSwerveDriveSimulation(swerveSim);
+        // this.simpleSim = new SelfControlledSwerveDriveSimulation(swerveSim);
 
         this.m_driveSysIdRoutine =
                 new SysIdRoutine(
@@ -197,6 +225,17 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
                                 null,
                                 this));
 
+		this.spinSysIdRoutine = 
+				new SysIdRoutine(
+					new SysIdRoutine.Config(
+						Units.Volts.of(1).per(Second), 
+						Units.Volts.of(3), Second.of(10), 
+						ModifiedSignalLogger.logState()),
+					new Mechanism(
+						(Voltage volts) -> setControl(periodicIO.spinSysidRequest.withRotationalRate(volts.in(Units.Volts))), 
+						null,
+						this));
+
         // AutoBuilder.configure(
         //     this::getOdoPose, // Robot pose supplier
         //     this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
@@ -224,7 +263,13 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         //     },
         //     this // Reference to this subsystem to set requirements
         // );
-        SimulatedArena.getInstance().addDriveTrainSimulation(simpleSim.getDriveTrainSimulation());
+
+		if(Utils.isSimulation()){
+			startSimThread();
+		}
+
+
+        // SimulatedArena.getInstance().addDriveTrainSimulation(simpleSim.getDriveTrainSimulation());
         
 
 
@@ -233,8 +278,31 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
 
     }
 
+	private void startSimThread() {
+    simDrive = new MapleSimSwerveDrivetrain(
+            Seconds.of(kSimLoopPeriod),
+            // TODO: modify the following constants according to your robot
+            Pound.of(125), // robot weight
+            Inches.of(30), // bumper length
+            Inches.of(30), // bumper width
+            DCMotor.getKrakenX60(1), // drive motor type
+            DCMotor.getFalcon500(1), // steer motor type
+            COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof, // wheel COF
+            getModuleLocations(),
+            getPigeon2(),
+            getModules(),
+            TunerConstants.FrontLeft,
+            TunerConstants.FrontRight,
+            TunerConstants.BackLeft,
+            TunerConstants.BackRight);
+    /* Run simulation at a faster rate so PID gains behave more reasonably */
+    m_simNotifier = new Notifier(simDrive::update);
+    m_simNotifier.startPeriodic(kSimLoopPeriod);
+}
+
     public void zeroPitch() {
         this.pitchZero = this.getPitch();
+		
     }
 
     @Override
@@ -259,8 +327,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
     public void writePeriodicOutputs() {
         setisAccel();
         this.setControl(periodicIO.masterRequest);
-        simpleSim.periodic();
-        Logger.recordOutput("simRobot/drive", simpleSim.getActualPoseInSimulationWorld());
+        // simpleSim.periodic();
+        // Logger.recordOutput("simRobot/drive", simpleSim.getActualPoseInSimulationWorld());
         Logger.recordOutput("simconsole", "Periodics");
         // SmartDashboard.putNumber("heading", getRawHeading());
     }
@@ -274,7 +342,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         // Logger.recordOutput(
                 // "Drive/Current",
                 // this.getModules()[0].getDriveMotor().getStatorCurrent().getValueAsDouble());
-        Logger.recordOutput("Robot/Under stage", underStage());
+    
         readPeriodicInputs();
         writePeriodicOutputs();
     }
@@ -307,15 +375,6 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         periodicIO.good = true;
     }
 
-    public boolean underStage() {
-        return ((getOdoPose().getX() > 3.2 && getOdoPose().getX() < 6.5)
-                        || (getOdoPose().getX() > 9.9 && getOdoPose().getX() < 13.3))
-                && ((Math.abs(getOdoPose().getY() - 4) < ((getOdoPose().getX() - 2.6) * 1 / 1.73)
-                                && getOdoPose().getX() < 6.5)
-                        || (Math.abs(getOdoPose().getY() - 4)
-                                        < ((13.9 - getOdoPose().getX()) * 1 / 1.73)
-                                && getOdoPose().getX() > 9.9));
-    }
 
     public Command runDriveQuasiTest(Direction direction) {
         return m_driveSysIdRoutine.quasistatic(direction);
@@ -334,6 +393,11 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
     }
 
     public void setRobotPose(Pose2d pose) {
+		if(RobotBase.isSimulation()){
+			simDrive.mapleSimDrive.setSimulationWorldPose(pose);
+			Timer.delay(0.05);
+		}
+
         resetPose(pose);
         periodicIO = new PeriodicIO();
     }
@@ -370,6 +434,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
     }
 
     private void reduceCancoderStatusframes() {
+		
         // this.backLeft.getCanCoderObject().setStatusFramePeriod(CANCoderStatusFrame.SensorData,
         // 255);
         // this.backRight
@@ -396,7 +461,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
     @AutoLogOutput
     public Pose2d getOdoPose() {
         
-        return RobotBase.isReal()? periodicIO.pose : simpleSim.getOdometryEstimatedPose();
+        // return RobotBase.isReal()? periodicIO.pose : simpleSim.getOdometryEstimatedPose();
+		return periodicIO.pose;
         
     }
 
@@ -472,10 +538,10 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         //             data.timestamp
         //         });
         addVisionMeasurement(data.pose, data.timestamp, data.stdDevs);
-        if(RobotBase.isSimulation()){
-            simpleSim.addVisionEstimation(data.pose, data.timestamp, data.stdDevs);
+        // if(RobotBase.isSimulation()){
+        //     simpleSim.addVisionEstimation(data.pose, data.timestamp, data.stdDevs);
             
-        }
+        // }
     }
 
     @Override
@@ -541,19 +607,19 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
                 .withVelocityY(setpoint.mChassisSpeeds.vyMetersPerSecond)
                 .withRotationalRate(setpoint.mChassisSpeeds.omegaRadiansPerSecond);
         periodicIO.masterRequest = periodicIO.robotCentric;
-        if(RobotBase.isSimulation()){
+        // if(RobotBase.isSimulation()){
             
-            simpleSim.runChassisSpeeds(
-                setpoint.mChassisSpeeds.real(), 
-                new Translation2d().real(), false, true);
+        //     simpleSim.runChassisSpeeds(
+        //         setpoint.mChassisSpeeds.real(), 
+        //         new Translation2d().real(), true, true);
                 
-        }
+        // }
         
     }
 
-    public void resetSimOdo(){
-        simpleSim.resetOdometry(simpleSim.getActualPoseInSimulationWorld());
-    }
+    // public void resetSimOdo(){
+    //     simpleSim.resetOdometry(simpleSim.getActualPoseInSimulationWorld());
+    // }
 
     public void driveFieldOriented(DoubleSupplier x, double y, double rotation) {
         if (!periodicIO.good) {

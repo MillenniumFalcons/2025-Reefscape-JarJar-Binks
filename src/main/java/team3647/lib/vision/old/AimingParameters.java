@@ -1,8 +1,8 @@
-package team3647.lib.vision;
+package team3647.lib.vision.old;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import team3647.lib.vision.AprilTagCamera.AprilTagId;
+import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
 
 /** 254 AimingParameters class */
 public class AimingParameters {

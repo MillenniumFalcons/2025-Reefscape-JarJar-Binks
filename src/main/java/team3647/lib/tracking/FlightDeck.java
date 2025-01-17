@@ -8,11 +8,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import team3647.lib.vision.AimingParameters;
-import team3647.lib.vision.AprilTagCamera.AprilTagId;
-import team3647.lib.vision.MultiTargetTracker;
-import team3647.lib.vision.TrackedTarget;
-import team3647.lib.vision.TrackedTarget.TrackedTargetComparator;
+
+import team3647.lib.vision.old.AimingParameters;
+import team3647.lib.vision.old.MultiTargetTracker;
+import team3647.lib.vision.old.TrackedTarget;
+import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
+import team3647.lib.vision.old.TrackedTarget.TrackedTargetComparator;
 
 public class FlightDeck {
     private final RobotTracker robotTracker;

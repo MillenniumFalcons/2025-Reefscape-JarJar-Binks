@@ -1,56 +1,16 @@
 package team3647.lib.vision;
 
-public interface AprilTagCamera extends IVisionCamera {
-    public enum AprilTagId {
-        ID_1(1),
-        ID_2(2),
-        ID_3(3),
-        ID_4(4),
-        ID_5(5),
-        ID_6(6),
-        ID_7(7),
-        ID_8(8),
-        ID_9(9),
-        ID_10(10),
-        ID_11(11),
-        ID_12(12),
-        ID_13(13),
-        ID_14(14),
-        ID_15(15),
-        ID_16(16),
-        ID_DNE(-1);
+import edu.wpi.first.math.geometry.Pose3d;
 
-        public final int num;
+import java.util.List;
+import java.util.Optional;
 
-        AprilTagId(int num) {
-            this.num = num;
-        }
-    }
+public interface AprilTagCamera {
+    public Optional<List<VisionMeasurement>> QueueToInputs();
 
-    public static AprilTagId getId(int id) {
-        var adjustedId = id - 1;
-        var possibleValues = AprilTagId.values();
-        if (adjustedId < 0 || adjustedId > possibleValues.length) {
-            return AprilTagId.ID_DNE;
-        }
+    public int getTagNum();
 
-        return possibleValues[adjustedId];
-    }
+    public String getName();
 
-    public static class VisionUpdate {
-        public final double captureTimestamp;
-        public final VisionPoint point;
-        public final AprilTagId id;
-
-        public VisionUpdate(double captureTimestamp, VisionPoint point, AprilTagId id) {
-            this.captureTimestamp = captureTimestamp;
-            this.point = point;
-            this.id = id;
-        }
-
-        public static final VisionUpdate kNoUpdate =
-                new VisionUpdate(0, new VisionPoint(0, 0), AprilTagId.ID_DNE);
-    }
-
-    public VisionUpdate getVisionUpdate();
+    public Optional<Pose3d> camPose();
 }
