@@ -21,6 +21,7 @@ import team3647.lib.inputs.Joysticks;
 import team3647.lib.team9442.AllianceChecker;
 import team3647.lib.team9442.AllianceObserver;
 import team3647.lib.team9442.AutoChooser;
+import team3647.lib.vision.AprilTagLimelight;
 import team3647.lib.vision.AprilTagPhotonVision;
 import team3647.lib.vision.VisionController;
 
@@ -75,5 +76,7 @@ public class RobotContainer {
 
 	AprilTagPhotonVision cam1ChangeName = new AprilTagPhotonVision("ballschangename", new Transform3d(), VecBuilder.fill(1,1,1));
 
-	public final VisionController controller = new VisionController(swerve::addVisionData, swerve::shouldAddData, swerve::resetPose, cam1ChangeName);
+	AprilTagLimelight ll1ChangeName = new AprilTagLimelight("LL1ChangeName", new Transform3d(), swerve::getPigeonOrientation, VecBuilder.fill(1,1,1));
+
+	public final VisionController controller = new VisionController(swerve::addVisionData, swerve::shouldAddData, swerve::resetPose, cam1ChangeName, ll1ChangeName);
 }

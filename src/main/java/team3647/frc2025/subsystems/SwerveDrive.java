@@ -84,6 +84,7 @@ import team3647.lib.team254.swerve.SwerveKinematicLimits;
 import team3647.lib.team254.swerve.SwerveSetpoint;
 import team3647.lib.team254.swerve.SwerveSetpointGenerator;
 import team3647.lib.team9442.AllianceObserver;
+import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
 public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> implements AllianceObserver,PeriodicSubsystem {
@@ -328,7 +329,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         setisAccel();
         this.setControl(periodicIO.masterRequest);
         // simpleSim.periodic();
-        // Logger.recordOutput("simRobot/drive", simpleSim.getActualPoseInSimulationWorld());
+        Logger.recordOutput("simRobot/drive", simDrive.mapleSimDrive.getSimulatedDriveTrainPose());
         Logger.recordOutput("simconsole", "Periodics");
         // SmartDashboard.putNumber("heading", getRawHeading());
     }
@@ -355,6 +356,17 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         }
         periodicIO.cachedVel = getVel();
     }
+
+
+	public Orientation getPigeonOrientation(){
+		return new Orientation(
+			getPigeon2().getYaw().getValue(),
+			getPigeon2().getPitch().getValue(), 
+			getPigeon2().getRoll().getValue(), 
+			getPigeon2().getAngularVelocityZWorld().getValue(), 
+			getPigeon2().getAngularVelocityXWorld().getValue(), 
+			getPigeon2().getAngularVelocityYWorld().getValue());
+	}
 
     public boolean getIsAccel() {
         return periodicIO.isAccel;
@@ -448,10 +460,10 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
         // .setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
     }
 
-    // Probably want to moving average filter pitch and roll.
-    public boolean isBalanced(double thresholdDeg) {
-        return Math.abs(getRoll()) < thresholdDeg && Math.abs(getPitch()) < thresholdDeg;
-    }
+    // // Probably want to moving average filter pitch and roll.
+    // public boolean isBalanced(double thresholdDeg) {
+    //     return Math.abs(getRoll()) < thresholdDeg && Math.abs(getPitch()) < thresholdDeg;
+    // }
 
     public double getRawHeading() {
         
