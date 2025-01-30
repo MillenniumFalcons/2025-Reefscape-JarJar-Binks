@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
 // import team3647.frc2025.constants.SwerveDriveConstants;
 
 public class SwerveModule {
@@ -69,7 +70,6 @@ public class SwerveModule {
         this.kDrivePossibleMaxSpeedMPS = kDrivePossibleMaxSpeedMPS;
         this.lastAngle = getState().angle.getDegrees();
         resetToAbsolute();
-        
     }
 
     public double getDrivePos() {
@@ -157,9 +157,7 @@ public class SwerveModule {
         // assumes continuous controller which CTRE is not
 
         if (isOpenLoop) {
-            double percentOutput =
-                    desiredState.speedMetersPerSecond
-                            / kDrivePossibleMaxSpeedMPS;
+            double percentOutput = desiredState.speedMetersPerSecond / kDrivePossibleMaxSpeedMPS;
             dutyCycleOut.Output = percentOutput;
             driveMotor.setControl(dutyCycleOut);
             this.percentOut = percentOutput;
@@ -173,8 +171,7 @@ public class SwerveModule {
         }
 
         double angle =
-                (Math.abs(desiredState.speedMetersPerSecond)
-                                <= (kDrivePossibleMaxSpeedMPS * 0.01))
+                (Math.abs(desiredState.speedMetersPerSecond) <= (kDrivePossibleMaxSpeedMPS * 0.01))
                         ? lastAngle
                         : desiredState.angle.getDegrees();
         // Prevents Jittering.

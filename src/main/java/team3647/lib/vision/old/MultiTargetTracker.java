@@ -2,11 +2,10 @@ package team3647.lib.vision.old;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
-
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
 
 public class MultiTargetTracker {
     private final Map<AprilTagId, TrackedTarget> trackedTargets = new EnumMap<>(AprilTagId.class);

@@ -1,35 +1,25 @@
 package team3647.frc2025.subsystems;
 
-import static edu.wpi.first.units.Units.Radian;
-
 import com.ctre.phoenix6.hardware.TalonFX;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.Angle;
 import team3647.lib.TalonFXSubsystem;
 
 public class Coraler extends TalonFXSubsystem {
-    
 
-
-    public Coraler(TalonFX master,
+    public Coraler(
+            TalonFX master,
             double velocityConversion,
             double positionConversion,
             double nominalVoltage,
-            double kDt){
-                super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
-				
-            }
+            double kDt) {
+        super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
+    }
 
-	public void setDutyCycle(double percent){
-		setOpenloop(percent);
-	}
+    public void setDutyCycle(double percent) {
+        setOpenloop(percent);
+    }
 
-
-
-	@Override
-	public String getName() {
-		return "Coraler";
-	}
-
+    @Override
+    public String getName() {
+        return "Coraler";
+    }
 }

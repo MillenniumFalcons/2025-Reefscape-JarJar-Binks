@@ -129,7 +129,7 @@ public class Translation2d implements ITranslation2d<Translation2d> {
         return new Translation2d(x_ * s, y_ * s);
     }
 
-    public edu.wpi.first.math.geometry.Translation2d real(){
+    public edu.wpi.first.math.geometry.Translation2d real() {
         return new edu.wpi.first.math.geometry.Translation2d(x_, y_);
     }
 

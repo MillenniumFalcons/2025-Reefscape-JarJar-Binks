@@ -1,20 +1,18 @@
 package team3647.lib.team9442;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import team3647.lib.utils.Simshit;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import team3647.lib.utils.Simshit;
 
 public class AllianceChecker {
     private final List<AllianceObserver> observers = new ArrayList<>();
     private Optional<Alliance> alliance = DriverStation.getAlliance();
     private Alliance cachedColor = Alliance.Red;
-   
 
     public void registerObserver(AllianceObserver observer) {
         observers.add(observer);
@@ -27,7 +25,10 @@ public class AllianceChecker {
     }
 
     public void periodic() {
-        alliance = RobotBase.isReal()? DriverStation.getAlliance() : Simshit.toAlliance(DriverStationSim.getAllianceStationId());
+        alliance =
+                RobotBase.isReal()
+                        ? DriverStation.getAlliance()
+                        : Simshit.toAlliance(DriverStationSim.getAllianceStationId());
 
         alliance.ifPresent(
                 color -> {

@@ -3,10 +3,9 @@ package team3647.lib.vision.old;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
-import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
-
 import java.util.Comparator;
 import java.util.TreeMap;
+import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
 
 /** 254 GoalTrack class */
 public class TrackedTarget {

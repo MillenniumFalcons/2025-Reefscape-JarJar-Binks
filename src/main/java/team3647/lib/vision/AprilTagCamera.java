@@ -1,7 +1,6 @@
 package team3647.lib.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
-
 import java.util.List;
 import java.util.Optional;
 

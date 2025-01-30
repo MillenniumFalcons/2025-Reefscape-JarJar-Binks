@@ -2,33 +2,22 @@ package team3647.frc2025.constants;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Volts;
-
-import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.*;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import team3647.lib.team254.geometry.Translation2d;
 import team3647.lib.team254.swerve.SwerveDriveKinematics;
 import team3647.lib.team254.swerve.SwerveKinematicLimits;
@@ -82,7 +71,7 @@ public class SwerveDriveConstants {
     public static final double kTrackWidth = Units.Inches.of(19).in(Units.Meter);
     // distance between front and back wheels
 
-    public static final double kWheelBase =  Units.Inches.of(19).in(Units.Meter);
+    public static final double kWheelBase = Units.Inches.of(19).in(Units.Meter);
     // translations are locations of each module wheel
     // 0 --> ++ --> front left
     // 1 --> +- --> front right
@@ -103,13 +92,12 @@ public class SwerveDriveConstants {
 
     public static final SwerveKinematicLimits kTeleopKinematicLimits = new SwerveKinematicLimits();
 
-
     // public static final double defaultAccel = TunerConstants.kSpeedAt12VoltsMps / 0.1;
     public static final double shootingAccel = 13;
 
     static {
-        kTeleopKinematicLimits.kMaxDriveVelocity = 5; //TunerConstants.kSpeedAt12VoltsMps;
-        kTeleopKinematicLimits.kMaxDriveAcceleration = 5/0.1; //defaultAccel;
+        kTeleopKinematicLimits.kMaxDriveVelocity = 5; // TunerConstants.kSpeedAt12VoltsMps;
+        kTeleopKinematicLimits.kMaxDriveAcceleration = 5 / 0.1; // defaultAccel;
         kTeleopKinematicLimits.kMaxSteeringVelocity = Units.Degree.of(360).in(Units.Radians);
     }
 
@@ -194,8 +182,6 @@ public class SwerveDriveConstants {
     public static final PIDController kAutoSteerHeadingController = new PIDController(0.03, 0, 0);
     // PID constants for roll and yaw
 
-
-
     private static final SwerveModuleConstantsFactory ConstantCreator =
             new SwerveModuleConstantsFactory()
                     .withDriveMotorGearRatio(kDriveMotorGearRatio)
@@ -206,10 +192,12 @@ public class SwerveDriveConstants {
                     .withDriveMotorGains(kDriveGains)
                     .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
                     .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-                    .withSpeedAt12Volts(LinearVelocity.ofRelativeUnits(kDrivePossibleMaxSpeedMPS, edu.wpi.first.units.Units.MetersPerSecond))
+                    .withSpeedAt12Volts(
+                            LinearVelocity.ofRelativeUnits(
+                                    kDrivePossibleMaxSpeedMPS,
+                                    edu.wpi.first.units.Units.MetersPerSecond))
                     .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
                     .withCouplingGearRatio(kCouplingGearRatio);
-
 
     // is stored as reference?
 
@@ -266,39 +254,43 @@ public class SwerveDriveConstants {
 
         System.out.println(error);
     }
-    static double driveMOI = 
-        Units.Pound.of(120).in(Units.Kilogram)* 
-        (1/6) * Units.Inch.of(19).in(Units.Meter)*
-        Units.Inch.of(19).in(Units.Meter);
-        
-        
-    public static final DriveTrainSimulationConfig simConfig = DriveTrainSimulationConfig.Default()
-            .withTrackLengthTrackWidth(Units.Inch.of(27), Units.Inches.of(27))
-            .withGyro(COTS.ofPigeon2())
-            .withRobotMass(Units.Pound.of(125))
-            .withSwerveModule(new SwerveModuleSimulationConfig(
-                DCMotor.getFalcon500(1),
-                DCMotor.getFalcon500(1),
-                TunerConstants.FrontLeft.DriveMotorGearRatio,
-                TunerConstants.FrontLeft.SteerMotorGearRatio,
-                Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
-                Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
-                Inches.of(2),
-                KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
-                COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof))
-            .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
 
+    static double driveMOI =
+            Units.Pound.of(120).in(Units.Kilogram)
+                    * (1 / 6)
+                    * Units.Inch.of(19).in(Units.Meter)
+                    * Units.Inch.of(19).in(Units.Meter);
 
-			public static final DriveTrainSimulationConfig kBetterSimConfig = DriveTrainSimulationConfig.Default()
-            .withTrackLengthTrackWidth(Units.Inch.of(19), Units.Inches.of(19))
-            .withGyro(COTS.ofPigeon2())
-            .withRobotMass(Units.Pound.of(120))
-            .withSwerveModule(COTS.ofMark4i(
-                DCMotor.getKrakenX60Foc(1), 
-                DCMotor.getFalcon500Foc(1), 
-                COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof, 4))
-            .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
-            
+    public static final DriveTrainSimulationConfig simConfig =
+            DriveTrainSimulationConfig.Default()
+                    .withTrackLengthTrackWidth(Units.Inch.of(27), Units.Inches.of(27))
+                    .withGyro(COTS.ofPigeon2())
+                    .withRobotMass(Units.Pound.of(125))
+                    .withSwerveModule(
+                            new SwerveModuleSimulationConfig(
+                                    DCMotor.getFalcon500(1),
+                                    DCMotor.getFalcon500(1),
+                                    TunerConstants.FrontLeft.DriveMotorGearRatio,
+                                    TunerConstants.FrontLeft.SteerMotorGearRatio,
+                                    Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
+                                    Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
+                                    Inches.of(2),
+                                    KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
+                                    COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof))
+                    .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
+
+    public static final DriveTrainSimulationConfig kBetterSimConfig =
+            DriveTrainSimulationConfig.Default()
+                    .withTrackLengthTrackWidth(Units.Inch.of(19), Units.Inches.of(19))
+                    .withGyro(COTS.ofPigeon2())
+                    .withRobotMass(Units.Pound.of(120))
+                    .withSwerveModule(
+                            COTS.ofMark4i(
+                                    DCMotor.getKrakenX60Foc(1),
+                                    DCMotor.getFalcon500Foc(1),
+                                    COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof,
+                                    4))
+                    .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
 
     static {
     }

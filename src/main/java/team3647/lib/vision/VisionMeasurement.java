@@ -8,7 +8,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import java.util.Objects;
 // import org.photonvision.EstimatedRobotPose;
-
 import org.photonvision.EstimatedRobotPose;
 
 public class VisionMeasurement implements Comparable<VisionMeasurement> {

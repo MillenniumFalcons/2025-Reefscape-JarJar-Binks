@@ -5,28 +5,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class AutoMode {
 
-	public Command autoCommand;
+    public Command autoCommand;
 
-	public Pose2d startingPose;
+    public Pose2d startingPose;
 
-	public String name;
+    public String name;
 
-	public AutoMode(Command autoCommand, Pose2d startingPose, String name) {
-		this.autoCommand = autoCommand;
-		this.startingPose = startingPose;
-		this.name = name;
-	}
+    public AutoMode(Command autoCommand, Pose2d startingPose, String name) {
+        this.autoCommand = autoCommand;
+        this.startingPose = startingPose;
+        this.name = name;
+    }
 
-	public Command getAutoCommand() {
-		return autoCommand;
-	}
+    public Command getAutoCommand() {
+        return autoCommand;
+    }
 
-	public Pose2d getStartingPose() {
-		return startingPose;
-	}
+    public Pose2d getStartingPose() {
+        return startingPose;
+    }
 
-	public String getName() {
-		return name;
-	}
-
+    public String getName() {
+        return name;
+    }
 }

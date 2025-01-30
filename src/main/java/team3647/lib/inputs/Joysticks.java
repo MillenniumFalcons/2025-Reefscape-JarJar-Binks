@@ -113,6 +113,7 @@ public class Joysticks {
                 || Math.abs(getLeftStickY()) > 0.15
                 || Math.abs(getRightStickX()) > 0.15;
     }
+
     /**
      * Returns 0.0 if the given value is within the specified range around zero. The remaining range
      * between the deadband and 1.0 is scaled from 0.0 to 1.0.

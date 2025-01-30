@@ -1,36 +1,35 @@
 package team3647.frc2025.commands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.function.DoubleSupplier;
 import team3647.frc2025.subsystems.Coraler;
 
 public class CoralerCommands {
-	
-	public Command intake(){
-		return Commands.run(() -> coraler.setDutyCycle(-0.8), coraler);
-	}
 
+    public Command intake() {
+        return Commands.run(() -> coraler.setDutyCycle(-0.8), coraler);
+    }
 
-	public Command spitOut(){
-		return Commands.run(() -> coraler.setDutyCycle(0.5), coraler);
-	}
+    public Command spitOut() {
+        return Commands.run(() -> coraler.setDutyCycle(0.5), coraler);
+    }
 
-	public Command stow(){
-		return Commands.run(() -> coraler.setDutyCycle(-0.2), coraler);
-	}
+    public Command stow() {
+        return Commands.run(() -> coraler.setDutyCycle(-0.2), coraler);
+    }
 
-	public Command setOpenLoop(double percent){
-		return Commands.run(() -> coraler.setDutyCycle(percent), coraler);
-	}
+    public Command setOpenLoop(double percent) {
+        return Commands.run(() -> coraler.setDutyCycle(percent), coraler);
+    }
 
-	public Command setOpenLoop(DoubleSupplier percent){
-		return Commands.run(() -> coraler.setDutyCycle(percent.getAsDouble()), coraler);
-	}
+    public Command setOpenLoop(DoubleSupplier percent) {
+        return Commands.run(() -> coraler.setDutyCycle(percent.getAsDouble()), coraler);
+    }
 
-	public Coraler coraler;
-	public CoralerCommands(Coraler coraler){
-		this.coraler = coraler;
-	}
+    public Coraler coraler;
+
+    public CoralerCommands(Coraler coraler) {
+        this.coraler = coraler;
+    }
 }
