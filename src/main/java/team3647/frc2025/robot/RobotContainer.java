@@ -4,10 +4,15 @@
 
 package team3647.frc2025.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import team3647.frc2025.autos.AutoCommands;
@@ -16,6 +21,7 @@ import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.GlobalConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.constants.TunerConstants;
+import team3647.frc2025.constants.TunerSimConstants;
 import team3647.frc2025.subsystems.SwerveDrive;
 import team3647.lib.inputs.Joysticks;
 import team3647.lib.team9442.AllianceChecker;
@@ -30,6 +36,8 @@ public class RobotContainer {
         configureBindings();
         configureDefaultCommands();
         configureAllianceObservers();
+		SmartDashboard.putData(autoChooser);
+		swerve.setRobotPose(new Pose2d(2,2,new Rotation2d()));
     }
 
 
@@ -57,12 +65,12 @@ public class RobotContainer {
             SwerveDriveConstants.kDrivePossibleMaxSpeedMPS,
             SwerveDriveConstants.kRotPossibleMaxSpeedRadPerSec,
             GlobalConstants.kDt,
-            TunerConstants.FrontLeft,
-            TunerConstants.FrontRight,
-            TunerConstants.BackLeft,
-            TunerConstants.BackRight);
+            TunerSimConstants.FrontLeft,
+            TunerSimConstants.FrontRight,
+            TunerSimConstants.BackLeft,
+            TunerSimConstants.BackRight);
 
-    public final SwerveDriveCommands swerveCommands = new SwerveDriveCommands(swerve);
+    public final SwerveDriveCommands swerveCommands = new SwerveDriveCommands(swerve, MetersPerSecond.of(SwerveDriveConstants.kDrivePossibleMaxSpeedMPS));
 
     public final Joysticks mainController = new Joysticks(0);
 

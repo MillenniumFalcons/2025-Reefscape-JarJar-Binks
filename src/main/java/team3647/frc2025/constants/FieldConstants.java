@@ -44,6 +44,29 @@ public class FieldConstants {
         new Pose2d(16.384, 0.998, Rotation2d.fromRadians(-0.951))
     );
 
+	//andrew put the fries in the bag
+
+	//A1 is the left branch on the closest side, ccw from there
+	public enum ScoringPos{
+		A1(new Pose2d()),
+		A2(new Pose2d()),
+		B1(new Pose2d()),
+		B2(new Pose2d()),
+		C1(new Pose2d()),
+		C2(new Pose2d()),
+		D1(new Pose2d()),
+		D2(new Pose2d()),
+		E1(new Pose2d()),
+		E2(new Pose2d()),
+		F1(new Pose2d()),
+		F2(new Pose2d());
+
+		Pose2d pose;
+		ScoringPos(Pose2d pose){
+			this.pose = pose;
+		}
+	}
+
 
 	public static Distance kFieldLength = Centimeter.of(1755);
 	public static Distance kFieldWidth = Centimeter.of(805);

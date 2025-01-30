@@ -108,13 +108,13 @@ public abstract class TalonFXSubsystem implements PeriodicSubsystem {
         setOpenloop(0);
     }
 
-    public void setOpenloop(double output) {
+    protected void setOpenloop(double output) {
         controlMode = dutyCycle;
         ioAutoLogged.feedforward = 0;
         dutyCycle.Output = output;
     }
 
-    public void setVoltage(double voltage) {
+    protected void setVoltage(double voltage) {
         controlMode = voltageOut;
         ioAutoLogged.feedforward = 0;
         voltageOut.Output = voltage;
