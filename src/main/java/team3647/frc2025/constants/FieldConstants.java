@@ -45,22 +45,21 @@ public class FieldConstants {
                     new Pose2d(16.384, 7.109, Rotation2d.fromRadians(0.936)),
                     new Pose2d(16.384, 0.998, Rotation2d.fromRadians(-0.951)));
 
-    // andrew put the fries in the bag
-
     // A1 is the left branch on the closest side, ccw from there
+    // A1? AI? ccw? ccp? deepseek? dont ask deepseek to do 8*8 and turn it into a date
     public enum ScoringPos {
-        A1(new Pose2d()),
-        A2(new Pose2d()),
-        B1(new Pose2d()),
-        B2(new Pose2d()),
-        C1(new Pose2d()),
-        C2(new Pose2d()),
-        D1(new Pose2d()),
-        D2(new Pose2d()),
-        E1(new Pose2d()),
-        E2(new Pose2d()),
-        F1(new Pose2d()),
-        F2(new Pose2d());
+        A1(new Pose2d(3.153, 4.192, new Rotation2d(0))),
+        A2(new Pose2d(3.187, 3.861, new Rotation2d(0))),
+        B1(new Pose2d(3.688, 2.974, new Rotation2d(Math.PI / 3.0))),
+        B2(new Pose2d(3.9799, 2.818, new Rotation2d(Math.PI / 3.0))),
+        C1(new Pose2d(4.999, 2.8158, new Rotation2d((2.0 * Math.PI) / 3.0))),
+        C2(new Pose2d(5.282, 2.9829, new Rotation2d((2.0 * Math.PI) / 3.0))),
+        D1(new Pose2d(5.8026, 3.858, new Rotation2d(Math.PI))),
+        D2(new Pose2d(5.790, 4.1887, new Rotation2d(Math.PI))),
+        E1(new Pose2d(5.2765, 5.06289, new Rotation2d((4.0 * Math.PI) / 3.0))),
+        E2(new Pose2d(4.998, 5.2329, new Rotation2d((4.0 * Math.PI) / 3.0))),
+        F1(new Pose2d(3.9867, 5.2277, new Rotation2d((5.0 * Math.PI) / 3.0))),
+        F2(new Pose2d(3.7016, 5.06289, new Rotation2d((5.0 * Math.PI) / 3.0)));
 
         Pose2d pose;
 
