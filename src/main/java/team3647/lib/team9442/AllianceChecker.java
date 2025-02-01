@@ -13,6 +13,7 @@ public class AllianceChecker {
     private final List<AllianceObserver> observers = new ArrayList<>();
     private Optional<Alliance> alliance = DriverStation.getAlliance();
     private Alliance cachedColor = Alliance.Red;
+    private boolean firstRun = true;
 
     public void registerObserver(AllianceObserver observer) {
         observers.add(observer);
@@ -33,8 +34,9 @@ public class AllianceChecker {
         alliance.ifPresent(
                 color -> {
                     // DriverStation.reportError("Run method? " + (cachedColor != color), false);
-                    if (cachedColor != color) {
+                    if (cachedColor != color || firstRun) {
                         observers.forEach(observer -> observer.onAllianceFound(color));
+                        if (firstRun) firstRun = false;
                     }
                     cachedColor = color;
                 });

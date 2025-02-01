@@ -4,7 +4,9 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pound;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -19,6 +21,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentric;
 import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
 import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveRotation;
+import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveSteerGains;
+import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveTranslation;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,6 +44,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import java.util.function.DoubleSupplier;
@@ -44,6 +52,7 @@ import org.ironmaple.simulation.drivesims.COTS;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.sim.MapleSimSwerveDrivetrain;
+import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.constants.TunerConstants;
 import team3647.lib.ModifiedSignalLogger;
@@ -78,21 +87,21 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
 
     private double cachedSpeed = 0;
 
-    private SysIdRoutine m_driveSysIdRoutine;
+    private final SysIdRoutine m_driveSysIdRoutine;
 
-    private SysIdRoutine m_steerSysIdRoutine;
+    private final SysIdRoutine m_steerSysIdRoutine;
 
-    private SysIdRoutine spinSysIdRoutine;
+    private final SysIdRoutine kSpinSysIdRoutine;
+
+    private final SysIdRoutine kTurnMotorRoutineVoltage;
+
+    private final SysIdRoutine xControllerTuning;
+    private final SysIdRoutine yControllerTuning;
+    private final SysIdRoutine rotControllerTuning;
 
     Notifier m_simNotifier;
 
     private static final double kSimLoopPeriod = 0.002;
-
-    // private final DriveTrainSimulationConfig simConfig;
-
-    // private final SelfControlledSwerveDriveSimulation simpleSim;
-
-    // public final SwerveDriveSimulation swerveSim;
 
     MapleSimSwerveDrivetrain simDrive;
 
@@ -144,6 +153,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
 
         public SwerveRequest masterRequest = new SwerveRequest.Idle();
         public SysIdSwerveRotation spinSysidRequest = new SysIdSwerveRotation();
+        public SysIdSwerveTranslation driveVoltageRequest = new SysIdSwerveTranslation();
+        public SysIdSwerveSteerGains steerVoltageRequest = new SysIdSwerveSteerGains();
         public SwerveFOCRequest driveFOCRequest = new SwerveFOCRequest(true);
         public SwerveFOCRequest steerFOCRequest = new SwerveFOCRequest(false);
         public FieldCentric fieldCentric =
@@ -172,17 +183,26 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         this.maxRotRadPerSec = maxRotRadPerSec;
         this.kDt = kDt;
 
-        // this.swerveSim = new SwerveDriveSimulation(simConfig, new Pose2d(2,2,new
-        // Rotation2d()));
-
         this.setpointGenerator = new SwerveSetpointGenerator(SwerveDriveConstants.kDriveKinematics);
 
         this.limits = SwerveDriveConstants.kTeleopKinematicLimits;
 
-        // this.simpleSim = new SelfControlledSwerveDriveSimulation(swerveSim);
-
-        // this.simpleSim.withCurrentLimits(Amp.of(60), Amp.of(20));
-        // this.simpleSim.withSteerPID(new PIDController(1, 0, 0.2));
+        this.kTurnMotorRoutineVoltage =
+                new SysIdRoutine(
+                        new SysIdRoutine.Config(
+                                null, // Use default ramp rate (1 V/s)
+                                Volts.of(7), // Use dynamic voltage of 7 V
+                                null, // Use default timeout (10 s)
+                                // Log state with SignalLogger class
+                                state ->
+                                        SignalLogger.writeString(
+                                                "SysIdSteer_State", state.toString())),
+                        new SysIdRoutine.Mechanism(
+                                volts ->
+                                        setControl(periodicIO.steerVoltageRequest.withVolts(volts)),
+                                null,
+                                this,
+                                "steer motor voltage"));
 
         this.m_driveSysIdRoutine =
                 new SysIdRoutine(
@@ -197,7 +217,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                                                 periodicIO.driveFOCRequest.withVoltage(
                                                         volts.in(Units.Volts))),
                                 null,
-                                this));
+                                this,
+                                "Drive motor foc"));
 
         this.m_steerSysIdRoutine =
                 new SysIdRoutine(
@@ -212,9 +233,10 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                                                 periodicIO.steerFOCRequest.withVoltage(
                                                         volts.in(Units.Volts))),
                                 null,
-                                this));
+                                this,
+                                "steer motor FOC"));
 
-        this.spinSysIdRoutine =
+        this.kSpinSysIdRoutine =
                 new SysIdRoutine(
                         new SysIdRoutine.Config(
                                 Units.Volts.of(1).per(Second),
@@ -227,47 +249,94 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                                                 periodicIO.spinSysidRequest.withRotationalRate(
                                                         volts.in(Units.Volts))),
                                 null,
-                                this));
+                                this,
+                                "Robot MOI Characterization"));
 
-        // AutoBuilder.configure(
-        // this::getOdoPose, // Robot pose supplier
-        // this::resetPose, // Method to reset odometry (will be called if your auto has
-        // a starting pose)
-        // this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        // (ChassisSpeeds speeds) ->
-        // this.drive(
-        // speeds.vxMetersPerSecond,
-        // speeds.vyMetersPerSecond,
-        // speeds.omegaRadiansPerSecond), // Method that will drive the robot given
-        // ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module
-        // feedforwards
-        // new PPHolonomicDriveController( // PPHolonomicController is the built in path
-        // following controller for holonomic drive trains
-        // new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-        // new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-        // ),
-        // RobotConfig.fromGUISettings(),
-        // () -> {
-        // // Boolean supplier that controls when the path will be mirrored for the red
-        // alliance
-        // // This will flip the path being followed to the red side of the field.
-        // // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+        // "voltage" is velocity and "Velocity" is position and "position" is the integral of
+        // position ig idk
+        this.xControllerTuning =
+                new SysIdRoutine(
+                        new Config(
+                                Volts.of(0.4).per(Seconds),
+                                Volts.of(0.6),
+                                Seconds.of(10),
+                                ModifiedSignalLogger.logState()),
+                        new Mechanism(
+                                (xVel) -> driveFieldOriented(xVel.in(Volts), 0, 0),
+                                null,
+                                this,
+                                getName() + " X Controller"));
 
-        // var alliance = DriverStation.getAlliance();
-        // if (alliance.isPresent()) {
-        // return alliance.get() == DriverStation.Alliance.Red;
-        // }
-        // return false;
-        // },
-        // this // Reference to this subsystem to set requirements
-        // );
+        this.yControllerTuning =
+                new SysIdRoutine(
+                        new Config(
+                                Volts.of(0.2).per(Seconds),
+                                Volts.of(0.6),
+                                Seconds.of(5),
+                                ModifiedSignalLogger.logState()),
+                        new Mechanism(
+                                (yVel) -> drive(0, yVel.in(Volts), 0),
+                                null,
+                                this,
+                                getName() + " Y Controller"));
+
+        this.rotControllerTuning =
+                new SysIdRoutine(
+                        new Config(
+                                Volts.of(0.4).per(Seconds),
+                                Volts.of(0.8),
+                                Seconds.of(10),
+                                ModifiedSignalLogger.logState()),
+                        new Mechanism(
+                                (rotVel) -> drive(0, 0, rotVel.in(Volts)),
+                                null,
+                                this,
+                                getName() + " Rot Controller"));
+
+        AutoBuilder.configure(
+                this::getOdoPose, // Robot pose supplier
+                this::resetPose, // Method to reset odometry (will be called if your auto has a
+                // starting pose)
+                this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (ChassisSpeeds speeds) ->
+                        this.drive(
+                                speeds.vxMetersPerSecond,
+                                speeds.vyMetersPerSecond,
+                                speeds.omegaRadiansPerSecond), // Method that will drive the robot
+                // given ROBOT RELATIVE
+                // ChassisSpeeds. Also optionally outputs individual module
+                // feedforwards
+                new PPHolonomicDriveController( // PPHolonomicController is the built in path
+                        // following controller for
+                        // holonomic drive trains
+                        new PIDConstants(
+                                AutoConstants.xController.getP(),
+                                AutoConstants.xController.getI(),
+                                AutoConstants.xController.getD()), // Translation PID constants
+                        new PIDConstants(
+                                AutoConstants.rotController.getP(),
+                                AutoConstants.rotController.getI(),
+                                AutoConstants.rotController.getD()) // Rotation PID constants
+                        ),
+                AutoConstants.ppRobotConfig,
+                () -> {
+                    // Boolean supplier that controls when the path will be mirrored for the red
+
+                    // This will flip the path being followed to the red side of the field.
+                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+                    var alliance = DriverStation.getAlliance();
+                    if (alliance.isPresent()) {
+                        return alliance.get() == DriverStation.Alliance.Red;
+                    }
+                    return false;
+                },
+                this // Reference to this subsystem to set requirements
+                );
 
         if (Utils.isSimulation()) {
             startSimThread();
         }
-
-        // SimulatedArena.getInstance().addDriveTrainSimulation(simpleSim.getDriveTrainSimulation());
-
     }
 
     private void startSimThread() {
@@ -325,10 +394,12 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         setisAccel();
         this.setControl(periodicIO.masterRequest);
         // simpleSim.periodic();
-        Logger.recordOutput("simRobot/drive", simDrive.mapleSimDrive.getSimulatedDriveTrainPose());
-        Logger.recordOutput("simRobot/states", periodicIO.states);
-        Logger.recordOutput("simRobot/targets", periodicIO.targets);
-
+        if (RobotBase.isSimulation()) {
+            Logger.recordOutput(
+                    "simRobot/drive", simDrive.mapleSimDrive.getSimulatedDriveTrainPose());
+            Logger.recordOutput("simRobot/states", periodicIO.states);
+            Logger.recordOutput("simRobot/targets", periodicIO.targets);
+        }
         // SmartDashboard.putNumber("heading", getRawHeading());
     }
 

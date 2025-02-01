@@ -11,6 +11,7 @@ import team3647.frc2025.commands.CoralerCommands;
 import team3647.frc2025.commands.ElevatorCommands;
 import team3647.frc2025.commands.PivotCommands;
 import team3647.frc2025.constants.ElevatorConstants;
+import team3647.frc2025.constants.FieldConstants.ScoringPos;
 import team3647.frc2025.constants.PivotConstants;
 
 public class Superstructure {
@@ -25,7 +26,9 @@ public class Superstructure {
 
     private final BooleanSupplier isAligned;
 
-    private final Level wantedLevel;
+    private Level wantedLevel;
+
+    public ScoringPos wantedScoringPos = ScoringPos.NONE;
 
     public Superstructure(
             Coraler coraler, Elevator elevator, Pivot pivot, BooleanSupplier isAligned) {

@@ -24,10 +24,12 @@ public class Robot extends LoggedRobot {
 
     private final boolean isReplay = false;
 
+    private final boolean rio1 = true;
+
     public Robot() {
         Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
-        if (isReal()) {
+        if (isReal() && !rio1) {
             Logger.addDataReceiver(
                     new WPILOGWriter(
                             RobotBase.isReal()
@@ -35,6 +37,9 @@ public class Robot extends LoggedRobot {
                                     : "logs")); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             new PowerDistribution(1, ModuleType.kRev); // Enables power distribution nlogging
+        } else if (isReal() && rio1) {
+            Logger.addDataReceiver(new NT4Publisher());
+
         } else {
             setUseTiming(false); // Run as fast as possible
             if (isReplay) {

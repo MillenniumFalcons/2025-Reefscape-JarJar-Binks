@@ -7,14 +7,10 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
-import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.LinearVelocity;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
@@ -180,24 +176,25 @@ public class SwerveDriveConstants {
     public static final PIDController kAutoSteerXYPIDController = new PIDController(0.05, 0, 0);
     // 3*Pi = move at 10 rads per second if we are 180* away from target heading
     public static final PIDController kAutoSteerHeadingController = new PIDController(0.03, 0, 0);
+
     // PID constants for roll and yaw
 
-    private static final SwerveModuleConstantsFactory ConstantCreator =
-            new SwerveModuleConstantsFactory()
-                    .withDriveMotorGearRatio(kDriveMotorGearRatio)
-                    .withSteerMotorGearRatio(kTurnMotorGearRatio)
-                    .withWheelRadius(kWheelRadiusInches)
-                    .withSlipCurrent(300)
-                    .withSteerMotorGains(kTurnGains)
-                    .withDriveMotorGains(kDriveGains)
-                    .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-                    .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-                    .withSpeedAt12Volts(
-                            LinearVelocity.ofRelativeUnits(
-                                    kDrivePossibleMaxSpeedMPS,
-                                    edu.wpi.first.units.Units.MetersPerSecond))
-                    .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
-                    .withCouplingGearRatio(kCouplingGearRatio);
+    // private static final SwerveModuleConstantsFactory ConstantCreator =
+    //         new SwerveModuleConstantsFactory()
+    //                 .withDriveMotorGearRatio(kDriveMotorGearRatio)
+    //                 .withSteerMotorGearRatio(kTurnMotorGearRatio)
+    //                 .withWheelRadius(kWheelRadiusInches)
+    //                 .withSlipCurrent(300)
+    //                 .withSteerMotorGains(kTurnGains)
+    //                 .withDriveMotorGains(kDriveGains)
+    //                 .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+    //                 .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+    //                 .withSpeedAt12Volts(
+    //                         LinearVelocity.ofRelativeUnits(
+    //                                 kDrivePossibleMaxSpeedMPS,
+    //                                 edu.wpi.first.units.Units.MetersPerSecond))
+    //                 .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
+    //                 .withCouplingGearRatio(kCouplingGearRatio);
 
     // is stored as reference?
 
