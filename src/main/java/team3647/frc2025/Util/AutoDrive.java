@@ -1,5 +1,7 @@
 package team3647.frc2025.Util;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
@@ -7,9 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-
-import static edu.wpi.first.units.Units.Inches;
-
+import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
@@ -31,14 +31,16 @@ public class AutoDrive implements AllianceObserver {
 
     private List<Pose2d> sourcePoses;
 
-	private final List<Pose2d> redSourcePoses;
-	private final List<Pose2d> blueSourcePoses;
+    private final List<Pose2d> redSourcePoses;
+    private final List<Pose2d> blueSourcePoses;
+
+    public boolean enabled = true;
 
     public AutoDrive(
             Supplier<Pose2d> odoPoseFunction,
             Supplier<ScoringPos> wantedScoringPose,
             List<Pose2d> redSourcePoses,
-			List<Pose2d> blueSourcePoses,
+            List<Pose2d> blueSourcePoses,
             PIDController xController,
             PIDController yController,
             PIDController rotController) {
@@ -48,9 +50,9 @@ public class AutoDrive implements AllianceObserver {
         this.rotController = rotController;
         this.wantedScoringPos = wantedScoringPose;
         this.redSourcePoses = redSourcePoses;
-		this.blueSourcePoses = blueSourcePoses;
+        this.blueSourcePoses = blueSourcePoses;
 
-		this.sourcePoses = color == Alliance.Red? redSourcePoses : blueSourcePoses;
+        this.sourcePoses = color == Alliance.Red ? redSourcePoses : blueSourcePoses;
     }
 
     public enum DriveMode {
@@ -62,6 +64,18 @@ public class AutoDrive implements AllianceObserver {
 
     public Pose2d getPose() {
         return odoPoseFunction.get();
+    }
+
+    public Command enableAutoDrive() {
+        return Commands.runOnce(() -> this.enabled = true);
+    }
+
+    public Command disableAutoDrive() {
+        return Commands.runOnce(() -> this.enabled = false);
+    }
+
+    public boolean getAutoDriveEnabled() {
+        return enabled;
     }
 
     // TODO: ground intake implementatoin
@@ -122,19 +136,21 @@ public class AutoDrive implements AllianceObserver {
                 0);
     }
 
+    public boolean isAlignedToReef() {
+        return PoseUtils.inCircle(getPose(), wantedScoringPos.get().pose, Inches.of(4));
+    }
 
-	public boolean isAlignedToReef(){
-		return PoseUtils.inCircle(getPose(), wantedScoringPos.get().pose, Inches.of(4));
-	}
+    public DriveMode getWantedMode() {
+        return wantedMode;
+    }
 
-
-	public Twist2d getVelocities(){
-		return new Twist2d(getX(), getY(), getRot());
-	}
+    public Twist2d getVelocities() {
+        return new Twist2d(getX(), getY(), getRot());
+    }
 
     @Override
     public void onAllianceFound(Alliance color) {
-		sourcePoses = color == Alliance.Red? redSourcePoses : blueSourcePoses;
+        sourcePoses = color == Alliance.Red ? redSourcePoses : blueSourcePoses;
         this.color = color;
     }
 }

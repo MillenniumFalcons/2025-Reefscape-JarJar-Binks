@@ -96,7 +96,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
 
     private final SysIdRoutine kTurnMotorRoutineVoltage;
 
-	private final SysIdRoutine wantedRoutine;
+    private final SysIdRoutine wantedRoutine;
 
     private final SysIdRoutine xControllerTuning;
     private final SysIdRoutine yControllerTuning;
@@ -171,7 +171,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
             double maxSpeedMpS,
             double maxRotRadPerSec,
             double kDt,
-			RobotConfig ppRobotConfig,
+            RobotConfig ppRobotConfig,
             SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
                             ...
                     swerveModuleConstants) {
@@ -256,8 +256,9 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                                 this,
                                 "Robot MOI Characterization"));
 
-        // "voltage" is velocity and "Velocity" is also velocity and "position" is position in the sysid app
-		//^ will lead to shit ff gains but hopefully good pid gains
+        // "voltage" is velocity and "Velocity" is also velocity and "position" is position in the
+        // sysid app
+        // ^ will lead to shit ff gains but hopefully good pid gains
         this.xControllerTuning =
                 new SysIdRoutine(
                         new Config(
@@ -270,8 +271,9 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                                 null,
                                 this,
                                 getName() + " X Controller"));
-        // "voltage" is velocity and "Velocity" is also velocity and "position" is position for the sysid app
-		//^ will lead to shit ff gains but hopefully good pid gains
+        // "voltage" is velocity and "Velocity" is also velocity and "position" is position for the
+        // sysid app
+        // ^ will lead to shit ff gains but hopefully good pid gains
         this.yControllerTuning =
                 new SysIdRoutine(
                         new Config(
@@ -342,7 +344,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         if (Utils.isSimulation()) {
             startSimThread();
         }
-		wantedRoutine = this.m_driveSysIdRoutine;
+        wantedRoutine = this.m_driveSysIdRoutine;
     }
 
     private void startSimThread() {
@@ -400,8 +402,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         setisAccel();
         this.setControl(periodicIO.masterRequest);
         // simpleSim.periodic();
-		Logger.recordOutput("robot/targets", periodicIO.targets);
-		Logger.recordOutput("robot/states", periodicIO.states);
+        Logger.recordOutput("robot/targets", periodicIO.targets);
+        Logger.recordOutput("robot/states", periodicIO.states);
         if (RobotBase.isSimulation()) {
             Logger.recordOutput(
                     "simRobot/drive", simDrive.mapleSimDrive.getSimulatedDriveTrainPose());
@@ -468,8 +470,6 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         return m_driveSysIdRoutine.quasistatic(direction);
     }
 
-	
-
     public Command runDriveDynamTestFOC(SysIdRoutine.Direction direction) {
         return m_driveSysIdRoutine.dynamic(direction);
     }
@@ -481,8 +481,6 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     public Command runSteerDynamTestFOC(SysIdRoutine.Direction direction) {
         return m_steerSysIdRoutine.dynamic(direction);
     }
-
-	
 
     public void setRobotPose(Pose2d pose) {
         if (RobotBase.isSimulation()) {

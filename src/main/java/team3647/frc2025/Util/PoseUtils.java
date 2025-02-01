@@ -11,7 +11,7 @@ public class PoseUtils {
         return Math.abs(pose.getTranslation().getDistance(center.getTranslation())) <= radius;
     }
 
-	public static boolean inCircle(Pose2d pose, Pose2d center, Distance radius) {
+    public static boolean inCircle(Pose2d pose, Pose2d center, Distance radius) {
         return inCircle(pose, center, radius.in(Meter));
     }
 }

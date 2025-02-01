@@ -27,8 +27,6 @@ public class Pivot extends TalonFXSubsystem {
             double kDt) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
 
-        
-
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;
 

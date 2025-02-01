@@ -46,12 +46,17 @@ public class AutoConstants {
         try {
             ppRobotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
-            ppRobotConfig = new RobotConfig(Kilogram.of(74), KilogramSquareMeters.of(6.883), ppModuleConfig, new Translation2d[]{
-				new Translation2d(),
-				new Translation2d(),
-				new Translation2d(),
-				new Translation2d()
-			});
+            ppRobotConfig =
+                    new RobotConfig(
+                            Kilogram.of(74),
+                            KilogramSquareMeters.of(6.883),
+                            ppModuleConfig,
+                            new Translation2d[] {
+                                new Translation2d(),
+                                new Translation2d(),
+                                new Translation2d(),
+                                new Translation2d()
+                            });
 
             DriverStation.reportError(
                     "problem setting pp robot config from gui", e.getStackTrace());

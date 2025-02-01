@@ -1,21 +1,12 @@
 package team3647.frc2025.constants;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
-import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import team3647.lib.team254.geometry.Translation2d;
 import team3647.lib.team254.swerve.SwerveDriveKinematics;
 import team3647.lib.team254.swerve.SwerveKinematicLimits;
@@ -179,28 +170,45 @@ public class SwerveDriveConstants {
     // 3*Pi = move at 10 rads per second if we are 180* away from target heading
     public static final PIDController kAutoSteerHeadingController = new PIDController(0.03, 0, 0);
 
+    public static final Slot0Configs BRSteerGains =
+            new Slot0Configs()
+                    .withKP(12.003)
+                    .withKI(0)
+                    .withKD(0.20649)
+                    .withKS(0.043482)
+                    .withKV(1.3384)
+                    .withKA(0.022826)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
-	 public static final Slot0Configs BRSteerGains = new Slot0Configs()
-        .withKP(12.003).withKI(0).withKD(0.20649)
-        .withKS(0.043482).withKV(1.3384).withKA(0.022826)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+    public static final Slot0Configs FLSteerGains =
+            new Slot0Configs()
+                    .withKP(16.447)
+                    .withKI(0)
+                    .withKD(0.31333)
+                    .withKS(0.0023325)
+                    .withKV(1.3182)
+                    .withKA(0.028693)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
-		
-	public static final Slot0Configs FLSteerGains = new Slot0Configs()
-        .withKP(16.447).withKI(0).withKD(0.31333)
-        .withKS(0.0023325).withKV(1.3182).withKA(0.028693)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+    public static final Slot0Configs BLSteerGains =
+            new Slot0Configs()
+                    .withKP(12.003)
+                    .withKI(0)
+                    .withKD(0.20649)
+                    .withKS(0.0083355)
+                    .withKV(1.3171)
+                    .withKA(0.020266)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
-
-	public static final Slot0Configs BLSteerGains = new Slot0Configs()
-        .withKP(12.003).withKI(0).withKD(0.20649)
-        .withKS(0.0083355).withKV(1.3171).withKA(0.020266)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
-
-	public static final Slot0Configs FRSteerGains = new Slot0Configs()
-        .withKP(8.353).withKI(0).withKD(0.53316)
-        .withKS(0.046629).withKV(1.3239).withKA(0.030673)
-        .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+    public static final Slot0Configs FRSteerGains =
+            new Slot0Configs()
+                    .withKP(8.353)
+                    .withKI(0)
+                    .withKD(0.53316)
+                    .withKS(0.046629)
+                    .withKV(1.3239)
+                    .withKA(0.030673)
+                    .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // PID constants for roll and yaw
 
@@ -297,7 +305,8 @@ public class SwerveDriveConstants {
     //                                 Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
     //                                 Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
     //                                 Inches.of(2),
-    //                                 KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
+    //
+    // KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
     //                                 COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof))
     //                 .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
 

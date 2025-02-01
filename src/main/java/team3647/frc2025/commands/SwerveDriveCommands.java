@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
 import team3647.frc2025.Util.AutoDrive.DriveMode;
 import team3647.frc2025.subsystems.SwerveDrive;
 import team3647.lib.team9442.AllianceObserver;
@@ -37,13 +36,13 @@ public class SwerveDriveCommands implements AllianceObserver {
             DoubleSupplier x, // X axis on joystick is Left/Right
             DoubleSupplier y, // Y axis on Joystick is Front/Back
             DoubleSupplier rot,
-			Supplier<Twist2d> autoDriveVelocities,
-			Supplier<DriveMode> getMode,
-			BooleanSupplier autoDriveEnabled) {
+            Supplier<Twist2d> autoDriveVelocities,
+            Supplier<DriveMode> getMode,
+            BooleanSupplier autoDriveEnabled) {
         return Commands.run(
                 () -> {
-					var isAutoDrive = autoDriveEnabled.getAsBoolean();
-					var velocities = autoDriveVelocities.get();
+                    var isAutoDrive = autoDriveEnabled.getAsBoolean();
+                    var velocities = autoDriveVelocities.get();
                     double invert = color == Alliance.Red ? -1 : 1;
 
                     double ySquared =
@@ -55,26 +54,29 @@ public class SwerveDriveCommands implements AllianceObserver {
                     double motionYComponent = xSquared * invert * kMaxSpeed.in(MetersPerSecond);
                     double motionTurnComponent =
                             rot.getAsDouble() * -1 * kMaxSpeed.in(MetersPerSecond);
-				if (!isAutoDrive || getMode.get().equals(DriveMode.NONE)) {
-					swerve.driveFieldOriented(motionXComponent, motionYComponent, motionTurnComponent);
-				}
+                    if (!isAutoDrive || getMode.get().equals(DriveMode.NONE)) {
+                        swerve.driveFieldOriented(
+                                motionXComponent, motionYComponent, motionTurnComponent);
+                    }
 
-				if (isAutoDrive && (getMode.get().equals(DriveMode.SCORE) || getMode.get().equals(DriveMode.SRCINTAKE))) {
-					motionXComponent = velocities.dx + motionXComponent * 0.3;
-					motionYComponent = velocities.dy + motionYComponent * 0.3;
-					motionTurnComponent = velocities.dtheta + motionTurnComponent + 0.2;
+                    if (isAutoDrive
+                            && (getMode.get().equals(DriveMode.SCORE)
+                                    || getMode.get().equals(DriveMode.SRCINTAKE))) {
+                        motionXComponent = velocities.dx + motionXComponent * 0.3;
+                        motionYComponent = velocities.dy + motionYComponent * 0.3;
+                        motionTurnComponent = velocities.dtheta + motionTurnComponent + 0.2;
 
-					swerve.driveFieldOriented(motionXComponent, motionYComponent, motionTurnComponent);
-				}
+                        swerve.driveFieldOriented(
+                                motionXComponent, motionYComponent, motionTurnComponent);
+                    }
 
-				if (isAutoDrive && getMode.get().equals(DriveMode.INTAKE)) {
-					motionXComponent = velocities.dx;
-					motionYComponent = velocities.dy;
-					motionTurnComponent = velocities.dtheta;
+                    if (isAutoDrive && getMode.get().equals(DriveMode.INTAKE)) {
+                        motionXComponent = velocities.dx;
+                        motionYComponent = velocities.dy;
+                        motionTurnComponent = velocities.dtheta;
 
-					swerve.drive(motionXComponent, motionYComponent, motionTurnComponent);
-				}
-
+                        swerve.drive(motionXComponent, motionYComponent, motionTurnComponent);
+                    }
                 },
                 swerve);
     }

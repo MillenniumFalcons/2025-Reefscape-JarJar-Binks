@@ -10,7 +10,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import team3647.frc2025.Util.AutoDrive;
@@ -41,146 +40,164 @@ import team3647.lib.vision.AprilTagPhotonVision;
 import team3647.lib.vision.VisionController;
 
 public class RobotContainer {
-	public RobotContainer() {
-		configureBindings();
-		configureDefaultCommands();
-		configureAllianceObservers();
-		SmartDashboard.putData(autoChooser);
-		swerve.setRobotPose(new Pose2d(2, 2, new Rotation2d()));
-		superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
-	}
+    public RobotContainer() {
+        configureBindings();
+        configureDefaultCommands();
+        configureAllianceObservers();
+        SmartDashboard.putData(autoChooser);
+        swerve.setRobotPose(new Pose2d(2, 2, new Rotation2d()));
+        superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
+    }
 
-	private void configureAllianceObservers() {
-		allianceChecker.registerObservers(
-				swerveCommands, swerve, swerveCommands, autoCommands, autoChooser);
-	}
+    private void configureAllianceObservers() {
+        allianceChecker.registerObservers(
+                swerveCommands, swerve, swerveCommands, autoCommands, autoChooser);
+    }
 
-	private void configureBindings() {
+    private void configureBindings() {
 
-		// cocontroller selecting the branch you wanna score coral on
-		coController.buttonA
-				.and(coController.buttonB.negate())
-				.and(coController.buttonX.negate())
-				.onTrue(superstructure.setWantedSide(Side.A))
-				.debounce(0.1);
+        // cocontroller selecting the branch you wanna score coral on
+        coController
+                .buttonA
+                .and(coController.buttonB.negate())
+                .and(coController.buttonX.negate())
+                .onTrue(superstructure.setWantedSide(Side.A))
+                .debounce(0.1);
 
-		coController.buttonA.and(coController.buttonB).onTrue(superstructure.setWantedSide(Side.B));
+        coController.buttonA.and(coController.buttonB).onTrue(superstructure.setWantedSide(Side.B));
 
-		coController.buttonB.and(coController.buttonY).onTrue(superstructure.setWantedSide(Side.C));
+        coController.buttonB.and(coController.buttonY).onTrue(superstructure.setWantedSide(Side.C));
 
-		coController.buttonY
-				.and(coController.buttonB.negate())
-				.and(coController.buttonX.negate())
-				.onTrue(superstructure.setWantedSide(Side.D))
-				.debounce(0.1);
+        coController
+                .buttonY
+                .and(coController.buttonB.negate())
+                .and(coController.buttonX.negate())
+                .onTrue(superstructure.setWantedSide(Side.D))
+                .debounce(0.1);
 
-		coController.buttonY.and(coController.buttonX).onTrue(superstructure.setWantedSide(Side.E));
+        coController.buttonY.and(coController.buttonX).onTrue(superstructure.setWantedSide(Side.E));
 
-		coController.buttonX.and(coController.buttonA).onTrue(superstructure.setWantedSide(Side.F));
+        coController.buttonX.and(coController.buttonA).onTrue(superstructure.setWantedSide(Side.F));
 
-		coController.leftBumper.onTrue(superstructure.setWantedBranch(Branch.ONE));
+        coController.leftBumper.onTrue(superstructure.setWantedBranch(Branch.ONE));
 
-		coController.rightBumper.onTrue(superstructure.setWantedBranch(Branch.TWO));
+        coController.rightBumper.onTrue(superstructure.setWantedBranch(Branch.TWO));
 
-		coController.dPadUp.onTrue(superstructure.setWantedLevel(Level.HIGH));
+        coController.dPadUp.onTrue(superstructure.setWantedLevel(Level.HIGH));
 
-		coController.dPadRight.onTrue(superstructure.setWantedLevel(Level.MID));
+        coController.dPadRight.onTrue(superstructure.setWantedLevel(Level.MID));
 
-		coController.dPadDown.onTrue(superstructure.setWantedLevel(Level.LOW));
+        coController.dPadDown.onTrue(superstructure.setWantedLevel(Level.LOW));
 
-		coController.dPadLeft.onTrue(superstructure.setWantedLevel(Level.TROUGH));
-	}
+        coController.dPadLeft.onTrue(superstructure.setWantedLevel(Level.TROUGH));
 
-	private void configureDefaultCommands() {
-		swerve.setDefaultCommand(
-				swerveCommands.driveCmd(
-						mainController::getLeftStickX,
-						mainController::getLeftStickY,
-						mainController::getRightStickX));
-	}
+        coController.rightMidButton.onTrue(autoDrive.enableAutoDrive());
 
-	public Command getAutonomousCommand() {
-		return autoChooser.getSelected().getAutoCommand();
-	}
+        coController.leftMidButton.onTrue(autoDrive.disableAutoDrive());
+    }
 
-	@SuppressWarnings("unchecked")
-	public final SwerveDrive swerve = new SwerveDrive(
-			TunerConstants.DrivetrainConstants,
-			SwerveDriveConstants.kDrivePossibleMaxSpeedMPS,
-			SwerveDriveConstants.kRotPossibleMaxSpeedRadPerSec,
-			GlobalConstants.kDt,
-			AutoConstants.ppRobotConfig,
-			TunerSimConstants.FrontLeft,
-			TunerSimConstants.FrontRight,
-			TunerSimConstants.BackLeft,
-			TunerSimConstants.BackRight);
+    private void configureDefaultCommands() {
+        swerve.setDefaultCommand(
+                swerveCommands.driveCmd(
+                        mainController::getLeftStickX,
+                        mainController::getLeftStickY,
+                        mainController::getRightStickX,
+                        autoDrive::getVelocities,
+                        autoDrive::getWantedMode,
+                        autoDrive::getAutoDriveEnabled));
+    }
 
-	public final Coraler coraler = new Coraler(
-		CoralerConstants.kMaster, 
-		0, 
-		0, 
-		GlobalConstants.kNominalVoltage,
-		GlobalConstants.kDt);
+    public Command getAutonomousCommand() {
+        return autoChooser.getSelected().getAutoCommand();
+    }
 
-	public final Elevator elevator = new Elevator(
-		ElevatorConstants.kMaster, 
-		ElevatorConstants.kSlave, 
-		0, 
-		0,
-		GlobalConstants.kNominalVoltage, 
-		0, 
-		0, 
-		0, 
-		GlobalConstants.kDt);
+    @SuppressWarnings("unchecked")
+    public final SwerveDrive swerve =
+            new SwerveDrive(
+                    TunerConstants.DrivetrainConstants,
+                    SwerveDriveConstants.kDrivePossibleMaxSpeedMPS,
+                    SwerveDriveConstants.kRotPossibleMaxSpeedRadPerSec,
+                    GlobalConstants.kDt,
+                    AutoConstants.ppRobotConfig,
+                    TunerSimConstants.FrontLeft,
+                    TunerSimConstants.FrontRight,
+                    TunerSimConstants.BackLeft,
+                    TunerSimConstants.BackRight);
 
-	public final Pivot pivot = new Pivot(
-		PivotConstants.kMaster, 
-		PivotConstants.kMaxAngle, 
-		PivotConstants.kMinAngle, 
-		0, 
-		0, 
-		0, 
-		GlobalConstants.kNominalVoltage, 
-		GlobalConstants.kDt);
+    public final Coraler coraler =
+            new Coraler(
+                    CoralerConstants.kMaster,
+                    0,
+                    0,
+                    GlobalConstants.kNominalVoltage,
+                    GlobalConstants.kDt);
 
-	public final Superstructure superstructure = new Superstructure(coraler, elevator, pivot);
+    public final Elevator elevator =
+            new Elevator(
+                    ElevatorConstants.kMaster,
+                    ElevatorConstants.kSlave,
+                    0,
+                    0,
+                    GlobalConstants.kNominalVoltage,
+                    0,
+                    0,
+                    0,
+                    GlobalConstants.kDt);
 
-	public final AutoDrive autoDrive = new AutoDrive(
-			swerve::getOdoPose,
-			superstructure::getWantedScoringPos,
-			FieldConstants.redSources,
-			FieldConstants.blueSources,
-			AutoConstants.xController,
-			AutoConstants.yController,
-			AutoConstants.rotController);
+    public final Pivot pivot =
+            new Pivot(
+                    PivotConstants.kMaster,
+                    PivotConstants.kMaxAngle,
+                    PivotConstants.kMinAngle,
+                    0,
+                    0,
+                    0,
+                    GlobalConstants.kNominalVoltage,
+                    GlobalConstants.kDt);
 
-	public final SwerveDriveCommands swerveCommands = new SwerveDriveCommands(
-			swerve, MetersPerSecond.of(SwerveDriveConstants.kDrivePossibleMaxSpeedMPS));
+    public final Superstructure superstructure = new Superstructure(coraler, elevator, pivot);
 
-	public final Joysticks mainController = new Joysticks(0);
-	public final Joysticks coController = new Joysticks(1);
+    public final AutoDrive autoDrive =
+            new AutoDrive(
+                    swerve::getOdoPose,
+                    superstructure::getWantedScoringPos,
+                    FieldConstants.redSources,
+                    FieldConstants.blueSources,
+                    AutoConstants.xController,
+                    AutoConstants.yController,
+                    AutoConstants.rotController);
 
-	public final AllianceChecker allianceChecker = new AllianceChecker();
+    public final SwerveDriveCommands swerveCommands =
+            new SwerveDriveCommands(
+                    swerve, MetersPerSecond.of(SwerveDriveConstants.kDrivePossibleMaxSpeedMPS));
 
-	public final AutoConstants autoConstants = new AutoConstants();
+    public final Joysticks mainController = new Joysticks(0);
+    public final Joysticks coController = new Joysticks(1);
 
-	public final AutoCommands autoCommands = new AutoCommands(autoConstants, swerve);
+    public final AllianceChecker allianceChecker = new AllianceChecker();
 
-	public final AutoChooser autoChooser = new AutoChooser(autoCommands, swerve::setRobotPose);
+    public final AutoConstants autoConstants = new AutoConstants();
 
-	AprilTagPhotonVision cam1ChangeName = new AprilTagPhotonVision(
-			"ballschangename", new Transform3d(), VecBuilder.fill(1, 1, 1));
+    public final AutoCommands autoCommands = new AutoCommands(autoConstants, swerve);
 
-	AprilTagLimelight ll1ChangeName = new AprilTagLimelight(
-			"LL1ChangeName",
-			new Transform3d(),
-			swerve::getPigeonOrientation,
-			VecBuilder.fill(1, 1, 1));
+    public final AutoChooser autoChooser = new AutoChooser(autoCommands, swerve::setRobotPose);
 
-	public final VisionController controller = new VisionController(
-			swerve::addVisionData,
-			swerve::shouldAddData,
-			swerve::resetPose,
-			cam1ChangeName,
-			ll1ChangeName);
+    AprilTagPhotonVision cam1ChangeName =
+            new AprilTagPhotonVision(
+                    "ballschangename", new Transform3d(), VecBuilder.fill(1, 1, 1));
+
+    AprilTagLimelight ll1ChangeName =
+            new AprilTagLimelight(
+                    "LL1ChangeName",
+                    new Transform3d(),
+                    swerve::getPigeonOrientation,
+                    VecBuilder.fill(1, 1, 1));
+
+    public final VisionController controller =
+            new VisionController(
+                    swerve::addVisionData,
+                    swerve::shouldAddData,
+                    swerve::resetPose,
+                    cam1ChangeName,
+                    ll1ChangeName);
 }
