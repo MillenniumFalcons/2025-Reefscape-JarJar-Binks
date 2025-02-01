@@ -30,6 +30,24 @@ public class Superstructure {
 
     public ScoringPos wantedScoringPos = ScoringPos.NONE;
 
+    private Side wantedSide;
+
+    private Branch wantedBranch;
+
+    public enum Side {
+        A,
+        B,
+        C,
+        D,
+        E,
+        F
+    }
+
+    public enum Branch {
+        ONE,
+        TWO
+    }
+
     public Superstructure(
             Coraler coraler, Elevator elevator, Pivot pivot, BooleanSupplier isAligned) {
         this.coraler = coraler;
@@ -122,7 +140,36 @@ public class Superstructure {
         return goToStateParalell(state);
     }
 
+    public Command setWantedBranch(Branch wantedBranch) {
+        return Commands.runOnce(
+                () -> {
+                    this.wantedBranch = wantedBranch;
+                });
+    }
+
+    public Command setWantedSide(Side wantedSide) {
+        return Commands.runOnce(
+                () -> {
+                    this.wantedSide = wantedSide;
+                });
+    }
+
+    public Command setWantedLevel(Level wantedLevel) {
+        return Commands.runOnce(
+                () -> {
+                    this.wantedLevel = wantedLevel;
+                });
+    }
+
     public Level getWantedLevel() {
         return wantedLevel;
+    }
+
+    public Side getWantedSide() {
+        return wantedSide;
+    }
+
+    public Branch getWantedBranch() {
+        return wantedBranch;
     }
 }
