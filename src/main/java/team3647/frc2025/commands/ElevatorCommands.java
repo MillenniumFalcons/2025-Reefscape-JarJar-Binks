@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import team3647.frc2025.subsystems.Elevator;
@@ -35,6 +37,13 @@ public class ElevatorCommands {
     public Command setOpenLoop(DoubleSupplier output) {
         return Commands.run(() -> elevator.setOpenLoop(output.getAsDouble()), elevator);
     }
+
+	// public Command holdPositionAtCall(){
+	// 	Distance startingPosition;
+	// 	return new FunctionalCommand(
+	// 		() -> startingPosition = elevator.getHeight(), 
+	// 		() -> elevator., null, null, null)
+	// }
 
     Elevator elevator;
 

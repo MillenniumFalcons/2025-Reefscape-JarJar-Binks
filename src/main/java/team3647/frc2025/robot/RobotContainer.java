@@ -12,6 +12,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import team3647.frc2025.Util.AutoDrive;
 import team3647.frc2025.autos.AutoCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
@@ -47,6 +49,8 @@ public class RobotContainer {
         SmartDashboard.putData(autoChooser);
         swerve.setRobotPose(new Pose2d(2, 2, new Rotation2d()));
         superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
+
+		CommandScheduler.getInstance().registerSubsystem(swerve, elevator, coraler, pivot);
     }
 
     private void configureAllianceObservers() {
@@ -54,7 +58,15 @@ public class RobotContainer {
                 swerveCommands, swerve, swerveCommands, autoCommands, autoChooser);
     }
 
+	
+
     private void configureBindings() {
+
+		//elev sysid
+		mainController.leftMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidDynamFor());
+        mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
+        mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
+        mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
 
         // cocontroller selecting the branch you wanna score coral on
         coController
@@ -119,10 +131,10 @@ public class RobotContainer {
                     SwerveDriveConstants.kRotPossibleMaxSpeedRadPerSec,
                     GlobalConstants.kDt,
                     AutoConstants.ppRobotConfig,
-                    TunerSimConstants.FrontLeft,
-                    TunerSimConstants.FrontRight,
-                    TunerSimConstants.BackLeft,
-                    TunerSimConstants.BackRight);
+                    TunerConstants.FrontLeft,
+                    TunerConstants.FrontRight,
+                    TunerConstants.BackLeft,
+                    TunerConstants.BackRight);
 
     public final Coraler coraler =
             new Coraler(
@@ -137,7 +149,7 @@ public class RobotContainer {
                     ElevatorConstants.kMaster,
                     ElevatorConstants.kSlave,
                     0,
-                    0,
+                    ElevatorConstants.nativeToMeters,
                     GlobalConstants.kNominalVoltage,
                     0,
                     0,

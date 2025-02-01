@@ -26,6 +26,9 @@ public class ElevatorConstants {
 
     public static final TalonFXConfiguration kMasterConfig = new TalonFXConfiguration();
 
+	//multiply native by this to get meters
+	public static final double nativeToMeters = 0.446 * Math.PI / 15.0; 
+
     static {
         kMasterConfig.Slot0.withKP(0);
         kMasterConfig.Slot0.withKI(0);
@@ -37,7 +40,7 @@ public class ElevatorConstants {
         kMasterConfig.Slot0.withKG(0);
 
         // prob not right, verify
-        kMasterConfig.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
+        kMasterConfig.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
         kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         kMasterConfig.CurrentLimits.StatorCurrentLimit = 90.0;
@@ -50,7 +53,7 @@ public class ElevatorConstants {
         kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0;
         kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false; // change after real value
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
-        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false; // change after real value
+        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true; // change after real value
 
         kMaster.getConfigurator().apply(kMasterConfig);
 
