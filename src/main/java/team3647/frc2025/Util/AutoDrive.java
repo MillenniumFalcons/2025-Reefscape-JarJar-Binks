@@ -4,8 +4,12 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+
+import static edu.wpi.first.units.Units.Inches;
+
 import java.util.List;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
@@ -24,12 +28,17 @@ public class AutoDrive implements AllianceObserver {
     private Alliance color = Alliance.Red;
 
     private DriveMode wantedMode = DriveMode.NONE;
-    private final List<Pose2d> sourcePoses;
+
+    private List<Pose2d> sourcePoses;
+
+	private final List<Pose2d> redSourcePoses;
+	private final List<Pose2d> blueSourcePoses;
 
     public AutoDrive(
             Supplier<Pose2d> odoPoseFunction,
             Supplier<ScoringPos> wantedScoringPose,
-            List<Pose2d> sourcePoses,
+            List<Pose2d> redSourcePoses,
+			List<Pose2d> blueSourcePoses,
             PIDController xController,
             PIDController yController,
             PIDController rotController) {
@@ -38,7 +47,10 @@ public class AutoDrive implements AllianceObserver {
         this.yController = yController;
         this.rotController = rotController;
         this.wantedScoringPos = wantedScoringPose;
-        this.sourcePoses = sourcePoses;
+        this.redSourcePoses = redSourcePoses;
+		this.blueSourcePoses = blueSourcePoses;
+
+		this.sourcePoses = color == Alliance.Red? redSourcePoses : blueSourcePoses;
     }
 
     public enum DriveMode {
@@ -110,8 +122,19 @@ public class AutoDrive implements AllianceObserver {
                 0);
     }
 
+
+	public boolean isAlignedToReef(){
+		return PoseUtils.inCircle(getPose(), wantedScoringPos.get().pose, Inches.of(4));
+	}
+
+
+	public Twist2d getVelocities(){
+		return new Twist2d(getX(), getY(), getRot());
+	}
+
     @Override
     public void onAllianceFound(Alliance color) {
+		sourcePoses = color == Alliance.Red? redSourcePoses : blueSourcePoses;
         this.color = color;
     }
 }

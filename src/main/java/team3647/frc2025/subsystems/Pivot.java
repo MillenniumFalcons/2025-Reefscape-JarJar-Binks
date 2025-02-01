@@ -18,7 +18,6 @@ public class Pivot extends TalonFXSubsystem {
 
     public Pivot(
             TalonFX master,
-            TalonFX follower,
             Angle maxAngle,
             Angle minAngle,
             double kG,
@@ -28,7 +27,7 @@ public class Pivot extends TalonFXSubsystem {
             double kDt) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
 
-        this.addFollower(follower, false);
+        
 
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;

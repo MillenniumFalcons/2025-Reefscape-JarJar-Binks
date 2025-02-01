@@ -25,6 +25,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveSteerGains;
 import com.ctre.phoenix6.swerve.SwerveRequest.SysIdSwerveTranslation;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -94,6 +95,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
     private final SysIdRoutine kSpinSysIdRoutine;
 
     private final SysIdRoutine kTurnMotorRoutineVoltage;
+
+	private final SysIdRoutine wantedRoutine;
 
     private final SysIdRoutine xControllerTuning;
     private final SysIdRoutine yControllerTuning;
@@ -168,6 +171,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
             double maxSpeedMpS,
             double maxRotRadPerSec,
             double kDt,
+			RobotConfig ppRobotConfig,
             SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
                             ...
                     swerveModuleConstants) {
@@ -252,8 +256,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                                 this,
                                 "Robot MOI Characterization"));
 
-        // "voltage" is velocity and "Velocity" is position and "position" is the integral of
-        // position ig idk
+        // "voltage" is velocity and "Velocity" is also velocity and "position" is position in the sysid app
+		//^ will lead to shit ff gains but hopefully good pid gains
         this.xControllerTuning =
                 new SysIdRoutine(
                         new Config(
@@ -266,7 +270,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                                 null,
                                 this,
                                 getName() + " X Controller"));
-
+        // "voltage" is velocity and "Velocity" is also velocity and "position" is position for the sysid app
+		//^ will lead to shit ff gains but hopefully good pid gains
         this.yControllerTuning =
                 new SysIdRoutine(
                         new Config(
@@ -318,7 +323,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
                                 AutoConstants.rotController.getI(),
                                 AutoConstants.rotController.getD()) // Rotation PID constants
                         ),
-                AutoConstants.ppRobotConfig,
+                ppRobotConfig,
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red
 
@@ -337,6 +342,7 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         if (Utils.isSimulation()) {
             startSimThread();
         }
+		wantedRoutine = this.m_driveSysIdRoutine;
     }
 
     private void startSimThread() {
@@ -394,6 +400,8 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         setisAccel();
         this.setControl(periodicIO.masterRequest);
         // simpleSim.periodic();
+		Logger.recordOutput("robot/targets", periodicIO.targets);
+		Logger.recordOutput("robot/states", periodicIO.states);
         if (RobotBase.isSimulation()) {
             Logger.recordOutput(
                     "simRobot/drive", simDrive.mapleSimDrive.getSimulatedDriveTrainPose());
@@ -456,21 +464,25 @@ public class SwerveDrive extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder>
         periodicIO.good = true;
     }
 
-    public Command runDriveQuasiTest(Direction direction) {
+    public Command runDriveQuasiTestFOC(Direction direction) {
         return m_driveSysIdRoutine.quasistatic(direction);
     }
 
-    public Command runDriveDynamTest(SysIdRoutine.Direction direction) {
+	
+
+    public Command runDriveDynamTestFOC(SysIdRoutine.Direction direction) {
         return m_driveSysIdRoutine.dynamic(direction);
     }
 
-    public Command runSteerQuasiTest(Direction direction) {
+    public Command runSteerQuasiTestFOC(Direction direction) {
         return m_steerSysIdRoutine.quasistatic(direction);
     }
 
-    public Command runSteerDynamTest(SysIdRoutine.Direction direction) {
+    public Command runSteerDynamTestFOC(SysIdRoutine.Direction direction) {
         return m_steerSysIdRoutine.dynamic(direction);
     }
+
+	
 
     public void setRobotPose(Pose2d pose) {
         if (RobotBase.isSimulation()) {
