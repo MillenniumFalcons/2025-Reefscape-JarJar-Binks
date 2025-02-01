@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degree;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
@@ -59,7 +60,14 @@ public class Superstructure {
         this.pivotCommands = new PivotCommands(this.pivot);
 
         this.wantedLevel = Level.NONE;
-        this.isAligned = () -> false;
+        this.isAligned =
+                () -> {
+                    DriverStation.reportError(
+                            "Haven't added isAligned Function yet, check for added message. "
+                                    + Timer.getFPGATimestamp(),
+                            false);
+                    return false;
+                };
     }
 
     public enum Level {
@@ -73,6 +81,7 @@ public class Superstructure {
 
     public void setIsAlignedFunction(BooleanSupplier isAligned) {
         this.isAligned = isAligned;
+        DriverStation.reportError("IsAligned function has been set, all is well", false);
     }
 
     public SuperstructureState getWantedStateByLevel(Level level) {
