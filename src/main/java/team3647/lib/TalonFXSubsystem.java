@@ -290,6 +290,10 @@ public abstract class TalonFXSubsystem implements PeriodicSubsystem {
         master.setPosition(position / positionConversion);
     }
 
+	protected void setEncoderNative(double position){
+		master.setPosition(position);
+	}
+
     /**
      * @return the velocity in the output units
      */

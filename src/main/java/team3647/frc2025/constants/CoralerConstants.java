@@ -14,7 +14,7 @@ public class CoralerConstants {
 
     static {
         kMasterConfig.MotorOutput.withNeutralMode(NeutralModeValue.Coast);
-        // TODO: make sure inverts are right for 2/1
+        // TODO: make sure inverts are right for 2/4
         kMasterConfig.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
     }
 }

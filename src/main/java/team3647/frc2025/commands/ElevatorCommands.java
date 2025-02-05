@@ -19,6 +19,12 @@ public class ElevatorCommands {
                 .until(() -> elevator.heightReached(Meters.of(height), Inches.of(1)));
     }
 
+	public Command setHeightNative(double height) {
+        return Commands.run(() -> elevator.setHeightNative(height), elevator)
+                .until(() -> elevator.heightReached(Meters.of(height), Inches.of(1)));
+    }
+	
+
     public Command setHeight(DoubleSupplier height) {
         return Commands.run(() -> elevator.setHeight(height.getAsDouble()), elevator)
                 .until(() -> elevator.heightReached(Meters.of(height.getAsDouble()), Inches.of(1)));

@@ -1,12 +1,20 @@
 package team3647.frc2025.constants;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Rotation;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.PerUnit;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
@@ -21,6 +29,12 @@ public class PivotConstants {
     public static final Angle kMaxAngle = Degree.of(90);
     public static final Angle kMinAngle = Degree.of(-90);
 
+
+
+
+	//multiply by native to get to degs (it's 1deg/(160/130)rots)
+	public static final double kNativeToDeg = 1.0/(160.0/360.0);
+
     // wait for intake to get done
 
     public static final Angle kMaxLowAngleIntakeUp = Degree.of(0);
@@ -32,14 +46,14 @@ public class PivotConstants {
     public static final TalonFXConfiguration kMasterConfig = new TalonFXConfiguration();
 
     static {
-        kMasterConfig.Slot0.withKP(0);
+        kMasterConfig.Slot0.withKP(5);
         kMasterConfig.Slot0.withKI(0);
         kMasterConfig.Slot0.withKD(0);
-        kMasterConfig.Slot0.withGravityType(GravityTypeValue.Elevator_Static);
+        kMasterConfig.Slot0.withGravityType(GravityTypeValue.Arm_Cosine);
         kMasterConfig.Slot0.withKS(0);
         kMasterConfig.Slot0.withKV(0);
         kMasterConfig.Slot0.withKA(0);
-        kMasterConfig.Slot0.withKG(0);
+        kMasterConfig.Slot0.withKG(0.40);
 
         // prob not right, verify
         kMasterConfig.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
@@ -52,10 +66,17 @@ public class PivotConstants {
         kMasterConfig.CurrentLimits.SupplyCurrentLowerTime = 1;
 
         // need figuring out
-        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0;
-        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false; // change after real value
-        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
-        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false; // change after real value
+        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 38;
+        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true; 
+        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -38;
+        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true; 
+
+		kMasterConfig.MotionMagic.MotionMagicCruiseVelocity = 120;
+		kMasterConfig.MotionMagic.MotionMagicAcceleration = 1200;
+		kMasterConfig.MotionMagic.MotionMagicJerk = 5000;
+		kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.10000000149011612;
+		kMasterConfig.MotionMagic.MotionMagicExpo_kV = 0.11999999731779099;
+
 
         kMaster.getConfigurator().apply(kMasterConfig);
     }

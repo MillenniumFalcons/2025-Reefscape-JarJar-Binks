@@ -22,7 +22,7 @@ public class GlobalConstants {
     }
 
     public class ElevatorIds {
-		public static final int kSlaveId = 55;
+		public static final int kSlaveId = 23;
         public static final int kMasterId = 22;
     }
 

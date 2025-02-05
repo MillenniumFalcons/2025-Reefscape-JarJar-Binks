@@ -1,6 +1,7 @@
 package team3647.frc2025.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Radian;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -31,23 +32,28 @@ public class Pivot extends TalonFXSubsystem {
         this.minAngle = minAngle;
 
         this.kG = kG;
+
+		this.setEncoderNative(38);
     }
 
     public void setAngle(Angle angle) {
-        Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
+        // Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
 
-        super.setPositionExpoVoltage(
-                MathUtil.clamp(angle.in(Radian), minAngle.in(Radian), maxAngle.in(Radian)),
-                ff.in(Amps));
+        super.setPositionMotionMagic(
+                MathUtil.clamp(angle.in(Degree), minAngle.in(Degree), maxAngle.in(Degree)),0);
     }
 
     public Angle getAngle() {
-        return Radian.of(getPosition());
+        return Degree.of(getPosition());
     }
 
     public double getAngleRads() {
         return getAngle().in(Radian);
     }
+
+	public double getAngleDegs(){
+		return getAngle().in(Degree);
+	}
 
     public boolean angleWithin(double lowBound, double highBound) {
         return getAngleRads() > lowBound && getAngleRads() < highBound;

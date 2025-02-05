@@ -10,6 +10,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -26,6 +27,7 @@ import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.constants.TunerConstants;
 import team3647.frc2025.constants.TunerSimConstants;
+import team3647.frc2025.constants.VisionConstants;
 import team3647.frc2025.subsystems.Coraler;
 import team3647.frc2025.subsystems.Elevator;
 import team3647.frc2025.subsystems.Pivot;
@@ -49,6 +51,7 @@ public class RobotContainer {
         SmartDashboard.putData(autoChooser);
         swerve.setRobotPose(new Pose2d(2, 2, new Rotation2d()));
         superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
+		elevator.setEncoderHeight(Units.Meters.of(0));
 
 		CommandScheduler.getInstance().registerSubsystem(swerve, elevator, coraler, pivot);
     }
@@ -148,11 +151,12 @@ public class RobotContainer {
             new Elevator(
                     ElevatorConstants.kMaster,
                     ElevatorConstants.kSlave,
-                    0,
-                    ElevatorConstants.nativeToMeters,
+                    ElevatorConstants.kNativeToMeters,
+                    ElevatorConstants.kNativeToMeters,
+
                     GlobalConstants.kNominalVoltage,
                     0,
-                    0,
+                    ElevatorConstants.kMinHeight.in(Units.Meter),
                     0,
                     GlobalConstants.kDt);
 
@@ -162,8 +166,8 @@ public class RobotContainer {
                     PivotConstants.kMaxAngle,
                     PivotConstants.kMinAngle,
                     0,
-                    0,
-                    0,
+                    PivotConstants.kNativeToDeg,
+                    PivotConstants.kNativeToDeg,
                     GlobalConstants.kNominalVoltage,
                     GlobalConstants.kDt);
 
@@ -196,14 +200,14 @@ public class RobotContainer {
 
     AprilTagPhotonVision cam1ChangeName =
             new AprilTagPhotonVision(
-                    "ballschangename", new Transform3d(), VecBuilder.fill(1, 1, 1));
+                    "ballschangename", new Transform3d(), VisionConstants.baseStdDevs);
 
     AprilTagLimelight ll1ChangeName =
             new AprilTagLimelight(
                     "LL1ChangeName",
                     new Transform3d(),
                     swerve::getPigeonOrientation,
-                    VecBuilder.fill(1, 1, 1));
+                    VisionConstants.baseStdDevs);
 
     public final VisionController controller =
             new VisionController(
