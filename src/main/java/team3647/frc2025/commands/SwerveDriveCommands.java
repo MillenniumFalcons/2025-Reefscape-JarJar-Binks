@@ -43,7 +43,7 @@ public class SwerveDriveCommands implements AllianceObserver {
                 () -> {
                     var isAutoDrive = autoDriveEnabled.getAsBoolean();
                     var velocities = autoDriveVelocities.get();
-                    double invert = color == Alliance.Red ? -1 : 1;
+                    double invert = RobotBase.isSimulation() && color == Alliance.Red ? -1 : 1;
 
                     double ySquared =
                             Math.pow(y.getAsDouble(), 2) * Math.signum(y.getAsDouble()) * 1.05;

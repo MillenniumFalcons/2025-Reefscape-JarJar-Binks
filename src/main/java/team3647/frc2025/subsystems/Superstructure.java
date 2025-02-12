@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.commands.CoralerCommands;
 import team3647.frc2025.commands.ElevatorCommands;
@@ -18,9 +21,9 @@ import team3647.frc2025.constants.PivotConstants;
 
 public class Superstructure {
 
-    public final Coraler coraler;
-    public final Elevator elevator;
-    public final Pivot pivot;
+    private final Coraler coraler;
+    private final Elevator elevator;
+    private final Pivot pivot;
 
     public final CoralerCommands coralerCommands;
     public final ElevatorCommands elevatorCommands;
@@ -30,7 +33,9 @@ public class Superstructure {
 
     private Level wantedLevel;
 
-    public ScoringPos wantedScoringPos = ScoringPos.NONE;
+	private SuperstructureState wantedSuperstructureState = SuperstructureState.kInvalidState;
+
+    private ScoringPos wantedScoringPos = ScoringPos.NONE;
 
     private Side wantedSide;
 
@@ -68,6 +73,8 @@ public class Superstructure {
                             false);
                     return false;
                 };
+		
+
     }
 
     public enum Level {
@@ -88,22 +95,22 @@ public class Superstructure {
         switch (level) {
             case TROUGH:
                 return new SuperstructureState(
-                        PivotConstants.kLevel1Angle, ElevatorConstants.kLevel1Height, -0.7);
+                        PivotConstants.kLevel1Angle, ElevatorConstants.kLevel1Height);
             case LOW:
                 return new SuperstructureState(
-                        PivotConstants.kLevel2Angle, ElevatorConstants.kLevel2Height, -0.7);
+                        PivotConstants.kLevel2Angle, ElevatorConstants.kLevel2Height);
             case MID:
                 return new SuperstructureState(
-                        PivotConstants.kLevel3Angle, ElevatorConstants.kLevel3Height, -0.7);
+                        PivotConstants.kLevel3Angle, ElevatorConstants.kLevel3Height);
             case HIGH:
                 return new SuperstructureState(
-                        PivotConstants.kLevel4Angle, ElevatorConstants.kLevel4Height, -0.7);
+                        PivotConstants.kLevel4Angle, ElevatorConstants.kLevel4Height);
             case INTAKE:
                 return new SuperstructureState(
-                        PivotConstants.kIntakeAngle, ElevatorConstants.kIntakeHeight, 1);
+                        PivotConstants.kIntakeAngle, ElevatorConstants.kIntakeHeight);
             default:
                 return new SuperstructureState(
-                        PivotConstants.kStowAngle, ElevatorConstants.kStowHeight, 0);
+                        PivotConstants.kStowAngle, ElevatorConstants.kStowHeight);
         }
     }
 
@@ -124,6 +131,7 @@ public class Superstructure {
                     default:
                         DriverStation.reportError(
                                 "Cannot set Wanted Scoring pos, no branch provided", false);
+						Logger.recordOutput("robot/robotErrors", "Cannot set Wanted Scoring pos, no branch provided" + Timer.getFPGATimestamp());
                         break;
                 }
                 break;
@@ -138,6 +146,7 @@ public class Superstructure {
                     default:
                         DriverStation.reportError(
                                 "Cannot set Wanted Scoring pos, no branch provided", false);
+								Logger.recordOutput("robot/robotErrors", "Cannot set Wanted Scoring pos, no branch provided" + Timer.getFPGATimestamp());
                         break;
                 }
             case C:
@@ -151,6 +160,7 @@ public class Superstructure {
                     default:
                         DriverStation.reportError(
                                 "Cannot set Wanted Scoring pos, no branch provided", false);
+						Logger.recordOutput("robot/robotErrors", "Cannot set Wanted Scoring pos, no branch provided" + Timer.getFPGATimestamp());
                         break;
                 }
             case D:
@@ -164,6 +174,7 @@ public class Superstructure {
                     default:
                         DriverStation.reportError(
                                 "Cannot set Wanted Scoring pos, no branch provided", false);
+						Logger.recordOutput("robot/robotErrors", "Cannot set Wanted Scoring pos, no branch provided" + Timer.getFPGATimestamp());
                         break;
                 }
             case E:
@@ -177,6 +188,7 @@ public class Superstructure {
                     default:
                         DriverStation.reportError(
                                 "Cannot set Wanted Scoring pos, no branch provided", false);
+						Logger.recordOutput("robot/robotErrors", "Cannot set Wanted Scoring pos, no branch provided" + Timer.getFPGATimestamp());
                         break;
                 }
             case F:
@@ -190,10 +202,12 @@ public class Superstructure {
                     default:
                         DriverStation.reportError(
                                 "Cannot set Wanted Scoring pos, no branch provided", false);
+						Logger.recordOutput("robot/robotErrors", "Cannot set Wanted Scoring pos, no branch provided" + Timer.getFPGATimestamp());
                         break;
                 }
             default:
                 DriverStation.reportError("Cannot set Wanted scoring pos, no SIDE provided", false);
+				Logger.recordOutput("robot/robotErrors", "Cannot set Wanted Scoring pos, no SIDE provided");
                 break;
         }
     }
@@ -202,19 +216,26 @@ public class Superstructure {
         return wantedScoringPos;
     }
 
+	public void logError(String message){
+		Logger.recordOutput("robot/robotErrors", message + Timer.getFPGATimestamp());
+	}
+
     /**
      * NOTE: WILL CHANGE BASED ON INTAKE GEOMETRY
      *
      * @return
      */
     public Command goToStateParalell(SuperstructureState state) {
+		if (state.equals(SuperstructureState.kInvalidState)) {
+			logError("Invalid state given to gotoState function!!");
+			return Commands.none();
+		}
         return Commands.parallel(
                 elevatorCommands.setHeight(state.elevatorHeight),
-                pivotCommands.setAngle(state.pivotAngle),
-                coralerCommands.setOpenLoop(state.rollers).withTimeout(0.5));
+                pivotCommands.setAngle(state.pivotAngle));
     }
 
-    // TUNE MINUS VALUE ONCE ROBOT
+   
     /**
      * For Scoring only
      *
@@ -222,17 +243,27 @@ public class Superstructure {
      * @return
      */
     public Command goToStatePerpendicular(SuperstructureState state) {
+		if (state.equals(SuperstructureState.kInvalidState)) {
+			logError("Invalid state given to gotoState function!!");
+			return Commands.none();
+		}
         return Commands.sequence(
                 pivotCommands.setAngle(state.pivotAngle),
                 Commands.waitUntil(isAligned),
-                elevatorCommands.setHeight(state.elevatorHeight),
-                pivotCommands.setAngle(state.pivotAngle.minus(Degree.of(10))),
-                Commands.waitSeconds(0.01), // basically 0.02
-                pivotCommands
-                        .setAngle(state.pivotAngle)
-                        .alongWith(coralerCommands.setOpenLoop(state.rollers))
-                        .withTimeout(Units.Seconds.of(0.6)));
+                elevatorCommands.setHeight(state.elevatorHeight)
+		);
     }
+
+	public Command score(SuperstructureState state){
+		return Commands.sequence(
+			goToStatePerpendicular(state),
+			coralerCommands.spitOut()
+		);
+	}
+
+	public Command scoreAuto(){
+		return score(wantedSuperstructureState);
+	}
 
     /**
      * REMEMBER TO TUNE THIS
@@ -240,7 +271,7 @@ public class Superstructure {
      * @param state
      * @return
      */
-    public Command goToStateIntake(SuperstructureState state) {
+    public Command prepIntake(SuperstructureState state) {
         return goToStateParalell(state);
     }
 
@@ -276,4 +307,28 @@ public class Superstructure {
     public Branch getWantedBranch() {
         return wantedBranch;
     }
+
+
+	//called when score button pressed on mainController
+	public Command setWantedSuperstructureState(){
+		return Commands.runOnce(
+			() -> setSSStateAuto());
+	}
+
+	private void setSSStateAuto(){
+		switch (wantedLevel) {
+			case TROUGH:
+				wantedSuperstructureState = SuperstructureState.troughScore;
+				break;
+			case LOW:
+				wantedSuperstructureState = SuperstructureState.lowScore;
+			case MID:
+				wantedSuperstructureState = SuperstructureState.midScore;
+			case HIGH:
+				wantedSuperstructureState = SuperstructureState.highScore;
+		
+			default:
+				break;
+		}
+	}
 }

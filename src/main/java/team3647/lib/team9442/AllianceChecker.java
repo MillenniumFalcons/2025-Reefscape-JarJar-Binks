@@ -34,7 +34,9 @@ public class AllianceChecker {
         alliance.ifPresent(
                 color -> {
                     // DriverStation.reportError("Run method? " + (cachedColor != color), false);
+					// DriverStation.reportError("First run? " + firstRun, false);
                     if (cachedColor != color || firstRun) {
+						// DriverStation.reportError("Ran mathod. First run = " + firstRun + " colorcheck = " + (cachedColor != color), false);
                         observers.forEach(observer -> observer.onAllianceFound(color));
                         if (firstRun) firstRun = false;
                     }

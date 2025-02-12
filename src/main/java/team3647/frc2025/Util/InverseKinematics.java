@@ -1,6 +1,7 @@
 package team3647.frc2025.Util;
 
-import static edu.wpi.first.units.Units.Foot;
+
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
@@ -13,7 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class InverseKinematics {
 
-	public static Distance armLength = Units.Inches.of(25.500);
+	public static Distance armLength = Units.Inches.of(25.500).plus(Inches.of(2));
 	
 
 	public static SuperstructureState getIK(Translation2d pose){
@@ -22,7 +23,7 @@ public class InverseKinematics {
 
 		if(x.in(Meters) < 0){
 			DriverStation.reportError("Tried to set negative x for IK value!!!", false);
-			return new SuperstructureState(Radian.of(0), Foot.of(3), 0);
+			return SuperstructureState.kInvalidState;
 		}
 
 		var armAngle = Radian.of(Math.acos(x.div(armLength).in(Units.Value)));
@@ -31,6 +32,8 @@ public class InverseKinematics {
 
 		var elevatorHeight = y.in(Meter) - armAddedHeight;
 
-		return new SuperstructureState(armAngle, Meters.of(elevatorHeight), 0);
+		return new SuperstructureState(armAngle, Meters.of(elevatorHeight));
 	}
+
+
 }

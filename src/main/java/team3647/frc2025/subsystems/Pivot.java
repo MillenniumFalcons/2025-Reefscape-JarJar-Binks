@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import team3647.lib.TalonFXSubsystem;
 
 public class Pivot extends TalonFXSubsystem {
@@ -33,7 +34,7 @@ public class Pivot extends TalonFXSubsystem {
 
         this.kG = kG;
 
-		this.setEncoderNative(38);
+		
     }
 
     public void setAngle(Angle angle) {
@@ -47,12 +48,20 @@ public class Pivot extends TalonFXSubsystem {
         return Degree.of(getPosition());
     }
 
+	public void setEncoderAngle(Angle angle){
+		this.setEncoder(angle.in(Radian));
+	}
+
     public double getAngleRads() {
         return getAngle().in(Radian);
     }
 
 	public double getAngleDegs(){
 		return getAngle().in(Degree);
+	}
+
+	public void setEncoderNative(double position){
+		super.setEncoderNative(position);
 	}
 
     public boolean angleWithin(double lowBound, double highBound) {

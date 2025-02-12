@@ -12,6 +12,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
@@ -28,7 +29,7 @@ public class Elevator extends TalonFXSubsystem {
 
     final double minLength, maxLength, kG;
 
-	public final SysIdRoutine sysid;
+	public final SysIdRoutine sysid, voltageSysid;
 
 	// public final ElevatorSim sim;
 
@@ -52,15 +53,29 @@ public class Elevator extends TalonFXSubsystem {
 
 		this.sysid = new SysIdRoutine(
 			new Config(
-				Units.Volts.of(5).per(Units.Second), 
-				Units.Volts.of(25), 
+				Units.Volts.of(6).per(Units.Second), 
+				Units.Volts.of(30), 
 				Units.Seconds.of(10), 
 				ModifiedSignalLogger.logState()), 
 			new Mechanism(
 				(volts) -> setTorque(volts.in(Units.Volt)), 
 				null, 
 				this,
-				"elevator sysid"));
+				"elevator torque sysid"));
+
+		this.voltageSysid = new SysIdRoutine(
+			new Config(
+				Units.Volts.of(0.9).per(Units.Second),
+				Units.Volt.of(3),
+				Units.Second.of(10),
+				ModifiedSignalLogger.logState()
+			),
+			new Mechanism(
+				(volts) -> this.setVoltage(volts.in(Units.Volt)), 
+				null, 
+				this,
+				"elevator voltage sysid")
+		);
 
 
 		// this.sim = new ElevatorSim(
@@ -77,28 +92,28 @@ public class Elevator extends TalonFXSubsystem {
 
 
     public void setHeight(double height) {
-        this.setPositionExpoVoltage(MathUtil.clamp(height, minLength, maxLength), this.kG);
+        this.setPositionMotionMagic(MathUtil.clamp(height, minLength, maxLength), this.kG);
     }
 
 	public Command elevSysidQuasiFor(){
-		return sysid.quasistatic(Direction.kForward).until(() -> getNativePos() >= 75);
+		return voltageSysid.quasistatic(Direction.kForward);
 	}
 
 	public Command elevSysidQuasiBack(){
-		return sysid.quasistatic(Direction.kReverse).until(() -> getNativePos() <= 16);
+		return voltageSysid.quasistatic(Direction.kReverse);
 	}
 
 
 	public Command elevSysidDynamFor(){
-		return sysid.dynamic(Direction.kForward).until(() -> getNativePos() >= 84);
+		return voltageSysid.dynamic(Direction.kForward);
 	}
 
 	public Command elevSysidDynamBack(){
-		return sysid.dynamic(Direction.kReverse).until(() -> getNativePos() <= 20);
+		return voltageSysid.dynamic(Direction.kReverse);
 	}
 
 	public void setHeightNative(double nativePos){
-		this.setPositionExpoVoltage(nativePos * positionConversion, 0);
+		this.setPositionMotionMagic(MathUtil.clamp(nativePos * positionConversion, this.minLength, this.maxLength), 0);
 	}
 
 	public void setEncoderHeight(Distance height){
