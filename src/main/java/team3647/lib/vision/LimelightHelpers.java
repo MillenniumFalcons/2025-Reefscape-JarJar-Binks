@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import java.io.IOException;
+import java.lang.StackWalker.Option;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -751,15 +752,17 @@ public class LimelightHelpers {
      * @param limelightName Name/identifier of the Limelight
      * @return Array of RawDetection objects containing detection details
      */
-    public static RawDetection[] getRawDetections(String limelightName) {
+    public static Optional<RawDetection[]> getRawDetections(String limelightName) {
         var entry = LimelightHelpers.getLimelightNTTableEntry(limelightName, "rawdetections");
         var rawDetectionArray = entry.getDoubleArray(new double[0]);
         int valsPerEntry = 12;
         if (rawDetectionArray.length % valsPerEntry != 0) {
-            return new RawDetection[0];
+            return Optional.empty();
         }
 
         int numDetections = rawDetectionArray.length / valsPerEntry;
+
+		if (numDetections <= 0 ) return Optional.empty();
         RawDetection[] rawDetections = new RawDetection[numDetections];
 
         for (int i = 0; i < numDetections; i++) {
@@ -783,7 +786,7 @@ public class LimelightHelpers {
                             corner2_X, corner2_Y, corner3_X, corner3_Y);
         }
 
-        return rawDetections;
+        return Optional.of(rawDetections);
     }
 
     /**

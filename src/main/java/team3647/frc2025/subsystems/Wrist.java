@@ -1,5 +1,6 @@
 package team3647.frc2025.subsystems;
 
+import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Radian;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -28,12 +29,16 @@ public class Wrist extends TalonFXSubsystem {
 
     public void setAngle(Angle angle) {
         setPositionExpoVoltage(
-                MathUtil.clamp(angle.in(Units.Radian), minAngle.in(Radian), maxAngle.in(Radian)),
+                MathUtil.clamp(angle.in(Units.Degree), minAngle.in(Degree), maxAngle.in(Degree)),
                 0);
     }
 
+	public void setEncoderAngle(Angle angle){
+		setEncoder(angle.in(Degree));
+	}
+
     public Angle getAngle() {
-        return Radian.of(getPosition());
+        return Degree.of(getPosition());
     }
 
     public double getAngleRads() {

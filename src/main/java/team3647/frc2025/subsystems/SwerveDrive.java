@@ -382,6 +382,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 		// simpleSim.periodic();
 		Logger.recordOutput("robot/targets", periodicIO.targets);
 		Logger.recordOutput("robot/states", periodicIO.states);
+		Logger.recordOutput("robot/pose", periodicIO.pose);
 		if (RobotBase.isSimulation()) {
 		
 		}
@@ -614,6 +615,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 				: Rotation2d.kZero;
 		
 		setOperatorPerspectiveForward(rot);
+		
 	}
 
 	@Override

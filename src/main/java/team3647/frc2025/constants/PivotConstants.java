@@ -17,17 +17,21 @@ public class PivotConstants {
     public static final Angle kLevel3Angle = Radian.of(1.1994256443859082);
     public static final Angle kLevel4Angle = Radian.of(1.2537999814655818);
 
-	public static final Angle kClearAngle = kLevel1Angle;
+	public static final Angle kClearAngle = Radian.of(-0.4);
+	//lowclearangle = max angle when the pivot is blocked by the intake going up 
+	public static final Angle kLowClearAngle = Radian.of(0);
 
     public static final Angle kStowAngle = Degree.of(0);
+	public static final Angle kStowAngleUp = Radian.of(0);
     public static final Angle kIntakeAngle = Degree.of(0);
 
     public static final Angle kMaxAngle = Radian.of(1.6036416572298584);
     public static final Angle kMinAngle = Degree.of(-90);
 
-	public static final Angle kStartingAngle = kMaxAngle;
+	public static final Angle kStartingAngle = kMinAngle;
 
-
+	// public static final Angle kBadAngle = Radian.of(0);
+	// public static final Angle kBadTolerance = Radian.of(0);
 
 
 	//multiply by native to get to degs (it's 40.9 rots per 90 degs)

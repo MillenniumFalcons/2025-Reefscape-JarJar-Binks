@@ -18,13 +18,16 @@ import java.util.function.Supplier;
 import team3647.frc2025.constants.FieldConstants;
 import team3647.lib.team6328.VirtualSubsystem;
 import team3647.lib.vision.LimelightHelpers.RawFiducial;
+import team3647.lib.vision.old.Limelight;
 
 public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamera {
 
-    public String name;
-    public Transform3d robotToCamera;
+    public final String name;
+    public final Transform3d robotToCamera;
 
-    Supplier<Orientation> orientation;
+	private final int kAprilTagPipelineIndex = 0;
+
+    private final Supplier<Orientation> orientation;
 
     private final Vector<N3> baseStdDevs;
 
@@ -45,12 +48,15 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
                 robotToCamera.getRotation().getX(),
                 robotToCamera.getRotation().getY(),
                 robotToCamera.getRotation().getZ());
+		LimelightHelpers.setPipelineIndex(name, kAprilTagPipelineIndex);
 
         this.baseStdDevs = baseStdDevs;
+		
     }
 
     @Override
     public Optional<Pose3d> camPose() {
+		
         var robotPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
         if (robotPose.isEmpty()) {
             return Optional.empty();

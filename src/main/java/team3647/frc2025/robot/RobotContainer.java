@@ -4,6 +4,8 @@
 
 package team3647.frc2025.robot;
 
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radian;
 
@@ -17,9 +19,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import team3647.frc2025.Util.AutoDrive;
+import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.autos.AutoCommands;
 import team3647.frc2025.commands.ElevatorCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
+import team3647.frc2025.commands.WristCommands;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.CoralerConstants;
 import team3647.frc2025.constants.ElevatorConstants;
@@ -30,6 +34,7 @@ import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.constants.TunerConstants;
 import team3647.frc2025.constants.TunerSimConstants;
 import team3647.frc2025.constants.VisionConstants;
+import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.Coraler;
 import team3647.frc2025.subsystems.Elevator;
 import team3647.frc2025.subsystems.Pivot;
@@ -56,8 +61,10 @@ public class RobotContainer {
         superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
 		elevator.setEncoderHeight(ElevatorConstants.kStartingHeight);
 		pivot.setEncoderAngle(PivotConstants.kStartingAngle);
+		wrist.setEncoderAngle(Degree.of(0));
 
-		CommandScheduler.getInstance().registerSubsystem(swerve, elevator, coraler, pivot);
+		CommandScheduler.getInstance().registerSubsystem(swerve, elevator, coraler, pivot, wrist);
+		
     }
 
     private void configureAllianceObservers() {
@@ -74,23 +81,32 @@ public class RobotContainer {
         // mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
         // mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
         // mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
-		mainController.buttonA.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel1Height));
-		mainController.buttonA.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
-		mainController.buttonB.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel2Height));
-		mainController.buttonB.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
-		mainController.buttonY.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel3Height));
-		mainController.buttonY.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
-		mainController.buttonX.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel4Height));
-		mainController.buttonX.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
+		mainController.buttonA.onTrue(superstructure.setWantedLevel(Level.LOW));
+		
+		mainController.buttonB.onTrue(superstructure.setWantedLevel(Level.MID));
+	
+		mainController.buttonY.onTrue(superstructure.setWantedLevel(Level.HIGH));
+		
+		mainController.buttonX.onTrue(superstructure.setWantedLevel(Level.TROUGH));
 
-		mainController.dPadUp.whileTrue(superstructure.pivotCommands.setAngle(PivotConstants.kLevel1Angle));
+		mainController.leftTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
 
-		mainController.leftTrigger.whileTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
-		mainController.leftTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(0));
+		mainController.leftMidButton.whileTrue(superstructure.wristCommands.setAngle(Degree.of(90)));
+		
+		
+	
+
+		// mainController.dPadUp.whileTrue(superstructure.prepL4());
+		// mainController.dPadDown.whileTrue(superstructure.prepL2());
+		// mainController.dPadRight.whileTrue(superstructure.prepL3());
+		// mainController.dPadLeft.whileTrue(superstructure.prepL1());
+
+		mainController.leftBumper.whileTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
+		mainController.leftBumper.onFalse(superstructure.coralerCommands.setOpenLoop(0));
 
 
-		mainController.rightTrigger.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
-		mainController.rightTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(-0.07));
+		mainController.rightBumper.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
+		mainController.rightBumper.onFalse(superstructure.coralerCommands.setOpenLoop(0.07));
 
 		// mainController.dPadUp.whileTrue(superstructure.pivotCommands.holdPositionAtCall());
 		// mainController.dPadUp.onFalse(superstructure.pivotCommands.setOpenLoop(() -> 0));
@@ -139,7 +155,11 @@ public class RobotContainer {
         coController.rightMidButton.onTrue(autoDrive.enableAutoDrive());
 
         coController.leftMidButton.onTrue(autoDrive.disableAutoDrive());
+
+		
     }
+
+	
 
     private void configureDefaultCommands() {
         swerve.setDefaultCommand(
@@ -151,6 +171,7 @@ public class RobotContainer {
                         autoDrive::getWantedMode,
                         autoDrive::getAutoDriveEnabled));
 		elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
+		pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
 		// coraler.setDefaultCommand(superstructure.coralerCommands.stow());
     }
 
@@ -201,9 +222,20 @@ public class RobotContainer {
                     PivotConstants.kNativeToRad,
                     PivotConstants.kNativeToRad,
                     GlobalConstants.kNominalVoltage,
+					PivotConstants.kClearAngle,
+					PivotConstants.kLowClearAngle,
+					elevator::getHeight,
                     GlobalConstants.kDt);
+	Wrist wrist  = new Wrist(
+		WristConstants.kMaster, 
+		WristConstants.kNativeToDeg, 
+		WristConstants.kNativeToDeg,
+		GlobalConstants.kNominalVoltage, 
+		WristConstants.kMinAngle, 
+		WristConstants.kMaxAngle, 
+		GlobalConstants.kDt);
 
-    public final Superstructure superstructure = new Superstructure(coraler, elevator, pivot);
+    public final Superstructure superstructure = new Superstructure(coraler, elevator, pivot,wrist);
 
     public final AutoDrive autoDrive =
             new AutoDrive(
@@ -240,6 +272,9 @@ public class RobotContainer {
                     new Transform3d(),
                     swerve::getPigeonOrientation,
                     VisionConstants.baseStdDevs);
+
+	AprilTagPhotonVision frontRight = 
+			new AprilTagPhotonVision("frontRight", VisionConstants.kRobotToFrontRight , VisionConstants.baseStdDevs);
 
     public final VisionController controller =
             new VisionController(

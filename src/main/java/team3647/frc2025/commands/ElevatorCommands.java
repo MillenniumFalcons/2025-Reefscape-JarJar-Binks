@@ -49,7 +49,7 @@ public class ElevatorCommands {
 
 		public Command holdPositionAtCall() {
         return new Command() {
-            Distance degreeAtStart = ElevatorConstants.kStartingHeight;
+            Distance degreeAtStart = ElevatorConstants.kStowHeight;
 
             @Override
             public void initialize() {

@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -143,6 +145,12 @@ public class Elevator extends TalonFXSubsystem {
     public double getHeightM() {
         return getPosition();
     }
+
+	@Override
+	public void readPeriodicInputs() {
+		super.readPeriodicInputs();
+		Logger.recordOutput("elevatorgood", getHeightM() >= ElevatorConstants.kClearHeight.in(Meters));
+	}
 
     @Override
     public String getName() {

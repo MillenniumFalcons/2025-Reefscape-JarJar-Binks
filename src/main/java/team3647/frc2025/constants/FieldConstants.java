@@ -38,8 +38,8 @@ public class FieldConstants {
                     new Pose2d(
                             1.237,
                             7.109,
-                            Rotation2d.fromRadians(2.219)), // based on the degree i saw in choreo
-                    new Pose2d(1.237, 0.998, Rotation2d.fromRadians(-2.198)));
+                            Rotation2d.fromDegrees(126)), // based on the degree i saw in choreo
+                    new Pose2d(1.237, 0.998, Rotation2d.fromDegrees(-126)));
 
     public static final List<Pose2d> redSources =
             List.of(

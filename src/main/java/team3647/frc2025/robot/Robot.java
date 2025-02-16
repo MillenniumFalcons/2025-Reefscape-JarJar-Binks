@@ -9,9 +9,11 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import team3647.frc2025.subsystems.Superstructure;
 import team3647.lib.ModifiedSignalLogger;
 
 import java.util.Objects;
+import java.util.logging.Level;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -30,7 +32,7 @@ public class Robot extends LoggedRobot {
 
     private final boolean isReplay = false;
 
-    private final boolean rio1 = true;
+    private final boolean rio1 = false;
 
     public Robot() {
         Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
@@ -75,6 +77,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+		Logger.recordOutput("clear elevator?", m_robotContainer.superstructure.shouldClearGoingUp());
+		Logger.recordOutput("selected level", m_robotContainer.superstructure.getWantedLevel());
+		
     }
 
     @Override

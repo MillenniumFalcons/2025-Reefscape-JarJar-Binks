@@ -4,17 +4,26 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Radian;
 
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
+import team3647.frc2025.constants.ElevatorConstants;
 import team3647.lib.TalonFXSubsystem;
 
 public class Pivot extends TalonFXSubsystem {
 
-    Angle maxAngle;
-    Angle minAngle;
+    private final Angle maxAngle;
+    private final Angle minAngle;
+	private final Angle kClearAngle, kLowClearAngle;
+
+	private final Supplier<Distance> elevatorHeight;
 
     double kG;
 
@@ -26,11 +35,18 @@ public class Pivot extends TalonFXSubsystem {
             double positionConversion,
             double velocityConversion,
             double nominalVoltage,
+			Angle kClearAngle,
+			//lowclearangle = max angle when the pivot is blocked by the intake going up 
+			Angle kLowClearAngle,
+			Supplier<Distance> elevatorHeight,
             double kDt) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
 
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;
+		this.kClearAngle = kClearAngle;
+		this.kLowClearAngle = kLowClearAngle;
+		this.elevatorHeight = elevatorHeight;
 
         this.kG = kG;
 
@@ -41,11 +57,11 @@ public class Pivot extends TalonFXSubsystem {
         // Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
 
         super.setPositionMotionMagic(
-                MathUtil.clamp(angle.in(Degree), minAngle.in(Degree), maxAngle.in(Degree)),0);
+                MathUtil.clamp(angle.in(Radian), getMinAngle().in(Radian), getMaxAngle().in(Radian)),0);
     }
 
     public Angle getAngle() {
-        return Degree.of(getPosition());
+        return Radian.of(getPosition());
     }
 
 	public void setEncoderAngle(Angle angle){
@@ -64,6 +80,24 @@ public class Pivot extends TalonFXSubsystem {
 		super.setEncoderNative(position);
 	}
 
+	public boolean needToClearElevator(){
+		return getPosition() > kClearAngle.in(Radian) && elevatorHeight.get().lt(ElevatorConstants.kClearHeight);
+	}
+
+	public Angle getMinAngle(){
+		if (getPosition() > kClearAngle.in(Radian) && elevatorHeight.get().lt(ElevatorConstants.kClearHeight)) {
+			return kClearAngle;
+		}
+		return minAngle;
+	}
+
+	public Angle getMaxAngle(){
+		if (getPosition() < kLowClearAngle.in(Radian) && elevatorHeight.get().lt(ElevatorConstants.kClearHeight)) {
+			return kLowClearAngle;
+		}
+		return maxAngle;
+	}
+
     public boolean angleWithin(double lowBound, double highBound) {
         return getAngleRads() > lowBound && getAngleRads() < highBound;
     }
@@ -75,6 +109,13 @@ public class Pivot extends TalonFXSubsystem {
     public void setOpenLoop(double out) {
         this.setOpenloop(out);
     }
+
+	@Override
+	public void readPeriodicInputs() {
+		// TODO Auto-generated method stub
+		super.readPeriodicInputs();
+		Logger.recordOutput("pivot good", getAngle().gte(kClearAngle));
+	}
 
     @Override
     public String getName() {
