@@ -24,6 +24,7 @@ import team3647.frc2025.commands.WristCommands;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
 import team3647.frc2025.constants.PivotConstants;
+import team3647.frc2025.constants.WristConstants;
 
 public class Superstructure {
 
@@ -329,12 +330,16 @@ public class Superstructure {
 
 
 
-	// public Command prepIntake(){
-	// 	return Commands.sequence(,
-	//		clearElevatorGoingDown(),
-	// 		wristcommands.godown(),
-	// 		pivotCommands.setAngle(PivotConstants.kIntakeAngle)
-			
+	public Command prepIntake(){
+		return Commands.sequence(
+			clearElevatorGoingDown(),
+			wristCommands.goToIntake()	
+		);
+	}
+
+	// public Command handoff(){
+	// 	return Commands.sequence(
+	// 		wristCommands.setAngle(WristConstants.)	
 	// 	);
 	// }
 

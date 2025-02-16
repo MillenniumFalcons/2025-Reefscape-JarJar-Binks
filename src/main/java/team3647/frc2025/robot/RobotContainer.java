@@ -61,7 +61,7 @@ public class RobotContainer {
         superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
 		elevator.setEncoderHeight(ElevatorConstants.kStartingHeight);
 		pivot.setEncoderAngle(PivotConstants.kStartingAngle);
-		wrist.setEncoderAngle(Degree.of(0));
+		wrist.setEncoderAngle(Degree.of(137.9));
 
 		CommandScheduler.getInstance().registerSubsystem(swerve, elevator, coraler, pivot, wrist);
 		
@@ -89,11 +89,15 @@ public class RobotContainer {
 		
 		mainController.buttonX.onTrue(superstructure.setWantedLevel(Level.TROUGH));
 
-		mainController.leftTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
+		mainController.leftBumper.onTrue(superstructure.clearElevatorGoingUp());
+		mainController.rightBumper.onTrue(superstructure.clearElevatorGoingDown());
 
-		mainController.leftMidButton.whileTrue(superstructure.wristCommands.setAngle(Degree.of(90)));
+		// mainController.leftTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
+	
+
+		// mainController.leftMidButton.whileTrue(superstructure.wristCommands.setAngle(Degree.of(90)));
 		
-		
+
 	
 
 		// mainController.dPadUp.whileTrue(superstructure.prepL4());
@@ -101,20 +105,14 @@ public class RobotContainer {
 		// mainController.dPadRight.whileTrue(superstructure.prepL3());
 		// mainController.dPadLeft.whileTrue(superstructure.prepL1());
 
-		mainController.leftBumper.whileTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
-		mainController.leftBumper.onFalse(superstructure.coralerCommands.setOpenLoop(0));
+		// mainController.leftBumper.whileTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
+		// mainController.leftBumper.onFalse(superstructure.coralerCommands.setOpenLoop(0));
 
 
-		mainController.rightBumper.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
-		mainController.rightBumper.onFalse(superstructure.coralerCommands.setOpenLoop(0.07));
+		// mainController.rightBumper.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
+		// mainController.rightBumper.onFalse(superstructure.coralerCommands.setOpenLoop(0.07));
 
-		// mainController.dPadUp.whileTrue(superstructure.pivotCommands.holdPositionAtCall());
-		// mainController.dPadUp.onFalse(superstructure.pivotCommands.setOpenLoop(() -> 0));
-
-		// mainController.dPadRight.whileTrue(superstructure.elevatorCommands.setOpenLoop(() -> 0.4));
-		// mainController.dPadRight.onFalse(superstructure.pivotCommands.setOpenLoop(() -> 0));
-		// mainController.dPadLeft.whileTrue(superstructure.elevatorCommands.setOpenLoop(() -> 0));
-		// mainController.dPadLeft.onFalse(superstructure.elevatorCommands.setOpenLoop(() -> 0));
+		
 
         // cocontroller selecting the branch you wanna score coral on
         coController
