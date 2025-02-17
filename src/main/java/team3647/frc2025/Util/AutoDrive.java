@@ -21,9 +21,9 @@ public class AutoDrive implements AllianceObserver {
     private final Supplier<Pose2d> odoPoseFunction;
     private final Supplier<ScoringPos> wantedScoringPos;
 
-    private final PIDController xController;
-    private final PIDController yController;
-    private final PIDController rotController;
+    public final PIDController xController;
+    public final PIDController yController;
+    public final PIDController rotController;
 
     private Alliance color = Alliance.Red;
 

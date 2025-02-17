@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radian;
 
+import org.dyn4j.world.ManifoldCollisionData;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,10 +19,12 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import team3647.frc2025.Util.AutoDrive;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.autos.AutoCommands;
+import team3647.frc2025.commands.CoralerCommands;
 import team3647.frc2025.commands.ElevatorCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
 import team3647.frc2025.commands.WristCommands;
@@ -30,6 +34,7 @@ import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants;
 import team3647.frc2025.constants.GlobalConstants;
 import team3647.frc2025.constants.PivotConstants;
+import team3647.frc2025.constants.RollersConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.constants.TunerConstants;
 import team3647.frc2025.constants.TunerSimConstants;
@@ -44,6 +49,7 @@ import team3647.frc2025.subsystems.Superstructure.Level;
 import team3647.frc2025.subsystems.Superstructure.Side;
 import team3647.frc2025.subsystems.SwerveDrive;
 import team3647.frc2025.subsystems.Wrist;
+import team3647.frc2025.subsystems.rollers;
 import team3647.lib.inputs.Joysticks;
 import team3647.lib.team9442.AllianceChecker;
 import team3647.lib.team9442.AutoChooser;
@@ -81,16 +87,28 @@ public class RobotContainer {
         // mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
         // mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
         // mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
-		mainController.buttonA.onTrue(superstructure.setWantedLevel(Level.LOW));
 		
-		mainController.buttonB.onTrue(superstructure.setWantedLevel(Level.MID));
-	
-		mainController.buttonY.onTrue(superstructure.setWantedLevel(Level.HIGH));
-		
-		mainController.buttonX.onTrue(superstructure.setWantedLevel(Level.TROUGH));
+        
 
-		mainController.leftBumper.onTrue(superstructure.clearElevatorGoingUp());
-		mainController.rightBumper.onTrue(superstructure.clearElevatorGoingDown());
+        mainController.leftBumper.whileTrue(superstructure.intakeTemp());
+        mainController.leftBumper.onFalse(
+                Commands.parallel(
+                        superstructure.wristCommands.setAngle(WristConstants.kStowAngle),
+                        superstructure.rollersCommands.kill()
+                )
+        );
+
+        mainController.dPadDown.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
+        mainController.dPadDown.onFalse(superstructure.coralerCommands.setOpenLoop(0));
+
+        mainController.rightTrigger.onTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
+        mainController.rightTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(0.5));
+
+
+        mainController.buttonA.whileTrue(superstructure.prepL2());
+        mainController.buttonB.whileTrue(superstructure.prepL3());
+        mainController.buttonY.whileTrue(superstructure.prepL4());
+        mainController.buttonX.whileTrue(superstructure.clearElevatorGoingDown());
 
 		// mainController.leftTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
 	
@@ -98,19 +116,8 @@ public class RobotContainer {
 		// mainController.leftMidButton.whileTrue(superstructure.wristCommands.setAngle(Degree.of(90)));
 		
 
-	
-
-		// mainController.dPadUp.whileTrue(superstructure.prepL4());
-		// mainController.dPadDown.whileTrue(superstructure.prepL2());
-		// mainController.dPadRight.whileTrue(superstructure.prepL3());
-		// mainController.dPadLeft.whileTrue(superstructure.prepL1());
-
-		// mainController.leftBumper.whileTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
-		// mainController.leftBumper.onFalse(superstructure.coralerCommands.setOpenLoop(0));
 
 
-		// mainController.rightBumper.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
-		// mainController.rightBumper.onFalse(superstructure.coralerCommands.setOpenLoop(0.07));
 
 		
 
@@ -154,6 +161,7 @@ public class RobotContainer {
 
         coController.leftMidButton.onTrue(autoDrive.disableAutoDrive());
 
+        mainController.leftTrigger.whileTrue(superstructure.handoff());
 		
     }
 
@@ -170,7 +178,7 @@ public class RobotContainer {
                         autoDrive::getAutoDriveEnabled));
 		elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
 		pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
-		// coraler.setDefaultCommand(superstructure.coralerCommands.stow());
+		coraler.setDefaultCommand(superstructure.coralerCommands.setOpenLoop(0));
     }
 
     public Command getAutonomousCommand() {
@@ -233,7 +241,10 @@ public class RobotContainer {
 		WristConstants.kMaxAngle, 
 		GlobalConstants.kDt);
 
-    public final Superstructure superstructure = new Superstructure(coraler, elevator, pivot,wrist);
+        rollers rollers = new rollers(
+                RollersConstants.kMaster, 1, 1, GlobalConstants.kNominalVoltage, GlobalConstants.kDt);
+
+    public final Superstructure superstructure = new Superstructure(coraler, elevator, pivot,wrist, rollers);
 
     public final AutoDrive autoDrive =
             new AutoDrive(
@@ -271,8 +282,8 @@ public class RobotContainer {
                     swerve::getPigeonOrientation,
                     VisionConstants.baseStdDevs);
 
-	AprilTagPhotonVision frontRight = 
-			new AprilTagPhotonVision("frontRight", VisionConstants.kRobotToFrontRight , VisionConstants.baseStdDevs);
+	// AprilTagPhotonVision frontRight = 
+			// new AprilTagPhotonVision("frontRight", VisionConstants.kRobotToFrontRight , VisionConstants.baseStdDevs);
 
     public final VisionController controller =
             new VisionController(

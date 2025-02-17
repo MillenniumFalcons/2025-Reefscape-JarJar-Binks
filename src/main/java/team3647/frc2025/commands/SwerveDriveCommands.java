@@ -2,6 +2,7 @@ package team3647.frc2025.commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -77,6 +78,34 @@ public class SwerveDriveCommands implements AllianceObserver {
                     }
                 },
                 swerve);
+    }
+
+    public Command align(PIDController xController, PIDController yController, PIDController rotController){
+        return Commands.run(() -> {
+            var x = xController.calculate(swerve.getPoseX(), 11.535591125488281);
+            var y = yController.calculate(swerve.getPoseY(), 7.252763748168945 );
+            var theta = rotController.calculate(swerve.getOdoRot().getRadians(), -Math.PI/2);
+
+            swerve.drive(x, y, theta);
+        }, swerve);
+    }
+
+    public Command alignRot(PIDController rotController){
+        return Commands.run(() -> {
+          
+            var theta = rotController.calculate(swerve.getOdoRot().getRadians(), -Math.PI/2);
+
+            swerve.drive(0, 0, theta);
+        }, swerve);
+    }
+
+    public Command alignX(PIDController xController){
+        return Commands.run(() -> {
+          
+            var theta = xController.calculate(swerve.getOdoRot().getRadians(), -Math.PI/2);
+
+            swerve.drive(theta, 0, 0);
+        }, swerve);
     }
 
     public Command driveVisionTeleop(

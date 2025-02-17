@@ -12,6 +12,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
+    public static final Angle kMinAngle = Degree.of(-90);
     public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561);
     public static final Angle kLevel2Angle = Radian.of(0.6324678425924254);
     public static final Angle kLevel3Angle = Radian.of(1.1994256443859082);
@@ -21,14 +22,16 @@ public class PivotConstants {
 	//lowclearangle = max angle when the pivot is blocked by the intake going up 
 	public static final Angle kLowClearAngle = Radian.of(0);
 
-    public static final Angle kStowAngle = Degree.of(0);
+    public static final Angle kStowAngle = kMinAngle;
 	public static final Angle kStowAngleUp = Radian.of(0);
     public static final Angle kIntakeAngle = Degree.of(0);
 
     public static final Angle kMaxAngle = Radian.of(1.6036416572298584);
-    public static final Angle kMinAngle = Degree.of(-90);
+    
 
 	public static final Angle kStartingAngle = kMinAngle;
+
+    public static final Angle kHandoffAngle = Radian.of(-1.350);
 
 	// public static final Angle kBadAngle = Radian.of(0);
 	// public static final Angle kBadTolerance = Radian.of(0);

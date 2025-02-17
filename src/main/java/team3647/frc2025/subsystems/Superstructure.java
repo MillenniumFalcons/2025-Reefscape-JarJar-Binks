@@ -20,6 +20,7 @@ import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.commands.CoralerCommands;
 import team3647.frc2025.commands.ElevatorCommands;
 import team3647.frc2025.commands.PivotCommands;
+import team3647.frc2025.commands.RollersCommands;
 import team3647.frc2025.commands.WristCommands;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
@@ -36,6 +37,7 @@ public class Superstructure {
     public final ElevatorCommands elevatorCommands;
     public final PivotCommands pivotCommands;
 	public final WristCommands wristCommands;
+    public final RollersCommands rollersCommands;
 
     private BooleanSupplier isAligned;
 
@@ -65,7 +67,7 @@ public class Superstructure {
         TWO
     }
 
-    public Superstructure(Coraler coraler, Elevator elevator, Pivot pivot, Wrist wrist) {
+    public Superstructure(Coraler coraler, Elevator elevator, Pivot pivot, Wrist wrist, rollers rollers) {
         this.coraler = coraler;
         this.elevator = elevator;
         this.pivot = pivot;
@@ -73,6 +75,7 @@ public class Superstructure {
         this.coralerCommands = new CoralerCommands(this.coraler);
         this.elevatorCommands = new ElevatorCommands(this.elevator);
         this.pivotCommands = new PivotCommands(this.pivot);
+        this.rollersCommands = new RollersCommands(rollers);
 
         this.wantedLevel = Level.NONE;
         this.isAligned =
@@ -328,20 +331,54 @@ public class Superstructure {
 		);
 	}
 
+    public Command humanIntake(){
+        return Commands.sequence(
+            clearElevatorGoingUp(),
+            Commands.parallel(
+                pivotCommands.setAngle(Degree.of(0)),
+            coralerCommands.setOpenLoop(0.3).until(coralerCommands.current())
+            ),
+            clearElevatorGoingDown()
+        );
+    }
 
 
 	public Command prepIntake(){
 		return Commands.sequence(
 			clearElevatorGoingDown(),
-			wristCommands.goToIntake()	
+			wristCommands.goToIntake().withTimeout(1)	
 		);
 	}
 
-	// public Command handoff(){
-	// 	return Commands.sequence(
-	// 		wristCommands.setAngle(WristConstants.)	
-	// 	);
-	// }
+    public Command intakeTemp(){
+        return Commands.sequence(
+            Commands.parallel(
+                prepIntake(),
+                rollersCommands.setOpenLoop(-0.5).until(() -> rollersCommands.currentGreater(35))
+            ),
+            wristCommands.setAngle(WristConstants.kStowAngle).withTimeout(1)
+        );
+    }
+    //needs tuning: wriist stow angle, wrist/pivot handoff angles, maybe current but i think itll be fine
+	public Command handoff(){
+		return Commands.sequence(
+			wristCommands.setAngle(WristConstants.kHandoffAngle).withTimeout(1),
+            pivotCommands.setAngle(PivotConstants.kHandoffAngle),
+            coralerCommands.setOpenLoop(0.5).withTimeout(2),
+            pivotCommands.setAngle(PivotConstants.kStowAngle),
+            wristCommands.setAngle(WristConstants.kStowAngle)
+		);
+	}
+
+    public Command stowFromL1(){
+        return Commands.sequence(
+            Commands.parallel(
+                prepL1(),
+                coralerCommands.setOpenLoop(-0.5)
+            ).withTimeout(0.3),
+            clearElevatorGoingDown()
+        );
+    }
 
 	// public Command intake(){
 	// 	return Commands.parallel(

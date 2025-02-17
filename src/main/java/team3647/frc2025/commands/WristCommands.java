@@ -30,7 +30,7 @@ public class WristCommands {
 
 	public Command setAngle(Angle angle){
 		return Commands.run(
-			() -> wrist.setAngle(angle), wrist).until(() -> wrist.angleReached(angle.in(Degree), 5));
+			() -> wrist.setAngle(angle), wrist).until(() -> wrist.angleReached(angle.in(Degree), 12));
 	}
 
 	public Command setAngle(Supplier<Angle> angle){
