@@ -63,6 +63,7 @@ public class RobotContainer {
         configureDefaultCommands();
         configureAllianceObservers();
         SmartDashboard.putData(autoChooser);
+		swerve.setRobotPose(new Pose2d(16, 0.7, Rotation2d.fromRadians(Math.PI)));
         
         superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
 		elevator.setEncoderHeight(ElevatorConstants.kStartingHeight);
@@ -90,30 +91,38 @@ public class RobotContainer {
 		
         
 
-        mainController.leftBumper.whileTrue(superstructure.intakeTemp());
-        mainController.leftBumper.onFalse(
-                Commands.parallel(
-                        superstructure.wristCommands.setAngle(WristConstants.kStowAngle),
-                        superstructure.rollersCommands.kill()
-                )
-        );
+        // mainController.leftBumper.whileTrue(superstructure.intakeTemp());
+        // mainController.leftBumper.onFalse(
+        //         Commands.parallel(
+        //                 superstructure.wristCommands.setAngle(WristConstants.kStowAngle),
+        //                 superstructure.rollersCommands.kill()
+        //         )
+        // );
+		
 
-        mainController.dPadDown.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
-        mainController.dPadDown.onFalse(superstructure.coralerCommands.setOpenLoop(0));
 
         mainController.rightTrigger.onTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
-        mainController.rightTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(0.5));
+        mainController.rightTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(0));
 
 
         mainController.buttonA.whileTrue(superstructure.prepL2());
         mainController.buttonB.whileTrue(superstructure.prepL3());
         mainController.buttonY.whileTrue(superstructure.prepL4());
-        mainController.buttonX.whileTrue(superstructure.clearElevatorGoingDown());
+        mainController.buttonX.whileTrue(superstructure.stowc());
+
+		mainController.buttonA.onFalse(superstructure.scoreL2());
+		mainController.buttonB.onFalse(superstructure.scoreL3());
+		// mainController.buttonX.onFalse(superstructure.scoreL1());
+		mainController.buttonY.onFalse(superstructure.scoreL4());
+		
 
 		// mainController.leftTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
 	
 
 		// mainController.leftMidButton.whileTrue(superstructure.wristCommands.setAngle(Degree.of(90)));
+
+		mainController.leftBumper.whileTrue(superstructure.humanIntake());
+		mainController.leftBumper.onFalse(superstructure.stowHigh());
 		
 
 
@@ -161,7 +170,6 @@ public class RobotContainer {
 
         coController.leftMidButton.onTrue(autoDrive.disableAutoDrive());
 
-        mainController.leftTrigger.whileTrue(superstructure.handoff());
 		
     }
 

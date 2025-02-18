@@ -21,6 +21,11 @@ public class PivotCommands {
                 .until(() -> pivot.angleReached(angleRads, Degree.of(2)));
     }
 
+	public Command setAngle(double angleRads) {
+        return Commands.run(() -> pivot.setAngleRads(angleRads), pivot)
+                .until(() -> pivot.angleReached(Radian.of(angleRads), Degree.of(2)));
+    }
+
     public Command setOpenLoop(DoubleSupplier out) {
         return Commands.run(() -> pivot.setOpenLoop(out.getAsDouble()), pivot);
     }

@@ -31,15 +31,22 @@ public class WristConstants {
 	public static final TalonFXConfiguration kMasterConfig = new TalonFXConfiguration();
 
 	static{
-		kMasterConfig.Slot0.kP = 5;
+		kMasterConfig.Slot0.kP = 0;
 
 		kMasterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-		kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+		kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+		;
 		
 		kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 30;
 		kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 		kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 		kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+
+		kMasterConfig.CurrentLimits.StatorCurrentLimit = 0;
+		kMasterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+
+		kMasterConfig.MotorOutput.PeakForwardDutyCycle = 0;
+		kMasterConfig.MotorOutput.PeakReverseDutyCycle = 0;
 
 		kMaster.getConfigurator().apply(kMasterConfig);
 		

@@ -369,6 +369,8 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 		periodicIO.backLeftState = periodicIO.states[2];
 		periodicIO.backRightState = periodicIO.states[3];
 
+	
+
 		// SmartDashboard.putBoolean("good", periodicIO.good);
 
 		// SmartDashboard.putNumber("characterization voltage",

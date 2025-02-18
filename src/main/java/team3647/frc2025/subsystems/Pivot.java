@@ -60,6 +60,13 @@ public class Pivot extends TalonFXSubsystem {
                 MathUtil.clamp(angle.in(Radian), getMinAngle().in(Radian), getMaxAngle().in(Radian)),0);
     }
 
+	public void setAngleRads(double angle) {
+        // Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
+
+        super.setPositionMotionMagic(
+                MathUtil.clamp(angle, getMinAngle().in(Radian), getMaxAngle().in(Radian)),0);
+    }
+
     public Angle getAngle() {
         return Radian.of(getPosition());
     }

@@ -26,7 +26,8 @@ public class ElevatorConstants {
     public static final Distance kLevel1Height = kStowHeight;
     public static final Distance kLevel2Height = kStowHeight;
     public static final Distance kLevel3Height = kStowHeight;
-    public static final Distance kLevel4Height = Meters.of(1.459962658964996);
+    public static final Distance kLevel4Height = Meters.of(1.529);
+
 
     public static final Distance kIntakeHeight = Meters.of(0);
 
@@ -52,7 +53,7 @@ public class ElevatorConstants {
 
     static {
 		//slot 0  = voltage configs
-        kMasterConfig.Slot0.withKP(5);
+        kMasterConfig.Slot0.withKP(4);
         kMasterConfig.Slot0.withKI(0);
         kMasterConfig.Slot0.withKD(0);
         kMasterConfig.Slot0.withGravityType(GravityTypeValue.Elevator_Static);

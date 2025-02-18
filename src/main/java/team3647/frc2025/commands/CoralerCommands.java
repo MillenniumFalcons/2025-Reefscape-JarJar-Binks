@@ -31,7 +31,7 @@ public class CoralerCommands {
     }
 
     public BooleanSupplier current(){
-        return new Trigger(() -> coraler.getMasterCurrent() > 30);
+        return new Trigger(() -> coraler.getMasterCurrent() > 40);
     }
 
     public Coraler coraler;

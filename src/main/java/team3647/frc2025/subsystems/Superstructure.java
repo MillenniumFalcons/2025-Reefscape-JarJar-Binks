@@ -3,7 +3,9 @@ package team3647.frc2025.subsystems;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Radian;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -108,33 +110,6 @@ public class Superstructure {
     public void setIsAlignedFunction(BooleanSupplier isAligned) {
         this.isAligned = isAligned;
         DriverStation.reportError("IsAligned function has been set, all is well", false);
-    }
-
-    public SuperstructureState getWantedStateByLevel(Level level) {
-        switch (level) {
-            case TROUGH:
-                return new SuperstructureState(
-                        PivotConstants.kLevel1Angle, ElevatorConstants.kLevel1Height);
-            case LOW:
-                return new SuperstructureState(
-                        PivotConstants.kLevel2Angle, ElevatorConstants.kLevel2Height);
-            case MID:
-                return new SuperstructureState(
-                        PivotConstants.kLevel3Angle, ElevatorConstants.kLevel3Height);
-            case HIGH:
-                return new SuperstructureState(
-                        PivotConstants.kLevel4Angle, ElevatorConstants.kLevel4Height);
-            case INTAKE:
-                return new SuperstructureState(
-                        PivotConstants.kIntakeAngle, ElevatorConstants.kIntakeHeight);
-            default:
-                return new SuperstructureState(
-                        PivotConstants.kStowAngle, ElevatorConstants.kStowHeight);
-        }
-    }
-
-    public SuperstructureState getWantedStateByWantedLevel() {
-        return getWantedStateByLevel(wantedLevel);
     }
 
     public void setWantedScoringPosBySideBranch() {
@@ -299,6 +274,19 @@ public class Superstructure {
 			() -> pivot.angleWithin(PivotConstants.kStartingAngle.in(Radian), PivotConstants.kClearAngle.in(Radian)) && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
 	}
 
+	public Command clearElevatorGoingUp(Angle finalAngle){
+		return Commands.either(
+			Commands.sequence(
+				Commands.deadline(
+					elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
+					pivotCommands.setAngle(PivotConstants.kStartingAngle)),
+				pivotCommands.setAngle(MathUtil.clamp(finalAngle.in(Radian), PivotConstants.kClearAngle.in(Radian), PivotConstants.kMaxAngle.in(Radian))),
+				elevatorCommands.setHeight(ElevatorConstants.kStowHeight)
+			).alongWith(Commands.runOnce(() -> Logger.recordOutput("toclear?", true))), 
+			Commands.none().alongWith(Commands.runOnce(() -> Logger.recordOutput("toClear?", false))), 
+			() -> pivot.angleWithin(PivotConstants.kStartingAngle.in(Radian), PivotConstants.kClearAngle.in(Radian)) && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
+	}
+
 	public Command clearElevatorGoingDown(){
 		return Commands.either(
 			Commands.sequence(
@@ -308,6 +296,14 @@ public class Superstructure {
 			), 
 			Commands.none(), 
 			() -> pivot.angleWithin(PivotConstants.kStartingAngle.in(Radian), PivotConstants.kClearAngle.in(Radian)) && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
+	}
+
+	public Command stowc(){
+		return Commands.sequence(
+			elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
+			pivotCommands.setAngle(PivotConstants.kStartingAngle),
+			elevatorCommands.setHeight(ElevatorConstants.kStowHeight)
+		);
 	}
 
 	@Deprecated
@@ -327,20 +323,72 @@ public class Superstructure {
 		return Commands.sequence(
 			clearElevatorGoingUpNoDown(),
 			elevatorCommands.setHeight(ElevatorConstants.kLevel2Height),
+			pivotCommands.setAngle(PivotConstants.kStowAngleUp)
+		);
+	}
+
+
+	public Command scoreL4(){
+		return Commands.sequence(
+			clearElevatorGoingUp(),
+			elevatorCommands.setHeight(ElevatorConstants.kLevel4Height),
+			pivotCommands.setAngle(PivotConstants.kLevel4Angle)
+		);
+	}
+
+	public Command scoreL3(){
+		return Commands.sequence(
+			clearElevatorGoingUp(),
+			elevatorCommands.setHeight(ElevatorConstants.kLevel3Height),
+			pivotCommands.setAngle(PivotConstants.kLevel3Angle)
+		);
+	}
+
+	public Command scoreL2(){
+		return Commands.sequence(
+			clearElevatorGoingUp(),
+			elevatorCommands.setHeight(ElevatorConstants.kLevel2Height),
 			pivotCommands.setAngle(PivotConstants.kLevel2Angle)
+		);
+	}
+
+	public Command scoreL1(){
+		return Commands.sequence(
+			clearElevatorGoingUp(),
+			elevatorCommands.setHeight(ElevatorConstants.kLevel1Height),
+			pivotCommands.setAngle(PivotConstants.kLevel1Angle)
 		);
 	}
 
     public Command humanIntake(){
         return Commands.sequence(
-            clearElevatorGoingUp(),
+            clearElevatorGoingUp(Degree.of(0)),
             Commands.parallel(
-                pivotCommands.setAngle(Degree.of(0)),
+            pivotCommands.setAngle(Degree.of(0)),
             coralerCommands.setOpenLoop(0.3).until(coralerCommands.current())
-            ),
-            clearElevatorGoingDown()
+            )
         );
     }
+
+	public Command stowHigh(){
+		return Commands.sequence(
+			clearElevatorGoingUp(),
+			pivotCommands.setAngle(PivotConstants.kStowAngleUp)
+		);
+	// }
+
+	// public Command letGoFromL4(){
+	// 	return pivotCommands.setAngle(PivotConstants.kLevel4Angle.minus(Radian.of(0.436)));
+	// }
+	// public Command letGoFromL3(){
+	// 	return pivotCommands.setAngle(PivotConstants.kLevel3Angle.minus(Radian.of(0.2967)));
+	// }
+	// public Command letGoFromL2(){
+	// 	return pivotCommands.setAngle(PivotConstants.kLevel2Angle.minus(Radian.of(0.22)));
+	// }
+	// public Command letGoFromL1(){
+	// 	return coralerCommands.setOpenLoop(-0.1).withTimeout(1);
+	}
 
 
 	public Command prepIntake(){
@@ -370,15 +418,9 @@ public class Superstructure {
 		);
 	}
 
-    public Command stowFromL1(){
-        return Commands.sequence(
-            Commands.parallel(
-                prepL1(),
-                coralerCommands.setOpenLoop(-0.5)
-            ).withTimeout(0.3),
-            clearElevatorGoingDown()
-        );
-    }
+
+
+
 
 	// public Command intake(){
 	// 	return Commands.parallel(
@@ -388,23 +430,13 @@ public class Superstructure {
 	// 	);
 	// }
 
-	public Command stow(Level level){
-		return Commands.sequence(
-			Commands.parallel(
-				elevatorCommands.holdPositionAtCall(),
-				pivotCommands.holdPositionAtCall(),
-				coralerCommands.spitOut()
-			),
-			pivotCommands.setAngle(PivotConstants.kStowAngle),
-			elevatorCommands.setHeight(ElevatorConstants.kStowHeight)
-		);
-	}
+	
 
 	public Command prepL3(){
 		return Commands.sequence(
 			clearElevatorGoingUpNoDown(),
 			elevatorCommands.setHeight(ElevatorConstants.kLevel3Height),
-			pivotCommands.setAngle(PivotConstants.kLevel3Angle)
+			pivotCommands.setAngle(PivotConstants.kStowAngleUp)
 		);
 	}
 
@@ -412,7 +444,7 @@ public class Superstructure {
 		return Commands.sequence(
 			clearElevatorGoingUpNoDown(),
 			elevatorCommands.setHeight(ElevatorConstants.kLevel4Height),
-			pivotCommands.setAngle(PivotConstants.kLevel4Angle)
+			pivotCommands.setAngle(PivotConstants.kStowAngleUp)
 		);
 	}
 
@@ -432,25 +464,7 @@ public class Superstructure {
 		return Commands.select(kLevelToCmdMap, this::getWantedLevel);
 	}
 
-	public Command autoPrepBylevel(Level level){
-		
-		
-		if (level.equals(Level.TROUGH)) {
-			
-			return prepL1();
-		}
-		if (level.equals(Level.LOW)) {
-			DriverStation.reportError("BALLLLLLA", false);
-			return prepL2();
-		}
-		if (level == Level.MID) {
-			return prepL3();
-		}
-		if (level == Level.HIGH) {
-			return prepL4();
-		}
-		return Commands.none().alongWith(Commands.runOnce(() -> DriverStation.reportError("default case on autoprep command!!!" + wantedLevel.toString(), false)));
-	}
+
 
     public Command setWantedBranch(Branch wantedBranch) {
         return Commands.runOnce(

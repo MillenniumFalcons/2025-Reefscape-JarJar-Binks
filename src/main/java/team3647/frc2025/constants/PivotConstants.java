@@ -13,18 +13,20 @@ import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
     public static final Angle kMinAngle = Degree.of(-90);
-    public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561);
-    public static final Angle kLevel2Angle = Radian.of(0.6324678425924254);
-    public static final Angle kLevel3Angle = Radian.of(1.1994256443859082);
-    public static final Angle kLevel4Angle = Radian.of(1.2537999814655818);
+    public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561).minus(Degree.of(10));
+    public static final Angle kLevel2Angle = Radian.of(0.6324678425924254).minus(Degree.of(10+0.22));
+    public static final Angle kLevel3Angle = Radian.of(0.90);
+    public static final Angle kLevel4Angle = Radian.of(0.730);
 
 	public static final Angle kClearAngle = Radian.of(-0.4);
 	//lowclearangle = max angle when the pivot is blocked by the intake going up 
 	public static final Angle kLowClearAngle = Radian.of(0);
 
     public static final Angle kStowAngle = kMinAngle;
-	public static final Angle kStowAngleUp = Radian.of(0);
-    public static final Angle kIntakeAngle = Degree.of(0);
+	public static final Angle kStowAngleUp = Radian.of(1.3638929658036516);
+ 
+
+
 
     public static final Angle kMaxAngle = Radian.of(1.6036416572298584);
     
@@ -61,21 +63,19 @@ public class PivotConstants {
         kMasterConfig.Slot0.withKA(0);
         kMasterConfig.Slot0.withKG(0.40);
 
-        // prob not right, verify
+    
         kMasterConfig.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-        kMasterConfig.CurrentLimits.StatorCurrentLimit = 90.0;
+        kMasterConfig.CurrentLimits.StatorCurrentLimit = 60.0;
         kMasterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        kMasterConfig.CurrentLimits.SupplyCurrentLimit = 70.0;
-        kMasterConfig.CurrentLimits.SupplyCurrentLowerLimit = 55.0;
-        kMasterConfig.CurrentLimits.SupplyCurrentLowerTime = 1;
+     
 
-        // need figuring out
+      
         kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = kMaxAngle.in(Radian)/kNativeToRad;
-        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false; 
+        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true; 
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = kMinAngle.in(Radian)/kNativeToRad;
-        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false; 
+        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true; 
 
 		kMasterConfig.MotionMagic.MotionMagicCruiseVelocity = 120;
 		kMasterConfig.MotionMagic.MotionMagicAcceleration = 1200;
