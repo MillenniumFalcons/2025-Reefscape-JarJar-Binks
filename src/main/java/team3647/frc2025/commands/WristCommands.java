@@ -16,7 +16,7 @@ public class WristCommands {
                 .until(() -> wrist.angleReached(angleRads, Degree.of(2)));
     }
 
-    public Command setOpenLoop(double output){
+    public Command setOpenLoop(double output) {
         return Commands.run(() -> wrist.setOpenLoop(output), wrist);
     }
 

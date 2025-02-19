@@ -38,7 +38,7 @@ public class WristConstants {
     static {
         kMaster.setPosition(0);
 
-        //needs tuning when the motor finally works
+        // needs tuning when the motor finally works
         kMasterConfig.Slot0.withKP(0);
         kMasterConfig.Slot0.withKI(0);
         kMasterConfig.Slot0.withKD(0);

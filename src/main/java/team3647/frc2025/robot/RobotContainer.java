@@ -88,14 +88,11 @@ public class RobotContainer {
         mainController.rightTrigger.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
         mainController.rightTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(-0.07));
 
-        //if you see this after 2/12/2025 delete it
+        // if you see this after 2/12/2025 delete it
         mainController.rightBumper.whileTrue(
                 superstructure.wristCommands.setAngle(WristConstants.kMaxAngle));
-        mainController.leftBumper.whileTrue(
-                superstructure.wristCommands.setOpenLoop(0.1));
-        mainController.leftBumper.onFalse(
-                superstructure.wristCommands.setOpenLoop(0)
-        );
+        mainController.leftBumper.whileTrue(superstructure.wristCommands.setOpenLoop(0.1));
+        mainController.leftBumper.onFalse(superstructure.wristCommands.setOpenLoop(0));
         wrist.setDefaultCommand(superstructure.wristCommands.setOpenLoop(0));
 
         // mainController.dPadUp.whileTrue(superstructure.pivotCommands.holdPositionAtCall());

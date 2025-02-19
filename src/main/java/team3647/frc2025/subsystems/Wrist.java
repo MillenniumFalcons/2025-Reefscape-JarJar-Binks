@@ -2,8 +2,6 @@ package team3647.frc2025.subsystems;
 
 import static edu.wpi.first.units.Units.Radian;
 
-import java.lang.management.ThreadInfo;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
@@ -34,7 +32,7 @@ public class Wrist extends TalonFXSubsystem {
                 0);
     }
 
-    public void setOpenLoop(double percent){
+    public void setOpenLoop(double percent) {
         this.setOpenloop(percent);
     }
 
