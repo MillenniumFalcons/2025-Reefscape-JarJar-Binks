@@ -8,7 +8,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
@@ -17,7 +16,7 @@ public class PivotConstants {
     public static final Angle kLevel3Angle = Radian.of(1.1994256443859082);
     public static final Angle kLevel4Angle = Radian.of(1.2537999814655818);
 
-	public static final Angle kClearAngle = kLevel1Angle;
+    public static final Angle kClearAngle = kLevel1Angle;
 
     public static final Angle kStowAngle = Degree.of(0);
     public static final Angle kIntakeAngle = Degree.of(0);
@@ -25,16 +24,12 @@ public class PivotConstants {
     public static final Angle kMaxAngle = Radian.of(1.6036416572298584);
     public static final Angle kMinAngle = Degree.of(-90);
 
-	public static final Angle kStartingAngle = kMaxAngle;
+    public static final Angle kStartingAngle = kMaxAngle;
 
-
-
-
-	//multiply by native to get to degs (it's 40.9 rots per 90 degs)
-	public static final double kNativeToRad = 1/(38.226562 / (Math.PI/2));
+    // multiply by native to get to degs (it's 40.9 rots per 90 degs)
+    public static final double kNativeToRad = 1 / (38.226562 / (Math.PI / 2));
 
     // wait for intake to get done 38.225652
-
 
     public static final Angle kMaxLowAngleIntakeUp = Degree.of(0);
     public static final Angle kMinHighAngleIntakeUp = Degree.of(0);
@@ -65,17 +60,18 @@ public class PivotConstants {
         kMasterConfig.CurrentLimits.SupplyCurrentLowerTime = 1;
 
         // need figuring out
-        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = kMaxAngle.in(Radian)/kNativeToRad;
-        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false; 
-        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = kMinAngle.in(Radian)/kNativeToRad;
-        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false; 
+        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+                kMaxAngle.in(Radian) / kNativeToRad;
+        kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+                kMinAngle.in(Radian) / kNativeToRad;
+        kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
-		kMasterConfig.MotionMagic.MotionMagicCruiseVelocity = 120;
-		kMasterConfig.MotionMagic.MotionMagicAcceleration = 1200;
-		kMasterConfig.MotionMagic.MotionMagicJerk = 5000;
-		kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.10000000149011612;
-		kMasterConfig.MotionMagic.MotionMagicExpo_kV = 0.11999999731779099;
-
+        kMasterConfig.MotionMagic.MotionMagicCruiseVelocity = 120;
+        kMasterConfig.MotionMagic.MotionMagicAcceleration = 1200;
+        kMasterConfig.MotionMagic.MotionMagicJerk = 5000;
+        kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.10000000149011612;
+        kMasterConfig.MotionMagic.MotionMagicExpo_kV = 0.11999999731779099;
 
         kMaster.getConfigurator().apply(kMasterConfig);
     }

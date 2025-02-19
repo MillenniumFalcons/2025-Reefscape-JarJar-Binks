@@ -13,7 +13,7 @@ public class GlobalConstants {
     public static final String kDriveCanbusName = "drive";
     public static final String kSubsystemCanbusName = "subsystems";
 
-    public static double kNominalVoltage = 11.0;
+    public static final double kNominalVoltage = 11.0;
 
     // obv need tuinng theyre alll 0
     public class PivotIds {
@@ -22,7 +22,7 @@ public class GlobalConstants {
     }
 
     public class ElevatorIds {
-		public static final int kSlaveId = 23;
+        public static final int kSlaveId = 23;
         public static final int kMasterId = 22;
     }
 
@@ -35,6 +35,6 @@ public class GlobalConstants {
     }
 
     public class WristIds {
-        public static final int kMasterId = 55;
+        public static final int kMasterId = 24;
     }
 }

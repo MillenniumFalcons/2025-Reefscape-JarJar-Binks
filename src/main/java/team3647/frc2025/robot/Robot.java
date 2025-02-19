@@ -4,15 +4,12 @@
 
 package team3647.frc2025.robot;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import team3647.lib.ModifiedSignalLogger;
-
-import java.util.Objects;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -20,8 +17,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
-import com.ctre.phoenix6.SignalLogger;
+import team3647.lib.ModifiedSignalLogger;
 
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
@@ -66,10 +62,9 @@ public class Robot extends LoggedRobot {
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata
         // values may
         // be added.
-		SignalLogger.start();
-		ModifiedSignalLogger.start();
+        SignalLogger.start();
+        ModifiedSignalLogger.start();
         m_robotContainer = new RobotContainer();
-	
     }
 
     @Override

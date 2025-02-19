@@ -5,20 +5,14 @@
 package team3647.frc2025.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radian;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import team3647.frc2025.Util.AutoDrive;
 import team3647.frc2025.autos.AutoCommands;
-import team3647.frc2025.commands.ElevatorCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.CoralerConstants;
@@ -28,8 +22,8 @@ import team3647.frc2025.constants.GlobalConstants;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.constants.TunerConstants;
-import team3647.frc2025.constants.TunerSimConstants;
 import team3647.frc2025.constants.VisionConstants;
+import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.Coraler;
 import team3647.frc2025.subsystems.Elevator;
 import team3647.frc2025.subsystems.Pivot;
@@ -52,53 +46,66 @@ public class RobotContainer {
         configureDefaultCommands();
         configureAllianceObservers();
         SmartDashboard.putData(autoChooser);
-        
-        superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
-		elevator.setEncoderHeight(ElevatorConstants.kStartingHeight);
-		pivot.setEncoderAngle(PivotConstants.kStartingAngle);
 
-		CommandScheduler.getInstance().registerSubsystem(swerve, elevator, coraler, pivot);
+        superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
+        elevator.setEncoderHeight(ElevatorConstants.kStartingHeight);
+        pivot.setEncoderAngle(PivotConstants.kStartingAngle);
+        wrist.setEncoderAngle(WristConstants.kStartingAngle);
+
+        CommandScheduler.getInstance().registerSubsystem(swerve, elevator, coraler, pivot, wrist);
     }
 
     private void configureAllianceObservers() {
-        allianceChecker.registerObservers(
-                swerveCommands, swerve, autoCommands, autoChooser);
-    }//0.6324678425924254
-
-	
+        allianceChecker.registerObservers(swerveCommands, swerve, autoCommands, autoChooser);
+    } // 0.6324678425924254
 
     private void configureBindings() {
 
-		//elev sysid
-		// mainController.leftMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidDynamFor());
+        // elev sysid
+        // mainController.leftMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidDynamFor());
         // mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
         // mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
         // mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
-		mainController.buttonA.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel1Height));
-		mainController.buttonA.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
-		mainController.buttonB.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel2Height));
-		mainController.buttonB.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
-		mainController.buttonY.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel3Height));
-		mainController.buttonY.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
-		mainController.buttonX.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel4Height));
-		mainController.buttonX.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
+        mainController.buttonA.whileTrue(
+                superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel1Height));
+        mainController.buttonA.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
+        mainController.buttonB.whileTrue(
+                superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel2Height));
+        mainController.buttonB.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
+        mainController.buttonY.whileTrue(
+                superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel3Height));
+        mainController.buttonY.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
+        mainController.buttonX.whileTrue(
+                superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel4Height));
+        mainController.buttonX.onFalse(superstructure.elevatorCommands.holdPositionAtCall());
 
-		mainController.dPadUp.whileTrue(superstructure.pivotCommands.setAngle(PivotConstants.kLevel1Angle));
+        mainController.dPadUp.whileTrue(
+                superstructure.pivotCommands.setAngle(PivotConstants.kLevel1Angle));
 
-		mainController.leftTrigger.whileTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
-		mainController.leftTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(0));
+        mainController.leftTrigger.whileTrue(superstructure.coralerCommands.setOpenLoop(-0.5));
+        mainController.leftTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(0));
 
+        mainController.rightTrigger.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
+        mainController.rightTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(-0.07));
 
-		mainController.rightTrigger.whileTrue(superstructure.coralerCommands.setOpenLoop(0.5));
-		mainController.rightTrigger.onFalse(superstructure.coralerCommands.setOpenLoop(-0.07));
+        //if you see this after 2/12/2025 delete it
+        mainController.rightBumper.whileTrue(
+                superstructure.wristCommands.setAngle(WristConstants.kMaxAngle));
+        mainController.leftBumper.whileTrue(
+                superstructure.wristCommands.setOpenLoop(0.1));
+        mainController.leftBumper.onFalse(
+                superstructure.wristCommands.setOpenLoop(0)
+        );
+        wrist.setDefaultCommand(superstructure.wristCommands.setOpenLoop(0));
 
-		// mainController.dPadUp.whileTrue(superstructure.pivotCommands.holdPositionAtCall());
-		// mainController.dPadUp.onFalse(superstructure.pivotCommands.setOpenLoop(() -> 0));
+        // mainController.dPadUp.whileTrue(superstructure.pivotCommands.holdPositionAtCall());
+        // mainController.dPadUp.onFalse(superstructure.pivotCommands.setOpenLoop(() -> 0));
 
-		// mainController.dPadRight.whileTrue(superstructure.elevatorCommands.setOpenLoop(() -> 0.4));
-		// mainController.dPadRight.onFalse(superstructure.pivotCommands.setOpenLoop(() -> 0));
-		// mainController.dPadLeft.whileTrue(superstructure.elevatorCommands.setOpenLoop(() -> 0));
-		// mainController.dPadLeft.onFalse(superstructure.elevatorCommands.setOpenLoop(() -> 0));
+        // mainController.dPadRight.whileTrue(superstructure.elevatorCommands.setOpenLoop(() ->
+        // 0.4));
+        // mainController.dPadRight.onFalse(superstructure.pivotCommands.setOpenLoop(() -> 0));
+        // mainController.dPadLeft.whileTrue(superstructure.elevatorCommands.setOpenLoop(() -> 0));
+        // mainController.dPadLeft.onFalse(superstructure.elevatorCommands.setOpenLoop(() -> 0));
 
         // cocontroller selecting the branch you wanna score coral on
         coController
@@ -118,7 +125,6 @@ public class RobotContainer {
                 .and(coController.buttonX.negate())
                 .onTrue(superstructure.setWantedSide(Side.D))
                 .debounce(0.1);
-
 
         coController.buttonY.and(coController.buttonX).onTrue(superstructure.setWantedSide(Side.E));
 
@@ -150,8 +156,8 @@ public class RobotContainer {
                         autoDrive::getVelocities,
                         autoDrive::getWantedMode,
                         autoDrive::getAutoDriveEnabled));
-		elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
-		// coraler.setDefaultCommand(superstructure.coralerCommands.stow());
+        elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
+        // coraler.setDefaultCommand(superstructure.coralerCommands.stow());
     }
 
     public Command getAutonomousCommand() {
@@ -185,7 +191,6 @@ public class RobotContainer {
                     ElevatorConstants.kSlave,
                     ElevatorConstants.kNativeToMeters,
                     ElevatorConstants.kNativeToMeters,
-
                     GlobalConstants.kNominalVoltage,
                     0,
                     ElevatorConstants.kMinHeight.in(Units.Meter),
@@ -203,7 +208,18 @@ public class RobotContainer {
                     GlobalConstants.kNominalVoltage,
                     GlobalConstants.kDt);
 
-    public final Superstructure superstructure = new Superstructure(coraler, elevator, pivot);
+    public final Wrist wrist =
+            new Wrist(
+                    WristConstants.kMaster,
+                    WristConstants.kNativeToRad,
+                    WristConstants.kNativeToRad,
+                    GlobalConstants.kNominalVoltage,
+                    WristConstants.kMinAngle,
+                    WristConstants.kMaxAngle,
+                    GlobalConstants.kDt);
+
+    public final Superstructure superstructure =
+            new Superstructure(coraler, elevator, pivot, wrist);
 
     public final AutoDrive autoDrive =
             new AutoDrive(
