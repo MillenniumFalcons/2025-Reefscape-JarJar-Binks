@@ -58,7 +58,7 @@ public class ElevatorCommands {
 
             @Override
             public void execute() {
-                elevator.setHeight(degreeAtStart);
+                elevator.setHeightExpo(degreeAtStart);
             }
 
             @Override

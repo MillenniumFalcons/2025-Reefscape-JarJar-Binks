@@ -105,6 +105,9 @@ public class Elevator extends TalonFXSubsystem {
 		return voltageSysid.quasistatic(Direction.kReverse);
 	}
 
+	public void setHeightExpo(Distance height){
+		this.setPositionExpoVoltage(MathUtil.clamp(height.in(Meters), minLength, maxLength), this.kG);
+	}
 
 	public Command elevSysidDynamFor(){
 		return voltageSysid.dynamic(Direction.kForward);

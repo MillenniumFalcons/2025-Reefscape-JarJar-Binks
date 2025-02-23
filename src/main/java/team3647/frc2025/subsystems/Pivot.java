@@ -56,14 +56,14 @@ public class Pivot extends TalonFXSubsystem {
     public void setAngle(Angle angle) {
         // Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
 
-        super.setPositionMotionMagic(
+        super.setPositionExpoVoltage(
                 MathUtil.clamp(angle.in(Radian), getMinAngle().in(Radian), getMaxAngle().in(Radian)),0);
     }
 
 	public void setAngleRads(double angle) {
         // Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
 
-        super.setPositionMotionMagic(
+        super.setPositionExpoVoltage(
                 MathUtil.clamp(angle, getMinAngle().in(Radian), getMaxAngle().in(Radian)),0);
     }
 
@@ -88,7 +88,7 @@ public class Pivot extends TalonFXSubsystem {
 	}
 
 	public boolean needToClearElevator(){
-		return getPosition() > kClearAngle.in(Radian) && elevatorHeight.get().lt(ElevatorConstants.kClearHeight);
+		return getPosition() < kClearAngle.in(Radian) && elevatorHeight.get().lt(ElevatorConstants.kClearHeight);
 	}
 
 	public Angle getMinAngle(){

@@ -16,6 +16,8 @@ public class VisionConstants {
 
 	public static final String kCrossbarLLName = "xbar";
 	public static final String backRightCamName = "backRight";
+	public static final String frontRightCamName = "frontRight";
+	public static final String frontLeftCamName = "frontLeft";
 
 	public static final Distance kOriginCubeToRobotBottom = Inches.of(1.75);
 
@@ -29,28 +31,38 @@ public class VisionConstants {
 
 	public static final Transform3d LLCrossMount = new Transform3d(
 		Inches.of(.00001772), 
-		Inches.of(-4.434), 
+		Inches.of(-4.795749), 
 		Inches.of(34.295), 
 		new Rotation3d(Degrees.of(0), 
 		Degrees.of(-7.382), 
 		Degrees.of(180)));
 
+		
+
 	public static final Transform3d FrontLeft = new Transform3d(
-		Inches.of(-9.5), 
-		Inches.of(11.5), 
+		Inches.of(12.168), 
+		Inches.of(-9.087701), 
 		Inches.of(7),
 		new Rotation3d(Degrees.of(0),
 		Degrees.of(0), 
 		Degrees.of(-58.384)));
 
+		public static final Transform3d FrontRight = new Transform3d(
+			Inches.of(12.168), 
+			Inches.of(9.087701), 
+			Inches.of(7),
+			new Rotation3d(Degrees.of(0),
+			Degrees.of(0), 
+			Degrees.of(58.384)));
+
 	public static final Transform3d BackRight = new Transform3d(
-		Inches.of(-9.290),
-		Inches.of(10.461),
-		Inches.of(7.993),
+		Inches.of(-9.579),
+		Inches.of(11.029),
+		Inches.of(8.450885),
 		new Rotation3d(
 			Degrees.of(0),
 			Degrees.of(35.65),
-			Degrees.of(162)
+			Degrees.of(0-90-27)
 		));
 
 }

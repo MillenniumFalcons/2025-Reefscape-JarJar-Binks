@@ -4,7 +4,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 public class RollersConstants {
-    public static final TalonFX kMaster = new TalonFX(25, GlobalConstants.kSubsystemCanbusName);
+    public static final TalonFX kMaster = new TalonFX(GlobalConstants.RollersIds.kMasterId, GlobalConstants.kSubsystemCanbusName);
 
 
     public static final TalonFXConfiguration kmasterConfg = new TalonFXConfiguration();

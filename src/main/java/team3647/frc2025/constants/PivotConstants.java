@@ -12,41 +12,47 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
-    public static final Angle kMinAngle = Degree.of(-90);
+    public static final Angle kMinAngle = Radian.of(-1.584);
     public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561).minus(Degree.of(10));
-    public static final Angle kLevel2Angle = Radian.of(0.6324678425924254).minus(Degree.of(10+0.22));
-    public static final Angle kLevel3Angle = Radian.of(0.90);
-    public static final Angle kLevel4Angle = Radian.of(0.730);
+    public static final Angle kLevel2Angle = Radian.of(-0.279);
+    public static final Angle kLevel3Angle = Radian.of(0.50);
+    public static final Angle kLevel4Angle = Radian.of(0.344);
+
+	public static final Angle kL2Prep = Radian.of(0);
+	public static final Angle KL1Prep = kLevel1Angle;
+	public static final Angle kStartingAngle = kMinAngle;
+
+	public static final Angle klowLevelsStow = Radian.of(-0.045);
 
 	public static final Angle kClearAngle = Radian.of(-0.4);
 	//lowclearangle = max angle when the pivot is blocked by the intake going up 
 	public static final Angle kLowClearAngle = Radian.of(0);
 
-    public static final Angle kStowAngle = kMinAngle;
+    public static final Angle kStowAngle = Degree.of(-90);
 	public static final Angle kStowAngleUp = Radian.of(1.3638929658036516);
  
+	public static final double kNativeToRad = 1/(10.081055 / (Math.PI/2));
 
 
-
-    public static final Angle kMaxAngle = Radian.of(1.6036416572298584);
+    public static final Angle kMaxAngle = Radian.of(9.60/kNativeToRad);
     
 
-	public static final Angle kStartingAngle = kMinAngle;
+	
+	//-1.402692317215491
+    public static final Angle kHandoffAngle = Radian.of(-1.407);
 
-    public static final Angle kHandoffAngle = Radian.of(-1.350);
+	
 
 	// public static final Angle kBadAngle = Radian.of(0);
 	// public static final Angle kBadTolerance = Radian.of(0);
 
 
 	//multiply by native to get to degs (it's 40.9 rots per 90 degs)
-	public static final double kNativeToRad = 1/(38.226562 / (Math.PI/2));
+	
 
     // wait for intake to get done 38.225652
 
 
-    public static final Angle kMaxLowAngleIntakeUp = Degree.of(0);
-    public static final Angle kMinHighAngleIntakeUp = Degree.of(0);
 
     public static final TalonFX kMaster =
             new TalonFX(GlobalConstants.PivotIds.kMasterId, GlobalConstants.kSubsystemCanbusName);
@@ -61,11 +67,11 @@ public class PivotConstants {
         kMasterConfig.Slot0.withKS(0);
         kMasterConfig.Slot0.withKV(0);
         kMasterConfig.Slot0.withKA(0);
-        kMasterConfig.Slot0.withKG(0.40);
+        kMasterConfig.Slot0.withKG(0.3);
 
     
         kMasterConfig.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
-        kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         kMasterConfig.CurrentLimits.StatorCurrentLimit = 60.0;
         kMasterConfig.CurrentLimits.StatorCurrentLimitEnable = true;

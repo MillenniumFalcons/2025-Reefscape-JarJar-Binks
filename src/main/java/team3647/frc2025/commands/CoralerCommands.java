@@ -22,6 +22,10 @@ public class CoralerCommands {
         return Commands.run(() -> coraler.setDutyCycle(-0.2), coraler);
     }
 
+	public Command kill(){
+		return setOpenLoop(0).withTimeout(0.1);
+	}
+
     public Command setOpenLoop(double percent) {
         return Commands.run(() -> coraler.setDutyCycle(percent), coraler);
     }
@@ -30,8 +34,8 @@ public class CoralerCommands {
         return Commands.run(() -> coraler.setDutyCycle(percent.getAsDouble()), coraler);
     }
 
-    public BooleanSupplier current(){
-        return new Trigger(() -> coraler.getMasterCurrent() > 40);
+    public Trigger current(){
+        return new Trigger(() -> coraler.getMasterCurrent() > 50).debounce(0.04);
     }
 
     public Coraler coraler;

@@ -44,8 +44,8 @@ public class Robot extends LoggedRobot {
                                     ? "/home/lvuser/logs"
                                     : "logs")); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution nlogging
-        } else if (isReal() && rio1) {
+           var pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution nlogging
+        } else if (rio1) {
             Logger.addDataReceiver(new NT4Publisher());
 
         } else {
@@ -77,13 +77,17 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-		Logger.recordOutput("clear elevator?", m_robotContainer.superstructure.shouldClearGoingUp());
+		Logger.recordOutput("superstruc/pivotoffset", m_robotContainer.superstructure.getPivotOffset());
+		Logger.recordOutput("superstruc/elevOffset", m_robotContainer.superstructure.getElevOffset());
 		Logger.recordOutput("selected level", m_robotContainer.superstructure.getWantedLevel());
 		
     }
 
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+		SignalLogger.stop();
+		ModifiedSignalLogger.stop();
+	}
 
     @Override
     public void disabledPeriodic() {

@@ -15,11 +15,14 @@ public class RollersCommands {
         return Commands.run(() -> rollers.setOpenLoop(output), rollers);
 
     }
+	
+
+
     public boolean currentGreater(double current){
         return rollers.getMasterCurrent() > current;
     }
 
     public Command kill(){
-        return setOpenLoop(0);
+        return setOpenLoop(0).withTimeout(0.3);
     }
 }

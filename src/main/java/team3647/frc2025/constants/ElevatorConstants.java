@@ -20,6 +20,8 @@ public class ElevatorConstants {
 	public static final Distance kStartingHeight = Meters.of(0.85);
 	public static final Distance kStowHeight = kStartingHeight.plus(Centimeter.of(5));
 
+	public static final Distance kHandoffHeight = kStowHeight.plus(Inches.of(3));
+
 	public static final Distance kMaxHeight = Meters.of(83.87989807128906 * kNativeToMeters);
 
 	//all heights measured as center dist from the pivot pivoting bar
@@ -53,7 +55,7 @@ public class ElevatorConstants {
 
     static {
 		//slot 0  = voltage configs
-        kMasterConfig.Slot0.withKP(4);
+        kMasterConfig.Slot0.withKP(3);
         kMasterConfig.Slot0.withKI(0);
         kMasterConfig.Slot0.withKD(0);
         kMasterConfig.Slot0.withGravityType(GravityTypeValue.Elevator_Static);

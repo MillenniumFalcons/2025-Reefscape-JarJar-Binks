@@ -37,4 +37,9 @@ public class GlobalConstants {
     public class WristIds {
         public static final int kMasterId = 24;
     }
+
+	public class  RollersIds {
+		public static final int kMasterId = 25;
+		
+	}
 }

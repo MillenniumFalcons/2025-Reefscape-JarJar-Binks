@@ -41,16 +41,18 @@ public class Wrist extends TalonFXSubsystem {
         return Degree.of(getPosition());
     }
 
-    public double getAngleRads() {
-        return getAngle().in(Radian);
+    public double getAngleDegs() {
+        return getPosition();
     }
 
+	
+
     public boolean angleWithin(double lowBound, double highBound) {
-        return getAngleRads() > lowBound && getAngleRads() < highBound;
+        return getAngleDegs() > lowBound && getAngleDegs() < highBound;
     }
 
     public boolean angleReached(double angle, double tolerance) {
-        return Math.abs(getAngleRads() - angle) < tolerance;
+        return Math.abs(getAngleDegs() - angle) < tolerance;
     }
 
     @Override
