@@ -107,7 +107,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     }
 
     @Override
-    public Optional<List<VisionMeasurement>> QueueToInputs() {
+    public Optional<VisionMeasurement> QueueToInputs() {
         var botPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
         if (botPose.isEmpty()) {
             return Optional.empty();
@@ -142,7 +142,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         var measurement =
                 new VisionMeasurement(result.pose, timestamp, ambiguityScore, stdDevs, name);
 
-        return Optional.of(List.of(measurement));
+        return Optional.of(measurement);
     }
 
     @Override

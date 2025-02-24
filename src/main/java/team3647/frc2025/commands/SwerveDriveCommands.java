@@ -2,18 +2,21 @@ package team3647.frc2025.commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 import team3647.frc2025.Util.AutoDrive.DriveMode;
 import team3647.frc2025.subsystems.SwerveDrive;
 import team3647.lib.team9442.AllianceObserver;
@@ -44,7 +47,7 @@ public class SwerveDriveCommands implements AllianceObserver {
                 () -> {
                     var isAutoDrive = autoDriveEnabled.getAsBoolean();
                     var velocities = autoDriveVelocities.get();
-                    double invert = RobotBase.isSimulation() && color == Alliance.Red ? -1 : 1;
+                    double invert = 1;
 
                     double ySquared =
                             Math.pow(y.getAsDouble(), 2) * Math.signum(y.getAsDouble()) * 1.05;
@@ -106,6 +109,24 @@ public class SwerveDriveCommands implements AllianceObserver {
 
             swerve.drive(theta, 0, 0);
         }, swerve);
+    }
+
+	public Command alignY(){
+		ProfiledPIDController xController = new ProfiledPIDController(30, 0, 0, new Constraints(5, 10));
+        return new Command() {
+			@Override
+			public void execute() {
+				            var theta = xController.calculate(swerve.getOdoPose().getY(), 4);
+
+            	swerve.drive(0, theta, 0);
+			}
+			@Override
+			public void end(boolean interrupted) {
+				swerve.drive(0, 0, 0);
+				
+			}
+		};
+		
     }
 
     public Command driveVisionTeleop(

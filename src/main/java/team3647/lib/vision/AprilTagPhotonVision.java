@@ -2,11 +2,15 @@ package team3647.lib.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -21,7 +25,7 @@ import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
 public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera {
 
     AprilTagFieldLayout aprilTagFieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     PhotonPoseEstimator photonPoseEstimator;
     Transform3d robotToCam;
     private final edu.wpi.first.math.Vector<N3> baseStdDevs;
@@ -54,7 +58,7 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
     }
 
     public AprilTagPhotonVision(String camera, Transform3d robotToCam) {
-        this(camera, robotToCam, VecBuilder.fill(0.05, 0.05, 5), (update) -> false);
+        this(camera, robotToCam, VecBuilder.fill(0.05, 0.05, 0.1), (update) -> false);
     }
 
     public AprilTagId getId(int id) {
@@ -87,96 +91,73 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
         return Optional.of(bruh.transformBy(robotToCam));
     }
 
-    public Optional<List<VisionMeasurement>> QueueToInputs() {
-        var resultList = this.getAllUnreadResults();
-        List<VisionMeasurement> outputList = List.of();
-
-        for (var result : resultList) {
-            if (!result.hasTargets()) {
-                return Optional.empty();
-            }
-            var update =
-                    photonPoseEstimator.update(
-                            result, this.getCameraMatrix(), this.getDistCoeffs());
-            if (update.isEmpty()) {
-                return Optional.empty();
-            }
-            double targetDistance =
-                    result.getBestTarget()
-                            .getBestCameraToTarget()
-                            .getTranslation()
-                            .toTranslation2d()
-                            .getNorm();
-
-            // // Use if want prio system
-            // if (hasPriority) {
-            //     targetDistance = MathUtil.clamp(targetDistance - 3, 1, 1000);
-            // }
-            if (targetDistance > 4 && !hasPriority) {
-                return Optional.empty();
-            }
-            // only for prio system
-            if (targetDistance > 8) {
-                return Optional.empty();
-            }
-            if (Math.abs(update.get().estimatedPose.getZ()) > 0.5) {
-                return Optional.empty();
-            }
-            if (update.get().estimatedPose.getMeasureX().gt(FieldConstants.kFieldLength)
-                    || update.get().estimatedPose.getX() < 0
-                    || update.get().estimatedPose.getMeasureY().gt(FieldConstants.kFieldWidth)
-                    || update.get().estimatedPose.getY() < 0) {
-                return Optional.empty();
-            }
-
-            // if (result.getBestTarget().getFiducialId() == 5
-            //         || result.getBestTarget().getFiducialId() == 6) {
-            //     return Optional.empty();
-            // }
-            // Logger.recordOutput(
-            //         "Cams/" + this.getName(),
-            // update.get().estimatedPose.transformBy(robotToCam));
-
-            double numTargets = result.getTargets().size();
-
-            // // ONLY IF PRIO HAS HELLA AMBIGUOUS VIEW OF TAGS, WE DONT GET MULTITAG ANYWHERE IN
-            // 2025
-            // if (hasPriority && numTargets < 2) {
-            //     return Optional.empty();
-            // }
-            final var stdDevs =
-                    baseStdDevs.times(targetDistance).times(8 / Math.pow(numTargets, 3));
-            double ambiguityScore =
-                    1 / (numTargets * 100 + (1 - result.getBestTarget().getPoseAmbiguity()));
-
-            if (hasPriority) {
-                Logger.recordOutput("Zoom ambiguity schore", ambiguityScore);
-            }
-
-            // final double priorityScore = this.hasPriority ? 50 : 0;
-            // ambiguityScore += priorityScore;
-
-            if (result.targets.stream().anyMatch(target -> target.getPoseAmbiguity() > 0.2)) {
-
-                return Optional.empty();
-            }
-            if (hasPriority) {
-                Logger.recordOutput(
-                        "toomuchambiguity?",
-                        result.targets.stream().anyMatch(t -> t.getPoseAmbiguity() > 0.2));
-            }
-            VisionMeasurement measurement =
-                    VisionMeasurement.fromEstimatedRobotPose(
-                            update.get(),
-                            update.get().timestampSeconds,
-                            ambiguityScore,
-                            stdDevs,
-                            getName());
-            outputList.add(measurement);
+ public Optional<VisionMeasurement> QueueToInputs() {
+        var result = this.getLatestResult();
+        if (!result.hasTargets()) {
+            return Optional.empty();
         }
-        return Optional.of(outputList);
-    }
+        var update = photonPoseEstimator.update(result);
+        if (update.isEmpty()) {
+            return Optional.empty();
+        }
 
+		Logger.recordOutput("Robot/unfilteredVision", update.get().estimatedPose);
+        double targetDistance =
+                result.getBestTarget()
+                        .getBestCameraToTarget()
+                        .getTranslation()
+                        .toTranslation2d()
+                        .getNorm();
+        if (hasPriority) {
+            targetDistance = MathUtil.clamp(targetDistance - 3, 1, 1000);
+        }
+        // if (result.getBestTarget().getFiducialId() != 3
+        //         && result.getBestTarget().getFiducialId() != 4) {
+        //     return Optional.empty();
+        // }
+        if (targetDistance > 4 && !hasPriority) {
+            return Optional.empty();
+        }
+        if (targetDistance > 8) {
+            return Optional.empty();
+        }
+        if (Math.abs(update.get().estimatedPose.getZ()) > 0.5) {
+            return Optional.empty();
+        }
+        if (update.get().estimatedPose.getX() > FieldConstants.kFieldLength.in(Meters)
+                || update.get().estimatedPose.getX() < 0
+                || update.get().estimatedPose.getY() > FieldConstants.kFieldWidth.in(Meters)
+                || update.get().estimatedPose.getY() < 0) {
+            return Optional.empty();
+        }
+
+        // if (result.getBestTarget().getFiducialId() == 5
+        //         || result.getBestTarget().getFiducialId() == 6) {
+        //     return Optional.empty();
+        // }
+        // Logger.recordOutput(
+        //         "Cams/" + this.getName(), update.get().estimatedPose.transformBy(robotToCam));
+        double numTargets = result.getTargets().size();
+        if (hasPriority && numTargets < 2) {
+            return Optional.empty();
+        }
+        final var stdDevs = baseStdDevs.times(targetDistance).times(8 / Math.pow(numTargets, 3));
+        double ambiguityScore =
+                1 / (numTargets * 100 + (1 - result.getBestTarget().getPoseAmbiguity()));
+        final double priorityScore = this.hasPriority ? 50 : 0;
+        ambiguityScore += priorityScore;
+        if (result.targets.stream().anyMatch(target -> target.getPoseAmbiguity() > 0.2)) {
+            return Optional.empty();
+        }
+        VisionMeasurement measurement =
+                VisionMeasurement.fromEstimatedRobotPose(
+                        update.get(),
+                        update.get().timestampSeconds,
+                        ambiguityScore,
+                        stdDevs,
+                        getName());
+        return Optional.of(measurement);
+    }
     public int getTagNum() {
         var result = this.getLatestResult();
         if (result.hasTargets()) {

@@ -2,15 +2,13 @@ package team3647.lib.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonPipelineResult;
 import team3647.lib.team6328.VirtualSubsystem;
 
 public class VisionController extends VirtualSubsystem {
@@ -19,8 +17,6 @@ public class VisionController extends VirtualSubsystem {
     private final Consumer<Pose2d> resetPose;
     private final Function<VisionMeasurement, Boolean> shouldAddData;
     private final ArrayList<VisionMeasurement> list = new ArrayList<>();
-    private final List<VisionMeasurement> inputQueue = List.of();
-
     private int count;
 
     public VisionController(
@@ -38,27 +34,26 @@ public class VisionController extends VirtualSubsystem {
     public void periodic() {
 
         list.clear();
-        for (AprilTagCamera cam : cameras) {
-            var inputs = cam.QueueToInputs();
 
-            if (inputs.isEmpty()) continue;
+        for (AprilTagCamera camera : cameras) {
 
-            for (VisionMeasurement ms : inputs.get()) {
-                inputQueue.add(ms);
+            var inputs = camera.QueueToInputs();
+
+            if (inputs.isEmpty()) {
+                continue;
             }
-        }
 
-        for (VisionMeasurement measurement : inputQueue) {
+            var getInputs = inputs.get();
 
-            // dist to last pose check
-            if (shouldAddData.apply(measurement)) {
-                list.add(measurement);
+            if (shouldAddData.apply(getInputs)) {
+                list.add(getInputs);
+				
                 count = 0;
             } else {
                 count++;
                 if (count > 4) {
-                    resetPose.accept(measurement.pose);
-                    Logger.recordOutput("Robot/Reset", measurement.pose);
+                    resetPose.accept(getInputs.pose);
+                    Logger.recordOutput("Robot/Reset", getInputs.pose);
                     break;
                 }
             }
@@ -73,21 +68,12 @@ public class VisionController extends VirtualSubsystem {
             botPoseAcceptor.accept(list.get(0));
 
             Logger.recordOutput("Robot/Vision", list.get(0).pose);
-
             Logger.recordOutput("Robot/Camera", list.get(0).name);
-
-            Logger.recordOutput("Robot/Has Pose", true);
+            Logger.recordOutput("stddev", list.get(0).stdDevs.get(0, 0));
         } else {
             Logger.recordOutput("Robot/Vision", new Pose2d(1, 1, new Rotation2d()));
             Logger.recordOutput("stddev", 0.0);
         }
-        Logger.recordOutput(
-                "Robot/Has Pose", !new Trigger(() -> list.isEmpty()).debounce(1).getAsBoolean());
-    }
-
-    public static PhotonPipelineResult getLatestResult(PhotonCamera cam) {
-        var list = cam.getAllUnreadResults();
-        if (list.isEmpty()) return new PhotonPipelineResult();
-        return list.get(0);
+        SmartDashboard.putBoolean("Has Vision?", list.isEmpty() || !list.get(0).pose.equals(new Pose2d(1,1,new Rotation2d())));
     }
 }

@@ -73,6 +73,8 @@ public class Superstructure {
 
 	private Map<Level, Command> kLevelToScoreMap;
 
+	private Map<Level, Command> stowFromShotMap;
+
     public enum Side {
         A,
         B,
@@ -121,6 +123,12 @@ public class Superstructure {
 										Level.LOW, scoreL2(),
 										Level.MID, scoreL3(),
 										Level.HIGH, scoreL4());
+
+		this.stowFromShotMap = Map.of(Level.TROUGH, poopCoral(),
+										Level.LOW, poopCoral(),
+										Level.MID, poopCoral(),
+										Level.HIGH, stowFromL4());
+
 
 		this.wristCommands = new WristCommands(wrist);
 
@@ -296,6 +304,9 @@ public class Superstructure {
 	public boolean shouldClearGoingUp(){
 		return pivot.angleWithin(PivotConstants.kMinAngle.minus(Degree.of((5))).in(Radian), PivotConstants.kClearAngle.in(Radian)) && elevator.getHeight().lt(ElevatorConstants.kClearHeight);
 	}
+	public Command autoStowFromShot(){
+		return Commands.select(stowFromShotMap, this::getWantedLevel);
+	}
 //
 	public Command clearElevatorGoingUp(){
 		return Commands.either(
@@ -452,7 +463,15 @@ public class Superstructure {
 	}
 
 	public Command poopCoral(){
-		return coralerCommands.setOpenLoop(-0.3).withTimeout(0.3);
+		return coralerCommands.setOpenLoop(-0.3).withTimeout(0.1);
+	}
+
+	public Command stowFromL4(){
+		return Commands.sequence(poopCoral(), pivotCommands.setAngle(-0.28));
+	}
+
+	public Command stowFromL3(){
+		return Commands.parallel(poopCoral(), pivotCommands.setAngle(-0.28));
 	}
 
 	public Command stowAll(){
@@ -479,15 +498,7 @@ public class Superstructure {
 		return pivotOffset;
 	}
 
-    public Command humanIntake(){
-        return Commands.sequence(
-            clearElevatorGoingUp(Degree.of(0)),
-            Commands.parallel(
-            pivotCommands.setAngle(Degree.of(0)),
-            coralerCommands.setOpenLoop(0.3).until(coralerCommands.current())
-            )
-        );
-    }
+   
 
 	public Command stowHigh(){
 		return Commands.sequence(
@@ -522,8 +533,8 @@ public class Superstructure {
 			)).alongWith(rollersCommands.setOpenLoop(-0.3));
 	}
 
-	public boolean intakeCurrent(){
-		return rollersCommands.currentGreater(currentLimit);
+	public Trigger intakeCurrent(){
+		return new Trigger(() -> rollersCommands.currentGreater(currentLimit)).debounce(0.05);
 	}
 
 
@@ -657,6 +668,8 @@ public class Superstructure {
                     this.wantedLevel = wantedLevel;
                 });
     }
+
+
 
     public Level getWantedLevel() {
         return wantedLevel;

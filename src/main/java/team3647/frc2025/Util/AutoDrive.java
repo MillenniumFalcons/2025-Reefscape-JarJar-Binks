@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.lib.team9442.AllianceObserver;
+import team3647.lib.vision.NeuralDetector;
 
 public class AutoDrive implements AllianceObserver {
 
@@ -43,7 +44,8 @@ public class AutoDrive implements AllianceObserver {
             List<Pose2d> blueSourcePoses,
             PIDController xController,
             PIDController yController,
-            PIDController rotController) {
+            PIDController rotController,
+			NeuralDetector detector) {
         this.odoPoseFunction = odoPoseFunction;
         this.xController = xController;
         this.yController = yController;

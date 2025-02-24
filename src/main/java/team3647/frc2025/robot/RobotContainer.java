@@ -57,6 +57,7 @@ import team3647.lib.team9442.AllianceChecker;
 import team3647.lib.team9442.AutoChooser;
 import team3647.lib.vision.AprilTagLimelight;
 import team3647.lib.vision.AprilTagPhotonVision;
+import team3647.lib.vision.NeuralDetectorLimelight;
 import team3647.lib.vision.VisionController;
 
 
@@ -69,7 +70,7 @@ public class RobotContainer {
         configureDefaultCommands();
         configureAllianceObservers();
         SmartDashboard.putData(autoChooser);
-		swerve.setRobotPose(new Pose2d(16, 0.7, Rotation2d.fromRadians(Math.PI)));
+		swerve.setRobotPose(new Pose2d(16, 0.7, Rotation2d.kZero));
         
         superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
 		elevator.setEncoderHeight(ElevatorConstants.kStartingHeight);
@@ -89,14 +90,12 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-		// // sysid
-		// mainController.leftMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidDynamFor());
-        // mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
-        // mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
-        // mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
+		// sysid
+		mainController.leftMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveDynamTestFOC(Direction.kForward));
+        mainController.leftMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveDynamTestFOC(Direction.kReverse));
+        mainController.rightMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kForward));
+        mainController.rightMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kReverse));
 		
-
-
 		// mainController.leftBumper.whileTrue(superstructure.prepIntake().until(intakeUp));
 		// mainController.leftBumper.onFalse(superstructure.stowIntake());
 		// intakeUp.and(safeToIntakeUp).onTrue(superstructure.stowFromIntake().withTimeout(3));
@@ -104,20 +103,23 @@ public class RobotContainer {
 
 
 		// mainController.rightTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
-		// mainController.rightTrigger.and(mainController.buttonX.negate()).onFalse(superstructure.poopCoral());	
+		// mainController.rightTrigger.and(mainController.buttonX.negate()).onFalse(superstructure.autoStowFromShot());	
 
-		mainController.rightTrigger.whileTrue(superstructure.poopCoral());
-		mainController.buttonA.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel2Height));
-		mainController.buttonX.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel1Height));
-		mainController.buttonB.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel3Height));
-		mainController.buttonY.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel4Height));
+		
 
 		// mainController.rightMidButton.whileTrue(superstructure.stowElevAndPivot());
 
 		
 		// score.and(safeToScore).onTrue(superstructure.autoScoreByLevel());
 
-		// mainController.leftTrigger.negate().and(mainController.buttonX).onTrue(getAutonomousCommand());
+		mainController.rightTrigger.whileTrue(swerveCommands.alignY());
+
+
+	
+
+	
+
+		
 
 		
 
@@ -177,7 +179,7 @@ public class RobotContainer {
                         autoDrive::getWantedMode,
                         autoDrive::getAutoDriveEnabled));
 		elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
-		// pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
+		pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
 		coraler.setDefaultCommand(superstructure.coralerCommands.setOpenLoop(0));
 		wrist.setDefaultCommand(superstructure.wristCommands.holdPositionAtCall());
     }
@@ -248,6 +250,9 @@ public class RobotContainer {
 
     public final Superstructure superstructure = new Superstructure(coraler, elevator, pivot,wrist, rollers, mainController.buttonY);
 
+
+	NeuralDetectorLimelight detector =  new NeuralDetectorLimelight(VisionConstants.kIntakeLLName);
+
     public final AutoDrive autoDrive =
             new AutoDrive(
                     swerve::getOdoPose,
@@ -256,7 +261,8 @@ public class RobotContainer {
                     FieldConstants.blueSources,
                     AutoConstants.xController,
                     AutoConstants.yController,
-                    AutoConstants.rotController);
+                    AutoConstants.rotController,
+					detector);
 
     public final SwerveDriveCommands swerveCommands =
             new SwerveDriveCommands(
@@ -298,6 +304,8 @@ public class RobotContainer {
 		VisionConstants.baseStdDevs
 	);
 
+	
+
 	// AprilTagPhotonVision frontRight = 
 			// new AprilTagPhotonVision("frontRight", VisionConstants.kRobotToFrontRight , VisionConstants.baseStdDevs);
 
@@ -321,6 +329,5 @@ public class RobotContainer {
 
 	Trigger safeToScore = new Trigger(mainController.rightTrigger.and(goodToScore).and(() -> !DriverStation.isAutonomous()));
 
-	Trigger 
-	intakeUp = new Trigger(() -> superstructure.intakeCurrent() && wrist.getAngleDegs() < 10).or(mainController.buttonB);
+	Trigger intakeUp = new Trigger(() -> superstructure.intakeCurrent().getAsBoolean() && wrist.getAngleDegs() < 10).or(mainController.buttonB);
 }

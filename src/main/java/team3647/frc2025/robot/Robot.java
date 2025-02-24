@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import team3647.frc2025.subsystems.Superstructure;
 import team3647.lib.ModifiedSignalLogger;
+import team3647.lib.team6328.VirtualSubsystem;
 
 import java.util.Objects;
 import java.util.logging.Level;
@@ -80,6 +81,7 @@ public class Robot extends LoggedRobot {
 		Logger.recordOutput("superstruc/pivotoffset", m_robotContainer.superstructure.getPivotOffset());
 		Logger.recordOutput("superstruc/elevOffset", m_robotContainer.superstructure.getElevOffset());
 		Logger.recordOutput("selected level", m_robotContainer.superstructure.getWantedLevel());
+		VirtualSubsystem.periodicAll();
 		
     }
 
@@ -92,6 +94,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void disabledPeriodic() {
         m_robotContainer.allianceChecker.periodic();
+	
     }
 
     @Override

@@ -2,6 +2,7 @@ package team3647.frc2025.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pound;
+import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -12,6 +13,8 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.SteerRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -76,6 +79,8 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 
 	public final Field2d field = new Field2d();
 
+	private boolean drivePerspectiveGood = false;
+
 	private final double maxSpeedMpS;
 	private final double maxRotRadPerSec;
 
@@ -129,6 +134,8 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 		public double rawHeading = 0;
 		public Rotation2d gyroRotation = new Rotation2d();
 
+		public Alliance color = Alliance.Blue;
+
 		public SwerveModuleState frontLeftState = new SwerveModuleState();
 		public SwerveModuleState frontRightState = new SwerveModuleState();
 		public SwerveModuleState backLeftState = new SwerveModuleState();
@@ -159,7 +166,8 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 		public SwerveFOCRequest driveFOCRequest = new SwerveFOCRequest(true);
 		public SwerveFOCRequest steerFOCRequest = new SwerveFOCRequest(false);
 		public FieldCentric fieldCentric = new FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-		public RobotCentric robotCentric = new RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+		public RobotCentric robotCentric = new RobotCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+										.withSteerRequestType(com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType.MotionMagicExpo);
 
 	}
 
@@ -385,9 +393,13 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 		Logger.recordOutput("robot/targets", periodicIO.targets);
 		Logger.recordOutput("robot/states", periodicIO.states);
 		Logger.recordOutput("robot/pose", periodicIO.pose);
-		if (RobotBase.isSimulation()) {
-		
+
+		if (!drivePerspectiveGood) {
+			setOperatorPerspectiveForward(periodicIO.color == Alliance.Red? Rotation2d.k180deg : Rotation2d.kZero);
+			drivePerspectiveGood = true;
 		}
+
+		Logger.recordOutput("operatorpserpective", new Pose2d(periodicIO.pose.getX(), periodicIO.pose.getY(), getOperatorForwardDirection()));
 		// SmartDashboard.putNumber("heading", getRawHeading());
 	}
 
@@ -611,7 +623,8 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 
 	@Override
 	public void onAllianceFound(Alliance color) {
-		
+		periodicIO.color = color;
+
 		var rot = color == Alliance.Red
 				? Rotation2d.k180deg
 				: Rotation2d.kZero;

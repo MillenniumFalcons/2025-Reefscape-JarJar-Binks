@@ -18,7 +18,7 @@ public class PivotConstants {
     public static final Angle kLevel3Angle = Radian.of(0.50);
     public static final Angle kLevel4Angle = Radian.of(0.344);
 
-	public static final Angle kL2Prep = Radian.of(0);
+	public static final Angle kL2Prep = Radian.of(-0.1);
 	public static final Angle KL1Prep = kLevel1Angle;
 	public static final Angle kStartingAngle = kMinAngle;
 
