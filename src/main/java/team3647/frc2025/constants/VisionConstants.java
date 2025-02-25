@@ -49,7 +49,7 @@ public class VisionConstants {
 		Inches.of(7),
 		new Rotation3d(Degrees.of(0),
 		Degrees.of(0), 
-		Degrees.of(-58.384)).rotateBy(new Rotation3d(Rotation2d.fromDegrees(90))));
+		Degrees.of(31.665959)));
 
 		public static final Transform3d FrontLeft = new Transform3d(
 			Inches.of(12.168), 
@@ -57,7 +57,7 @@ public class VisionConstants {
 			Inches.of(7),
 			new Rotation3d(Degrees.of(0),
 			Degrees.of(0), 
-			Degrees.of(58.384)).rotateBy(new Rotation3d(Rotation2d.fromDegrees(-90))));
+			Degrees.of(-31.665959)));
 
 	public static final Transform3d BackRight = new Transform3d(
 		Inches.of(-9.579),

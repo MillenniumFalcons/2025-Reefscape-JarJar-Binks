@@ -6,6 +6,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,33 +38,40 @@ public class SwerveDriveCommands implements AllianceObserver {
         this.color = color;
     }
 
-    public Command driveCmd(
+    public Command driveVisionTeleop(
             DoubleSupplier x, // X axis on joystick is Left/Right
             DoubleSupplier y, // Y axis on Joystick is Front/Back
             DoubleSupplier rot,
             Supplier<Twist2d> autoDriveVelocities,
             Supplier<DriveMode> getMode,
             BooleanSupplier autoDriveEnabled) {
+				var corrector = new PIDController(1, 0, 0);
         return Commands.run(
                 () -> {
                     var isAutoDrive = autoDriveEnabled.getAsBoolean();
                     var velocities = autoDriveVelocities.get();
                     double invert = 1;
+					var heading = swerve.getOdoPose().getRotation().getRadians();
 
                     double ySquared =
                             Math.pow(y.getAsDouble(), 2) * Math.signum(y.getAsDouble()) * 1.05;
                     double xSquared =
                             Math.pow(x.getAsDouble(), 2) * Math.signum(x.getAsDouble()) * 1.05;
 
-                    double motionXComponent = -ySquared * invert * kMaxSpeed.in(MetersPerSecond);
-                    double motionYComponent = xSquared * invert * kMaxSpeed.in(MetersPerSecond);
+                    double motionXComponent = ySquared * invert * kMaxSpeed.in(MetersPerSecond);
+                    double motionYComponent = -xSquared * invert * kMaxSpeed.in(MetersPerSecond);
                     double motionTurnComponent =
                             rot.getAsDouble() * -1 * kMaxSpeed.in(MetersPerSecond);
+					if (Math.abs(motionTurnComponent) <= 0.01 && Math.abs(motionXComponent) >= 0.01 && Math.abs(motionYComponent) >=0.01) {
+						motionTurnComponent += corrector.calculate(heading);
+					}
+					
                     if (!isAutoDrive || getMode.get().equals(DriveMode.NONE)) {
                         swerve.driveFieldOriented(
                                 motionXComponent, motionYComponent, motionTurnComponent);
                         return;
-                    } else if (isAutoDrive
+                    } 
+					else if (isAutoDrive
                             && (getMode.get().equals(DriveMode.SCORE)
                                     || getMode.get().equals(DriveMode.SRCINTAKE))) {
                         motionXComponent = velocities.dx + motionXComponent * 0.3;
@@ -80,130 +89,10 @@ public class SwerveDriveCommands implements AllianceObserver {
                         swerve.drive(motionXComponent, motionYComponent, motionTurnComponent);
                     }
                 },
-                swerve);
+                swerve).finallyDo(() -> corrector.close());
     }
 
-    public Command align(PIDController xController, PIDController yController, PIDController rotController){
-        return Commands.run(() -> {
-            var x = xController.calculate(swerve.getPoseX(), 11.535591125488281);
-            var y = yController.calculate(swerve.getPoseY(), 7.252763748168945 );
-            var theta = rotController.calculate(swerve.getOdoRot().getRadians(), -Math.PI/2);
+    
 
-            swerve.drive(x, y, theta);
-        }, swerve);
-    }
-
-    public Command alignRot(PIDController rotController){
-        return Commands.run(() -> {
-          
-            var theta = rotController.calculate(swerve.getOdoRot().getRadians(), -Math.PI/2);
-
-            swerve.drive(0, 0, theta);
-        }, swerve);
-    }
-
-    public Command alignX(PIDController xController){
-        return Commands.run(() -> {
-          
-            var theta = xController.calculate(swerve.getOdoRot().getRadians(), -Math.PI/2);
-
-            swerve.drive(theta, 0, 0);
-        }, swerve);
-    }
-
-	public Command alignY(){
-		ProfiledPIDController xController = new ProfiledPIDController(30, 0, 0, new Constraints(5, 10));
-        return new Command() {
-			@Override
-			public void execute() {
-				            var theta = xController.calculate(swerve.getOdoPose().getY(), 4);
-
-            	swerve.drive(0, theta, 0);
-			}
-			@Override
-			public void end(boolean interrupted) {
-				swerve.drive(0, 0, 0);
-				
-			}
-		};
-		
-    }
-
-    public Command driveVisionTeleop(
-            DoubleSupplier xSpeedFunction, // X axis on joystick is Left/Right
-            DoubleSupplier ySpeedFunction, // Y axis on Joystick is Front/Back
-            DoubleSupplier turnSpeedFunction,
-            // BooleanSupplier slowTriggerFunction,
-            // BooleanSupplier enableAutoSteer,
-            BooleanSupplier getIsFieldOriented
-            // Supplier<DriveMode> autoDriveMode,
-            // BooleanSupplier autoDriveEnabled,
-            // Supplier<Twist2d> autoDriveVelocities
-            // Supplier<Twist2d> autoSteerVelocitiesSupplier
-            ) {
-        return Commands.run(
-                () -> {
-                    int invert = 1;
-                    // boolean enabeld = autoDriveEnabled.getAsBoolean();
-                    // DriveMode mode = autoDriveMode.get();
-                    // Twist2d autoDriveTwist2d = autoDriveVelocities.get();
-                    // double triggerSlow = slowTriggerFunction.getAsBoolean() ? 0.6 : 1;
-                    // boolean autoSteer = enableAutoSteer.getAsBoolean();
-                    boolean fieldOriented = getIsFieldOriented.getAsBoolean();
-                    boolean openloop = true;
-
-                    if (DriverStation.getAlliance().isPresent() && RobotBase.isSimulation()) {
-                        if (DriverStation.getAlliance().get() == Alliance.Red) {
-                            invert = -1;
-                        }
-                    }
-                    double y =
-                            Math.pow(ySpeedFunction.getAsDouble(), 2)
-                                    * Math.signum(ySpeedFunction.getAsDouble())
-                                    * 1.05;
-                    double x =
-                            Math.pow(xSpeedFunction.getAsDouble(), 2)
-                                    * Math.signum(xSpeedFunction.getAsDouble())
-                                    * 1.05;
-                    var motionXComponent = y * invert;
-                    // right stick X, (negative so that left positive)
-                    var motionYComponent = -x * invert;
-
-                    var motionTurnComponent = -turnSpeedFunction.getAsDouble();
-
-                    // if (mode == DriveMode.SHOOT_AT_AMP && enabeld) {
-                    // motionXComponent = autoDriveTwist2d.dx + motionXComponent * 0.1;
-                    // motionTurnComponent = autoDriveTwist2d.dtheta + motionTurnComponent * 0.1;
-
-                    // var translation = new Translation2d(motionXComponent, motionYComponent);
-
-                    // var rotation = motionTurnComponent;
-                    // swerve.driveFieldOriented(translation.getX(), translation.getY(), rotation);
-                    // } else if (mode == DriveMode.INTAKE_IN_AUTO && enabeld) {
-                    // motionXComponent = autoDriveTwist2d.dx;
-                    // motionYComponent = autoDriveTwist2d.dy;
-
-                    // var translation = new Translation2d(motionXComponent, motionYComponent);
-
-                    // var rotation = motionTurnComponent;
-                    // swerve.drive(translation.getX(), translation.getY(), rotation);
-                    // } else if (mode == DriveMode.FEED && enabeld) {
-                    // motionTurnComponent = autoDriveTwist2d.dtheta + motionTurnComponent;
-                    // swerve.driveFieldOriented(motionXComponent, motionYComponent,
-                    // motionTurnComponent);
-                    // } else {
-
-                    // if (mode != DriveMode.NONE && enabeld) {
-                    // motionTurnComponent = autoDriveTwist2d.dtheta;
-                    // }
-
-                    // SmartDashboard.putNumber("theta", autoDriveTwist2d.dtheta);
-
-                    var translation = new Translation2d(motionXComponent, motionYComponent);
-
-                    var rotation = motionTurnComponent;
-                    swerve.drive(translation.getX(), translation.getY(), rotation);
-                },
-                swerve);
-    }
+ 
 }

@@ -81,6 +81,7 @@ public class Robot extends LoggedRobot {
 		Logger.recordOutput("superstruc/pivotoffset", m_robotContainer.superstructure.getPivotOffset());
 		Logger.recordOutput("superstruc/elevOffset", m_robotContainer.superstructure.getElevOffset());
 		Logger.recordOutput("selected level", m_robotContainer.superstructure.getWantedLevel());
+		Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
 		VirtualSubsystem.periodicAll();
 		
     }

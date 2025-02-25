@@ -67,6 +67,7 @@ import team3647.lib.team254.swerve.SwerveKinematicLimits;
 import team3647.lib.team254.swerve.SwerveSetpoint;
 import team3647.lib.team254.swerve.SwerveSetpointGenerator;
 import team3647.lib.team9442.AllianceObserver;
+import team3647.lib.tracking.RobotTracker;
 import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
@@ -177,6 +178,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 			double maxRotRadPerSec,
 			double kDt,
 			RobotConfig ppRobotConfig,
+			SwerveKinematicLimits limits,
 			SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>... swerveModuleConstants) {
 		super(swerveDriveConstants, swerveModuleConstants);
 		registerTelemetry(this::setStuff);
@@ -187,7 +189,11 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 
 		this.setpointGenerator = new SwerveSetpointGenerator(SwerveDriveConstants.kDriveKinematics);
 
-		this.limits = SwerveDriveConstants.kTeleopKinematicLimits;
+		this.limits = limits;
+
+		this.limits.kMaxDriveVelocity = 5; // TunerConstants.kSpeedAt12VoltsMps;
+        this.limits.kMaxDriveAcceleration = 5 / 0.1; // defaultAccel;
+        this.limits.kMaxSteeringVelocity = Units.Degree.of(1500).in(Units.Radians);
 
 		this.kTurnMotorRoutineVoltage = new SysIdRoutine(
 				new SysIdRoutine.Config(
@@ -390,9 +396,11 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 		setisAccel();
 		this.setControl(periodicIO.masterRequest);
 		// simpleSim.periodic();
-		Logger.recordOutput("robot/targets", periodicIO.targets);
-		Logger.recordOutput("robot/states", periodicIO.states);
-		Logger.recordOutput("robot/pose", periodicIO.pose);
+		Logger.recordOutput("Robot/targets", periodicIO.targets);
+		Logger.recordOutput("Robot/states", periodicIO.states);
+		Logger.recordOutput("Robot/pose", periodicIO.pose);
+		Logger.recordOutput("rawHeading", periodicIO.rawHeading);
+		
 
 		if (!drivePerspectiveGood) {
 			setOperatorPerspectiveForward(periodicIO.color == Alliance.Red? Rotation2d.k180deg : Rotation2d.kZero);
@@ -657,13 +665,18 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 	}
 
 	public SwerveSetpoint generate(double x, double y, double omega) {
+		Logger.recordOutput("prevspt", periodicIO.setpoint.mChassisSpeeds.vyMetersPerSecond);
 		var robotRel = team3647.lib.team254.swerve.ChassisSpeeds.fromFieldRelativeSpeeds(
 				x,
 				y,
 				omega,
 				team3647.lib.team254.geometry.Rotation2d.fromDegrees(
 						this.getOdoPose().getRotation().getDegrees()));
+
+	
+		
 		periodicIO.setpoint = setpointGenerator.generateSetpoint(limits, periodicIO.setpoint, robotRel, kDt);
+		
 		return periodicIO.setpoint;
 	}
 
@@ -687,6 +700,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 				.withVelocityX(setpoint.mChassisSpeeds.vxMetersPerSecond)
 				.withVelocityY(setpoint.mChassisSpeeds.vyMetersPerSecond)
 				.withRotationalRate(setpoint.mChassisSpeeds.omegaRadiansPerSecond);
+		
 		periodicIO.masterRequest = periodicIO.robotCentric;
 	}
 

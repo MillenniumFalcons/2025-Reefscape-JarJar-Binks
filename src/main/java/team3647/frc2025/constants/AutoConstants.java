@@ -27,9 +27,9 @@ public class AutoConstants {
             new Trajectory<SwerveSample>(
                     "kEmtpy", List.of(kEmptySample), List.of(1), List.of(kEmptyEventMarker));
 
-    public static PIDController xController = new PIDController(0, 0, 0);
-    public static PIDController yController = new PIDController(0, 0, 0);
-    public static PIDController rotController = new PIDController(0, 0, 0);
+    public static PIDController xController = new PIDController(4, 0, 0);
+    public static PIDController yController = new PIDController(4, 0, 0);
+    public static PIDController rotController = new PIDController(5, 0, 0);
 
     public static ModuleConfig ppModuleConfig =
             new ModuleConfig(

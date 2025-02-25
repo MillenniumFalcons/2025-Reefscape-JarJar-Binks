@@ -3,6 +3,9 @@ package team3647.lib.team254.swerve;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.littletonrobotics.junction.Logger;
+
 import team3647.lib.team254.geometry.Rotation2d;
 import team3647.lib.team254.geometry.Translation2d;
 import team3647.lib.team254.geometry.Twist2d;
@@ -190,14 +193,17 @@ public class SwerveSetpointGenerator {
             ChassisSpeeds desiredState,
             double dt) {
         final Translation2d[] modules = mKinematics.getModuleLocations();
+		
 
         SwerveModuleState[] desiredModuleState = mKinematics.toSwerveModuleStates(desiredState);
+		//Logger.recordOutput("maxvelbeforedesaturate", desiredState.vxMetersPerSecond);
         // Make sure desiredState respects velocity limits.
         if (limits.kMaxDriveVelocity > 0.0) {
             SwerveDriveKinematics.desaturateWheelSpeeds(
                     desiredModuleState, limits.kMaxDriveVelocity);
             desiredState = mKinematics.toChassisSpeeds(desiredModuleState);
         }
+		
 
         // Special case: desiredState is a complete stop. In this case, module angle is arbitrary,
         // so just use the previous angle.
@@ -270,6 +276,8 @@ public class SwerveSetpointGenerator {
         double dtheta =
                 desiredState.omegaRadiansPerSecond
                         - prevSetpoint.mChassisSpeeds.omegaRadiansPerSecond;
+
+		//Logger.recordOutput("dy", dx);
 
         // 's' interpolates between start and goal. At 0, we are at prevState and at 1, we are at
         // desiredState.
@@ -384,6 +392,8 @@ public class SwerveSetpointGenerator {
             min_s = Math.min(min_s, s);
         }
 
+		//Logger.recordOutput("mins", min_s);
+
         ChassisSpeeds retSpeeds =
                 new ChassisSpeeds(
                         prevSetpoint.mChassisSpeeds.vxMetersPerSecond + min_s * dx,
@@ -406,6 +416,7 @@ public class SwerveSetpointGenerator {
                 retStates[i].speedMetersPerSecond *= -1.0;
             }
         }
+		//Logger.recordOutput("prevspeedsy", prevSetpoint.mChassisSpeeds.vxMetersPerSecond);
         return new SwerveSetpoint(retSpeeds, retStates);
     }
 }

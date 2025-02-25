@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.lib.team9442.AllianceObserver;
@@ -55,12 +58,14 @@ public class AutoDrive implements AllianceObserver {
         this.blueSourcePoses = blueSourcePoses;
 
         this.sourcePoses = color == Alliance.Red ? redSourcePoses : blueSourcePoses;
+		this.rotController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     public enum DriveMode {
         INTAKE,
         SRCINTAKE,
         SCORE,
+		TEST,
         NONE
     }
 
@@ -79,6 +84,10 @@ public class AutoDrive implements AllianceObserver {
     public boolean getAutoDriveEnabled() {
         return enabled;
     }
+
+	public Command setDriveMode(DriveMode mode){
+		return Commands.runOnce(() -> this.wantedMode = mode);
+	}
 
     // TODO: ground intake implementatoin
     public double getX() {
@@ -101,6 +110,8 @@ public class AutoDrive implements AllianceObserver {
                         getPose().getY(), getPose().nearest(sourcePoses).getY());
             case SCORE:
                 return yController.calculate(getPose().getY(), wantedScoringPos.get().pose.getY());
+				
+				
 
             default:
                 return yController.calculate(getPose().getY(), wantedScoringPos.get().pose.getY());
@@ -117,6 +128,9 @@ public class AutoDrive implements AllianceObserver {
                 return rotController.calculate(
                         getPose().getRotation().getRadians(),
                         wantedScoringPos.get().pose.getRotation().getRadians());
+			case TEST:
+					Logger.recordOutput("error", rotController.getError());
+					return rotController.calculate(getPose().getRotation().getRadians());
 
             default:
                 return rotController.calculate(

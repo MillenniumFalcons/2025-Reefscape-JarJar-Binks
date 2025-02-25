@@ -55,14 +55,14 @@ public class ElevatorConstants {
 
     static {
 		//slot 0  = voltage configs
-        kMasterConfig.Slot0.withKP(3);
+		kMasterConfig.Slot0.withKP(3);
         kMasterConfig.Slot0.withKI(0);
-        kMasterConfig.Slot0.withKD(0);
+        kMasterConfig.Slot0.withKD(0.1);
         kMasterConfig.Slot0.withGravityType(GravityTypeValue.Elevator_Static);
-        kMasterConfig.Slot0.withKS(0); 
+        kMasterConfig.Slot0.withKS(0.2005); 
         kMasterConfig.Slot0.withKV(0);
         kMasterConfig.Slot0.withKA(0);
-        kMasterConfig.Slot0.withKG(0.359);
+        kMasterConfig.Slot0.withKG(0.29492);
 		//121cm - 85cm @19.855
 		
 //wanted pos: 40

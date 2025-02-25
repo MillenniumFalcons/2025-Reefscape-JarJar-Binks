@@ -57,10 +57,10 @@ public class SwerveDriveConstants {
     // config swerve module reversed here, module class doens't reverse for you
 
     // distance between right and left wheels
-    public static final double kTrackWidth = Units.Inches.of(19).in(Units.Meter);
+    public static final double kTrackWidth = Units.Inches.of(22).in(Units.Meter);
     // distance between front and back wheels
 
-    public static final double kWheelBase = Units.Inches.of(19).in(Units.Meter);
+    public static final double kWheelBase = Units.Inches.of(22).in(Units.Meter);
     // translations are locations of each module wheel
     // 0 --> ++ --> front left
     // 1 --> +- --> front right
@@ -87,7 +87,7 @@ public class SwerveDriveConstants {
     static {
         kTeleopKinematicLimits.kMaxDriveVelocity = 5; // TunerConstants.kSpeedAt12VoltsMps;
         kTeleopKinematicLimits.kMaxDriveAcceleration = 5 / 0.1; // defaultAccel;
-        kTeleopKinematicLimits.kMaxSteeringVelocity = Units.Degree.of(360).in(Units.Radians);
+        kTeleopKinematicLimits.kMaxSteeringVelocity = Units.Degree.of(1500).in(Units.Radians);
     }
 
     // config conversion factors here for each module. in meters for postiion and

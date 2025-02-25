@@ -4,32 +4,20 @@
 
 package team3647.frc2025.robot;
 
-import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radian;
-
-import org.dyn4j.world.ManifoldCollisionData;
-
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import team3647.frc2025.Util.AutoDrive;
-import team3647.frc2025.Util.SuperstructureState;
+import team3647.frc2025.Util.AutoDrive.DriveMode;
 import team3647.frc2025.autos.AutoCommands;
-import team3647.frc2025.commands.CoralerCommands;
-import team3647.frc2025.commands.ElevatorCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
-import team3647.frc2025.commands.WristCommands;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.CoralerConstants;
 import team3647.frc2025.constants.ElevatorConstants;
@@ -39,16 +27,13 @@ import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.RollersConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.constants.TunerConstants;
-import team3647.frc2025.constants.TunerSimConstants;
 import team3647.frc2025.constants.VisionConstants;
 import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.Coraler;
 import team3647.frc2025.subsystems.Elevator;
 import team3647.frc2025.subsystems.Pivot;
 import team3647.frc2025.subsystems.Superstructure;
-import team3647.frc2025.subsystems.Superstructure.Branch;
 import team3647.frc2025.subsystems.Superstructure.Level;
-import team3647.frc2025.subsystems.Superstructure.Side;
 import team3647.frc2025.subsystems.SwerveDrive;
 import team3647.frc2025.subsystems.Wrist;
 import team3647.frc2025.subsystems.rollers;
@@ -90,29 +75,30 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-		// sysid
-		mainController.leftMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveDynamTestFOC(Direction.kForward));
-        mainController.leftMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveDynamTestFOC(Direction.kReverse));
-        mainController.rightMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kForward));
-        mainController.rightMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kReverse));
+		// // sysid
+		// mainController.leftMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveDynamTestFOC(Direction.kForward));
+        // mainController.leftMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveDynamTestFOC(Direction.kReverse));
+        // mainController.rightMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kForward));
+        // mainController.rightMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kReverse));
 		
-		// mainController.leftBumper.whileTrue(superstructure.prepIntake().until(intakeUp));
-		// mainController.leftBumper.onFalse(superstructure.stowIntake());
-		// intakeUp.and(safeToIntakeUp).onTrue(superstructure.stowFromIntake().withTimeout(3));
+		mainController.leftBumper.whileTrue(superstructure.prepIntake().until(intakeUp));
+		mainController.leftBumper.onFalse(superstructure.stowIntake());
+		intakeUp.and(safeToIntakeUp).onTrue(superstructure.stowFromIntake().withTimeout(3));
 
 
 
-		// mainController.rightTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
-		// mainController.rightTrigger.and(mainController.buttonX.negate()).onFalse(superstructure.autoStowFromShot());	
-
-		
-
-		// mainController.rightMidButton.whileTrue(superstructure.stowElevAndPivot());
+		mainController.rightTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
+		mainController.rightTrigger.and(mainController.buttonX.negate()).onFalse(superstructure.autoStowFromShot());	
 
 		
-		// score.and(safeToScore).onTrue(superstructure.autoScoreByLevel());
 
-		mainController.rightTrigger.whileTrue(swerveCommands.alignY());
+		mainController.rightMidButton.whileTrue(superstructure.stowElevAndPivot());
+
+		
+		score.and(safeToScore).onTrue(superstructure.autoScoreByLevel());
+
+		
+
 
 
 	
@@ -196,6 +182,7 @@ public class RobotContainer {
                     SwerveDriveConstants.kRotPossibleMaxSpeedRadPerSec,
                     GlobalConstants.kDt,
                     AutoConstants.ppRobotConfig,
+					SwerveDriveConstants.kTeleopKinematicLimits,
                     TunerConstants.FrontLeft,
                     TunerConstants.FrontRight,
                     TunerConstants.BackLeft,
