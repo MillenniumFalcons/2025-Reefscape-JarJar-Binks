@@ -89,11 +89,18 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-		// // sysid
-		// mainController.leftMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidDynamFor());
-        // mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
-        // mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
-        // mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
+		// sysid
+		mainController.leftMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidDynamFor());
+        mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
+        mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
+        mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
+
+
+		mainController.dPadUp.whileTrue(swerve.runDriveQuasiTestFOC(Direction.kForward));
+		mainController.dPadDown.whileTrue(swerve.runDriveQuasiTestFOC(Direction.kReverse));
+		mainController.dPadRight.whileTrue(swerve.runDriveDynamTestFOC(Direction.kForward));
+		mainController.dPadLeft.whileTrue(swerve.runDriveDynamTestFOC(Direction.kReverse));
+
 		
 
 
@@ -106,11 +113,7 @@ public class RobotContainer {
 		// mainController.rightTrigger.whileTrue(superstructure.autoPrepByWantedLevel());
 		// mainController.rightTrigger.and(mainController.buttonX.negate()).onFalse(superstructure.poopCoral());	
 
-		mainController.rightTrigger.whileTrue(superstructure.poopCoral());
-		mainController.buttonA.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel2Height));
-		mainController.buttonX.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel1Height));
-		mainController.buttonB.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel3Height));
-		mainController.buttonY.whileTrue(superstructure.elevatorCommands.setHeight(ElevatorConstants.kLevel4Height));
+
 
 		// mainController.rightMidButton.whileTrue(superstructure.stowElevAndPivot());
 
@@ -176,7 +179,7 @@ public class RobotContainer {
                         autoDrive::getVelocities,
                         autoDrive::getWantedMode,
                         autoDrive::getAutoDriveEnabled));
-		elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
+		// elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
 		// pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
 		coraler.setDefaultCommand(superstructure.coralerCommands.setOpenLoop(0));
 		wrist.setDefaultCommand(superstructure.wristCommands.holdPositionAtCall());

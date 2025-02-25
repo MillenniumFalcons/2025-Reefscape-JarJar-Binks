@@ -6,8 +6,11 @@ import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
 
+import java.util.logging.LogRecord;
+
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -67,10 +70,10 @@ public class Elevator extends TalonFXSubsystem {
 
 		this.voltageSysid = new SysIdRoutine(
 			new Config(
-				Units.Volts.of(0.9).per(Units.Second),
-				Units.Volt.of(3),
+				Units.Volts.of(3).per(Units.Second),
+				Units.Volt.of(5),
 				Units.Second.of(10),
-				ModifiedSignalLogger.logState()
+				(state) -> SignalLogger.writeString("state_sysid", state.toString())
 			),
 			new Mechanism(
 				(volts) -> this.setVoltage(volts.in(Units.Volt)), 

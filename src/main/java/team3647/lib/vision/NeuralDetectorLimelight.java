@@ -13,17 +13,15 @@ public class NeuralDetectorLimelight implements NeuralDetector{
 
 	@Override
 	public double getTX() {
-		var detections = LimelightHelpers.getRawDetections(name);
-		if (detections.isEmpty()) return 0;
-		return detections.get()[0].txnc;
+		var detections = LimelightHelpers.getTX(name);
+		return detections;
 		
 	}
 
 	@Override
 	public double getTY() {
-		var detections = LimelightHelpers.getRawDetections(name);
-		if (detections.isEmpty()) return 0;
-		return detections.get()[0].tync;
+		var detections = LimelightHelpers.getTY(name);
+		return detections;
 	}
 
 	@Override

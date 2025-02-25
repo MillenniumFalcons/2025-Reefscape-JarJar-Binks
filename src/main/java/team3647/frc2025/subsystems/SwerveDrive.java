@@ -385,9 +385,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 		Logger.recordOutput("robot/targets", periodicIO.targets);
 		Logger.recordOutput("robot/states", periodicIO.states);
 		Logger.recordOutput("robot/pose", periodicIO.pose);
-		if (RobotBase.isSimulation()) {
 		
-		}
 		// SmartDashboard.putNumber("heading", getRawHeading());
 	}
 

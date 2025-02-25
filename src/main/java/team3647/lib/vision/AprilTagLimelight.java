@@ -11,7 +11,10 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+
+import java.security.PublicKey;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -31,6 +34,8 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
     private final Vector<N3> baseStdDevs;
 
+	
+
     public AprilTagLimelight(
             String name,
             Transform3d robotToCamera,
@@ -49,6 +54,8 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
                 robotToCamera.getRotation().getY(),
                 robotToCamera.getRotation().getZ());
 		LimelightHelpers.setPipelineIndex(name, kAprilTagPipelineIndex);
+		LimelightHelpers.SetIMUMode(name, 4);
+		
 
         this.baseStdDevs = baseStdDevs;
 		
@@ -77,6 +84,13 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
                 angle.pitchRate.in(DegreesPerSecond),
                 angle.roll.in(Degree),
                 angle.rollRate.in(DegreesPerSecond));
+
+		if (DriverStation.isDisabled() && DriverStation.isFMSAttached()) {
+			LimelightHelpers.setThrottle(name);
+		}
+		if (DriverStation.isEnabled() && DriverStation.isFMSAttached()) {
+			LimelightHelpers.cancelThrottle(name);
+		}
     }
 
     public Distance getBestTagDist(RawFiducial[] fiducials) {
@@ -156,6 +170,8 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
         return bestTag.id;
     }
+
+
 
     @Override
     public String getName() {
