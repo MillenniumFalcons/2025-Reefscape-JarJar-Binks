@@ -2,23 +2,16 @@ package team3647.frc2025.commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import team3647.frc2025.Util.AutoDrive.DriveMode;
 import team3647.frc2025.subsystems.SwerveDrive;
 import team3647.lib.team9442.AllianceObserver;
@@ -45,13 +38,18 @@ public class SwerveDriveCommands implements AllianceObserver {
             Supplier<Twist2d> autoDriveVelocities,
             Supplier<DriveMode> getMode,
             BooleanSupplier autoDriveEnabled) {
-				var corrector = new PIDController(1, 0, 0);
+        var corrector = new PIDController(1, 0, 0);
         return Commands.run(
                 () -> {
                     var isAutoDrive = autoDriveEnabled.getAsBoolean();
                     var velocities = autoDriveVelocities.get();
-                    double invert = 1;
-					var heading = swerve.getOdoPose().getRotation().getRadians();
+
+                    int invert = 1;
+                    if (DriverStation.getAlliance().isPresent()) {
+                        if (DriverStation.getAlliance().get() == Alliance.Red) {
+                            invert = -1;
+                        }
+                    }
 
                     double ySquared =
                             Math.pow(y.getAsDouble(), 2) * Math.signum(y.getAsDouble()) * 1.05;
@@ -62,16 +60,13 @@ public class SwerveDriveCommands implements AllianceObserver {
                     double motionYComponent = -xSquared * invert * kMaxSpeed.in(MetersPerSecond);
                     double motionTurnComponent =
                             rot.getAsDouble() * -1 * kMaxSpeed.in(MetersPerSecond);
-					if (Math.abs(motionTurnComponent) <= 0.01 && Math.abs(motionXComponent) >= 0.01 && Math.abs(motionYComponent) >=0.01) {
-						motionTurnComponent += corrector.calculate(heading);
-					}
-					
+
                     if (!isAutoDrive || getMode.get().equals(DriveMode.NONE)) {
+
                         swerve.driveFieldOriented(
                                 motionXComponent, motionYComponent, motionTurnComponent);
-                        return;
-                    } 
-					else if (isAutoDrive
+                        
+                    } else if (isAutoDrive
                             && (getMode.get().equals(DriveMode.SCORE)
                                     || getMode.get().equals(DriveMode.SRCINTAKE))) {
                         motionXComponent = velocities.dx + motionXComponent * 0.3;
@@ -89,10 +84,6 @@ public class SwerveDriveCommands implements AllianceObserver {
                         swerve.drive(motionXComponent, motionYComponent, motionTurnComponent);
                     }
                 },
-                swerve).finallyDo(() -> corrector.close());
+                swerve);
     }
-
-    
-
- 
 }

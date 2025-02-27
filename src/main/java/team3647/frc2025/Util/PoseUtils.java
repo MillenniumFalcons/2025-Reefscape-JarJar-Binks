@@ -16,8 +16,11 @@ public class PoseUtils {
         return inCircle(pose, center, radius.in(Meter));
     }
 
-	
-	public static boolean inRect(Translation2d point, double lowX, double highX, double lowY, double highY){
-		return point.getX() > lowX && point.getX() < highX && point.getY() > lowY && point.getY() < highY;
-	}
+    public static boolean inRect(
+            Translation2d point, double lowX, double highX, double lowY, double highY) {
+        return point.getX() > lowX
+                && point.getX() < highX
+                && point.getY() > lowY
+                && point.getY() < highY;
+    }
 }

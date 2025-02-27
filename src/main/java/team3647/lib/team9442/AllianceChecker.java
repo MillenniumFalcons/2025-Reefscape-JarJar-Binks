@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 import team3647.lib.utils.Simshit;
 
 public class AllianceChecker {
@@ -33,11 +34,14 @@ public class AllianceChecker {
 
         alliance.ifPresent(
                 color -> {
+                    Logger.recordOutput("monkey", cachedColor == color);
                     // DriverStation.reportError("Run method? " + (cachedColor != color), false);
-					// DriverStation.reportError("First run? " + firstRun, false);
+                    // DriverStation.reportError("First run? " + firstRun, false);
                     if (cachedColor != color || firstRun) {
-						// DriverStation.reportError("Ran mathod. First run = " + firstRun + " colorcheck = " + (cachedColor != color), false);
+                        // DriverStation.reportError("Ran mathod. First run = " + firstRun + "
+                        // colorcheck = " + (cachedColor != color), false);
                         observers.forEach(observer -> observer.onAllianceFound(color));
+
                         if (firstRun) firstRun = false;
                     }
                     cachedColor = color;

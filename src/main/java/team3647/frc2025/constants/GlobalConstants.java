@@ -22,7 +22,7 @@ public class GlobalConstants {
     }
 
     public class ElevatorIds {
-		public static final int kSlaveId = 23;
+        public static final int kSlaveId = 23;
         public static final int kMasterId = 22;
     }
 
@@ -38,8 +38,11 @@ public class GlobalConstants {
         public static final int kMasterId = 24;
     }
 
-	public class  RollersIds {
-		public static final int kMasterId = 25;
-		
-	}
+    public class RollersIds {
+        public static final int kMasterId = 25;
+    }
+
+    public class ClimbIds {
+        public static final int kMasterId = 26;
+    }
 }

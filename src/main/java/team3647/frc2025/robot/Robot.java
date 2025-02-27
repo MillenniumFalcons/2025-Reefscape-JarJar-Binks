@@ -4,18 +4,13 @@
 
 package team3647.frc2025.robot;
 
+import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import team3647.frc2025.subsystems.Superstructure;
-import team3647.lib.ModifiedSignalLogger;
-import team3647.lib.team6328.VirtualSubsystem;
-
-import java.util.Objects;
-import java.util.logging.Level;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -24,7 +19,9 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import com.ctre.phoenix6.SignalLogger;
+import team3647.frc2025.constants.LEDConstants;
+import team3647.lib.ModifiedSignalLogger;
+import team3647.lib.team6328.VirtualSubsystem;
 
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
@@ -45,7 +42,9 @@ public class Robot extends LoggedRobot {
                                     ? "/home/lvuser/logs"
                                     : "logs")); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-           var pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution nlogging
+            var pdh =
+                    new PowerDistribution(
+                            1, ModuleType.kRev); // Enables power distribution nlogging
         } else if (rio1) {
             Logger.addDataReceiver(new NT4Publisher());
 
@@ -69,33 +68,37 @@ public class Robot extends LoggedRobot {
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata
         // values may
         // be added.
-		SignalLogger.start();
-		ModifiedSignalLogger.start();
+        SignalLogger.start();
+        ModifiedSignalLogger.start();
         m_robotContainer = new RobotContainer();
-	
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-		Logger.recordOutput("superstruc/pivotoffset", m_robotContainer.superstructure.getPivotOffset());
-		Logger.recordOutput("superstruc/elevOffset", m_robotContainer.superstructure.getElevOffset());
-		Logger.recordOutput("selected level", m_robotContainer.superstructure.getWantedLevel());
-		Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
-		VirtualSubsystem.periodicAll();
-		
+        Logger.recordOutput(
+                "superstruc/pivotoffset", m_robotContainer.superstructure.getPivotOffset());
+        Logger.recordOutput(
+                "superstruc/elevOffset", m_robotContainer.superstructure.getElevOffset());
+        Logger.recordOutput("selected level", m_robotContainer.superstructure.getWantedLevel());
+        Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
+		Logger.recordOutput("tx", m_robotContainer.detector.getTX());
+		Logger.recordOutput("ty", m_robotContainer.detector.getTY());
+
+		m_robotContainer.updateRobotPoseForSmartdashboard();
+        VirtualSubsystem.periodicAll();
+		LEDConstants.m_candle.animate(LEDConstants.RAINBOW);
     }
 
     @Override
     public void disabledInit() {
-		SignalLogger.stop();
-		ModifiedSignalLogger.stop();
-	}
+        SignalLogger.stop();
+        ModifiedSignalLogger.stop();
+    }
 
     @Override
     public void disabledPeriodic() {
         m_robotContainer.allianceChecker.periodic();
-	
     }
 
     @Override
@@ -141,7 +144,14 @@ public class Robot extends LoggedRobot {
     public void testExit() {}
 
     @Override
+    public void simulationInit() {
+
+        
+    }
+
+    @Override
     public void simulationPeriodic() {
+
         SimulatedArena.getInstance().simulationPeriodic();
     }
 }

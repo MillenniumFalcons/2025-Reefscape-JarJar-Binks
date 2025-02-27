@@ -12,20 +12,18 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.FieldConstants;
 import team3647.lib.team6328.VirtualSubsystem;
 import team3647.lib.vision.LimelightHelpers.RawFiducial;
-import team3647.lib.vision.old.Limelight;
 
 public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamera {
 
     public final String name;
     public final Transform3d robotToCamera;
 
-	private final int kAprilTagPipelineIndex = 0;
+    private final int kAprilTagPipelineIndex = 0;
 
     private final Supplier<Orientation> orientation;
 
@@ -48,15 +46,14 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
                 robotToCamera.getRotation().getX(),
                 robotToCamera.getRotation().getY(),
                 robotToCamera.getRotation().getZ());
-		LimelightHelpers.setPipelineIndex(name, kAprilTagPipelineIndex);
+        LimelightHelpers.setPipelineIndex(name, kAprilTagPipelineIndex);
 
         this.baseStdDevs = baseStdDevs;
-		
     }
 
     @Override
     public Optional<Pose3d> camPose() {
-		
+
         var robotPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
         if (robotPose.isEmpty()) {
             return Optional.empty();

@@ -20,6 +20,8 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.AutoLog;
@@ -66,6 +68,7 @@ public abstract class TalonFXSubsystem implements PeriodicSubsystem {
         this.nominalVoltage = nominalVoltage;
         this.kDt = kDt;
         this.master.clearStickyFaults(kLongStatusTimeMS);
+		
     }
 
     @AutoLog
@@ -290,9 +293,9 @@ public abstract class TalonFXSubsystem implements PeriodicSubsystem {
         master.setPosition(position / positionConversion);
     }
 
-	protected void setEncoderNative(double position){
-		master.setPosition(position);
-	}
+    protected void setEncoderNative(double position) {
+        master.setPosition(position);
+    }
 
     /**
      * @return the velocity in the output units

@@ -14,13 +14,12 @@ public class CoralerConstants {
 
     static {
         kMasterConfig.MotorOutput.withNeutralMode(NeutralModeValue.Coast);
-       
+
         kMasterConfig.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
 
-		kMasterConfig.CurrentLimits.StatorCurrentLimit = 60.0;
-		kMasterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        kMasterConfig.CurrentLimits.StatorCurrentLimit = 60.0;
+        kMasterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-		kMaster.getConfigurator().apply(kMasterConfig);
-
+        kMaster.getConfigurator().apply(kMasterConfig);
     }
 }

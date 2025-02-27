@@ -12,7 +12,7 @@ public class AllianceFlip {
         return new Pose2d(
                 FieldConstants.kFieldLength.minus(pose.getMeasureX()),
                 FieldConstants.kFieldWidth.minus(pose.getMeasureY()),
-                pose.getRotation().rotateBy(Rotation2d.fromRadians(Math.PI)));
+                pose.getRotation().rotateBy(Rotation2d.kPi));
     }
 
     public static Pose2d flip(Pose2d pose) {

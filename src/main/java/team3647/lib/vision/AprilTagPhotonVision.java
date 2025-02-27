@@ -1,5 +1,7 @@
 package team3647.lib.vision;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
@@ -8,10 +10,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
-import static edu.wpi.first.units.Units.Meters;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import org.littletonrobotics.junction.Logger;
@@ -91,7 +89,7 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
         return Optional.of(bruh.transformBy(robotToCam));
     }
 
- public Optional<VisionMeasurement> QueueToInputs() {
+    public Optional<VisionMeasurement> QueueToInputs() {
         var result = this.getLatestResult();
         if (!result.hasTargets()) {
             return Optional.empty();
@@ -101,7 +99,7 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
             return Optional.empty();
         }
 
-		Logger.recordOutput("Robot/unfilteredVision", update.get().estimatedPose);
+        Logger.recordOutput("Robot/unfilteredVision", update.get().estimatedPose);
         double targetDistance =
                 result.getBestTarget()
                         .getBestCameraToTarget()
@@ -158,6 +156,7 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
                         getName());
         return Optional.of(measurement);
     }
+
     public int getTagNum() {
         var result = this.getLatestResult();
         if (result.hasTargets()) {

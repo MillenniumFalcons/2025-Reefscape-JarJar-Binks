@@ -3,7 +3,6 @@ package team3647.lib.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.function.Consumer;
@@ -47,7 +46,7 @@ public class VisionController extends VirtualSubsystem {
 
             if (shouldAddData.apply(getInputs)) {
                 list.add(getInputs);
-				
+
                 count = 0;
             } else {
                 count++;
@@ -74,6 +73,8 @@ public class VisionController extends VirtualSubsystem {
             Logger.recordOutput("Robot/Vision", new Pose2d(1, 1, new Rotation2d()));
             Logger.recordOutput("stddev", 0.0);
         }
-        SmartDashboard.putBoolean("Has Vision?", list.isEmpty() || !list.get(0).pose.equals(new Pose2d(1,1,new Rotation2d())));
+        SmartDashboard.putBoolean(
+                "Has Vision?",
+                list.isEmpty() || !list.get(0).pose.equals(new Pose2d(1, 1, new Rotation2d())));
     }
 }

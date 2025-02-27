@@ -50,7 +50,7 @@ public class GroupPrinter implements Subsystem {
         Objects.requireNonNull(key);
         Objects.requireNonNull(func);
         if (posePrint.isEmpty()) {
-            SmartDashboard.putData(field);
+            SmartDashboard.putData("Field", field);
         }
         posePrint.put(key, func);
     }

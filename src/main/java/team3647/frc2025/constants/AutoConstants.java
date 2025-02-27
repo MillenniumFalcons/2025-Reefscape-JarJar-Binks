@@ -27,39 +27,10 @@ public class AutoConstants {
             new Trajectory<SwerveSample>(
                     "kEmtpy", List.of(kEmptySample), List.of(1), List.of(kEmptyEventMarker));
 
-    public static PIDController xController = new PIDController(4, 0, 0);
-    public static PIDController yController = new PIDController(4, 0, 0);
-    public static PIDController rotController = new PIDController(5, 0, 0);
+    public static final PIDController xController = new PIDController(5, 0, 0.1);
+    public static final PIDController yController = new PIDController(4, 0, 0.1);
+    public static final PIDController rotController = new PIDController(5, 0, 0);
 
-    public static ModuleConfig ppModuleConfig =
-            new ModuleConfig(
-                    Meters.of(TunerConstants.BackLeft.WheelRadius),
-                    TunerConstants.kSpeedAt12Volts,
-                    COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof,
-                    DCMotor.getKrakenX60Foc(1).withReduction(5.684210526315789),
-                    Units.Amps.of(90),
-                    1);
+	public static final PIDController AutoXController = new PIDController(6, 0, 0.1);
 
-    public static RobotConfig ppRobotConfig;
-
-    static {
-        try {
-            ppRobotConfig = RobotConfig.fromGUISettings();
-        } catch (Exception e) {
-            ppRobotConfig =
-                    new RobotConfig(
-                            Kilogram.of(74),
-                            KilogramSquareMeters.of(6.883),
-                            ppModuleConfig,
-                            new Translation2d[] {
-                                new Translation2d(),
-                                new Translation2d(),
-                                new Translation2d(),
-                                new Translation2d()
-                            });
-
-            DriverStation.reportError(
-                    "problem setting pp robot config from gui", e.getStackTrace());
-        }
-    }
 }

@@ -14,21 +14,21 @@ public class FieldConstants {
 
     public static final List<Pose2d> blueReefSides =
             List.of(
-                    new Pose2d(5.10, 5.11, kDefaultRot),
-                    new Pose2d(5.73, 4.02, kDefaultRot),
-                    new Pose2d(5.11, 2.96, kDefaultRot),
-                    new Pose2d(3.87, 2.96, kDefaultRot),
-                    new Pose2d(3.25, 4.02, kDefaultRot),
-                    new Pose2d(3.87, 5.09, kDefaultRot));
+                    new Pose2d(5.10, 5.11, Rotation2d.kZero), // e
+                    new Pose2d(5.73, 4.02, new Rotation2d(Radians.of(Math.PI / 3.0))), // d
+                    new Pose2d(5.11, 2.96, new Rotation2d(Radians.of((2.0 * Math.PI) / 3.0))), // c
+                    new Pose2d(3.87, 2.96, new Rotation2d(Radians.of(Math.PI))), // b
+                    new Pose2d(3.25, 4.02, new Rotation2d(Radians.of((-2.0 * Math.PI) / 3.0))), // a
+                    new Pose2d(3.87, 5.09, new Rotation2d(Radians.of((-Math.PI) / 3.0)))); // f
 
     public static final List<Pose2d> redReefSides =
             List.of(
-                    new Pose2d(13.69, 5.11, kDefaultRot),
-                    new Pose2d(14.3, 4.02, kDefaultRot),
-                    new Pose2d(13.69, 2.96, kDefaultRot),
-                    new Pose2d(12.45, 2.96, kDefaultRot),
-                    new Pose2d(11.83, 4.02, kDefaultRot),
-                    new Pose2d(12.45, 5.09, kDefaultRot));
+                    new Pose2d(12.45, 2.96, kDefaultRot), // E
+                    new Pose2d(11.83, 4.02, kDefaultRot), // D
+                    new Pose2d(12.45, 5.09, kDefaultRot), // C
+                    new Pose2d(13.69, 5.11, kDefaultRot), // b
+                    new Pose2d(14.3, 4.02, kDefaultRot), // A
+                    new Pose2d(13.69, 2.96, kDefaultRot)); // F
 
     public static final Pose2d blueProcessor = new Pose2d(6.35, 0.48, kDefaultRot);
     public static final Pose2d redProcessor = new Pose2d(11.522, 7.568, kDefaultRot);
