@@ -2,7 +2,6 @@ package team3647.frc2025.constants;
 
 import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -28,9 +27,9 @@ public class ElevatorConstants {
     public static final Distance kLevel2Height = kStowHeight;
     public static final Distance kLevel3Height = kStowHeight;
     public static final Distance kLevel4Height = Meters.of(1.529);
-	//high needs tuning, low doesn't; tune for same angle at both heights
-	public static final Distance kHighAlgaeHeight = Meters.of(1.368);
-	public static final Distance kLowAlgaeHeight = kStartingHeight;
+    // high needs tuning, low doesn't; tune for same angle at both heights
+    public static final Distance kHighAlgaeHeight = Meters.of(1.368);
+    public static final Distance kLowAlgaeHeight = kStartingHeight;
 
     public static final Distance kIntakeHeight = kStartingHeight;
 
@@ -58,8 +57,8 @@ public class ElevatorConstants {
         kMasterConfig.Slot0.withKV(0);
         kMasterConfig.Slot0.withKA(0);
         kMasterConfig.Slot0.withKG(0.359);
-		kMasterConfig.MotionMagic.MotionMagicExpo_kV = 0.01;
-		kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.01000000149011612;
+        kMasterConfig.MotionMagic.MotionMagicExpo_kV = 0.01;
+        kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.01000000149011612;
         // 121cm - 85cm @19.855
 
         // wanted pos: 40

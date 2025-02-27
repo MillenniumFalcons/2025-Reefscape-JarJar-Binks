@@ -2,24 +2,24 @@ package team3647.frc2025.constants;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.ColorFlowAnimation;
+import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.SingleFadeAnimation;
 import com.ctre.phoenix.led.StrobeAnimation;
-import com.ctre.phoenix.led.CANdle.VBatOutputMode;
-import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
-
-
 
 public class LEDConstants {
-	 public static final int CANdleID = 17;
+    public static final int CANdleID = 17;
     public static final CANdle m_candle =
             new CANdle(LEDConstants.CANdleID, GlobalConstants.kSubsystemCanbusName);
-	static{
-		m_candle.configVBatOutput(VBatOutputMode.On);
-	}
+
+    static {
+        m_candle.configVBatOutput(VBatOutputMode.On);
+    }
+
     // LED Counts
     public static final int candleLEDS = 8;
     public static final int stripLEDS = 600;

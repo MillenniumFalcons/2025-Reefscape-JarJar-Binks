@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
-import org.littletonrobotics.junction.Logger;
-import team3647.frc2025.constants.ElevatorConstants;
 import team3647.lib.ModifiedSignalLogger;
 import team3647.lib.TalonFXSubsystem;
 
@@ -141,7 +139,6 @@ public class Elevator extends TalonFXSubsystem {
     @Override
     public void readPeriodicInputs() {
         super.readPeriodicInputs();
-
     }
 
     @Override

@@ -5,11 +5,9 @@
 package team3647.frc2025.robot;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.ironmaple.simulation.SimulatedArena;
@@ -20,7 +18,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import team3647.frc2025.constants.LEDConstants;
 import team3647.lib.ModifiedSignalLogger;
 import team3647.lib.team6328.VirtualSubsystem;
@@ -41,7 +38,7 @@ public class Robot extends LoggedRobot {
             Logger.addDataReceiver(
                     new WPILOGWriter("/home/lvuser/logs")); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-           	new PowerDistribution(1, ModuleType.kRev); // Enables power distribution nlogging
+            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution nlogging
         } else if (rio1) {
             Logger.addDataReceiver(new NT4Publisher());
 
@@ -62,16 +59,16 @@ public class Robot extends LoggedRobot {
             }
         }
 
-		AutoLogOutputManager.addPackage("team3647.lib");
+        AutoLogOutputManager.addPackage("team3647.lib");
 
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata
         // values may
         // be added.
-		LiveWindow.disableAllTelemetry();
-		LiveWindow.setEnabled(false);
-		SignalLogger.stop();
-		SignalLogger.enableAutoLogging(false);
-		SignalLogger.stop();
+        LiveWindow.disableAllTelemetry();
+        LiveWindow.setEnabled(false);
+        SignalLogger.stop();
+        SignalLogger.enableAutoLogging(false);
+        SignalLogger.stop();
         // SignalLogger.start();
         // ModifiedSignalLogger.start();
         m_robotContainer = new RobotContainer();
@@ -84,13 +81,14 @@ public class Robot extends LoggedRobot {
                 "Superstructure/pivotoffset", m_robotContainer.superstructure.getPivotOffset());
         Logger.recordOutput(
                 "Superstructure/elevOffset", m_robotContainer.superstructure.getElevOffset());
-        Logger.recordOutput("Superstructure/Level", m_robotContainer.superstructure.getWantedLevel());
+        Logger.recordOutput(
+                "Superstructure/Level", m_robotContainer.superstructure.getWantedLevel());
 
         Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
 
-		m_robotContainer.updateRobotPoseForSmartdashboard();
+        m_robotContainer.updateRobotPoseForSmartdashboard();
         VirtualSubsystem.periodicAll();
-		LEDConstants.m_candle.animate(LEDConstants.RAINBOW);
+        LEDConstants.m_candle.animate(LEDConstants.RAINBOW);
     }
 
     @Override
@@ -147,10 +145,7 @@ public class Robot extends LoggedRobot {
     public void testExit() {}
 
     @Override
-    public void simulationInit() {
-
-        
-    }
+    public void simulationInit() {}
 
     @Override
     public void simulationPeriodic() {

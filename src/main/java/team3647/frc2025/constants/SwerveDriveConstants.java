@@ -1,10 +1,6 @@
 package team3647.frc2025.constants;
 
-import static edu.wpi.first.units.Units.Kilogram;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
-
-import org.ironmaple.simulation.drivesims.COTS;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.*;
@@ -12,12 +8,12 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import org.ironmaple.simulation.drivesims.COTS;
 import team3647.lib.team254.geometry.Translation2d;
 import team3647.lib.team254.swerve.SwerveDriveKinematics;
 import team3647.lib.team254.swerve.SwerveKinematicLimits;
@@ -101,7 +97,6 @@ public class SwerveDriveConstants {
         kTeleopKinematicLimits.kMaxSteeringVelocity = Units.Degree.of(1500).in(Units.Radians);
     }
 
-	
     public static ModuleConfig ppModuleConfig =
             new ModuleConfig(
                     Meters.of(TunerConstants.BackLeft.WheelRadius),
@@ -117,12 +112,7 @@ public class SwerveDriveConstants {
         try {
             ppRobotConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
-            ppRobotConfig =
-                    new RobotConfig(
-                            74,
-                           	6.883,
-                            ppModuleConfig,
-							kTrackWidth);
+            ppRobotConfig = new RobotConfig(74, 6.883, ppModuleConfig, kTrackWidth);
 
             DriverStation.reportError(
                     "problem setting pp robot config from gui", e.getStackTrace());

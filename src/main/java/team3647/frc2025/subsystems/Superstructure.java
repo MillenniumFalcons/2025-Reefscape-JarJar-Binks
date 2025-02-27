@@ -414,7 +414,7 @@ public class Superstructure {
         return Commands.sequence(
                 clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
                 elevatorCommands.setHeight(ElevatorConstants.kLevel4Height),
-                pivotCommands.setAngle(PivotConstants.kLevel4Angle.plus(Degree.of(10))));
+                pivotCommands.setAngle(PivotConstants.kLevel4Angle));
     }
 
     public Command scoreL3() {
@@ -443,11 +443,11 @@ public class Superstructure {
     }
 
     public Command stowFromL4() {
-        return Commands.sequence(poopCoral(), pivotCommands.setAngle(-0.28));
+        return Commands.sequence(pivotCommands.setAngle(-0.28), poopCoral());
     }
 
     public Command stowFromL3() {
-        return Commands.parallel(poopCoral(), pivotCommands.setAngle(Degree.of(-10)));
+        return Commands.parallel(pivotCommands.setAngle(Degree.of(-10)), poopCoral());
     }
 
     public Command stowAll() {

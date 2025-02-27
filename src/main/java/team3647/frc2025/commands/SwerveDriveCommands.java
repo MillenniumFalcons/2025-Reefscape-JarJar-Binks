@@ -65,7 +65,7 @@ public class SwerveDriveCommands implements AllianceObserver {
 
                         swerve.driveFieldOriented(
                                 motionXComponent, motionYComponent, motionTurnComponent);
-                        
+
                     } else if (isAutoDrive
                             && (getMode.get().equals(DriveMode.SCORE)
                                     || getMode.get().equals(DriveMode.SRCINTAKE))) {

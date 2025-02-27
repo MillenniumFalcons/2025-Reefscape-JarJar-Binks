@@ -1,8 +1,6 @@
 package team3647.frc2025.Util;
 
-import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Radian;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
@@ -18,8 +16,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import org.dyn4j.world.result.DetectResult;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
 import team3647.frc2025.constants.SwerveDriveConstants;
@@ -34,7 +30,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     private final Supplier<Pose2d> odoPoseFunction;
     private ScoringPos wantedScoringPos;
 
-	private NeuralDetector detector;
+    private NeuralDetector detector;
 
     private Side wantedSide = Side.A;
 
@@ -79,7 +75,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         this.blueSourcePoses = blueSourcePoses;
         this.redSidePoses = redSidePoses;
         this.blueSidePoses = blueSidePoses;
-		this.detector = detector;
+        this.detector = detector;
 
         this.sidePoses = color == Alliance.Red ? redSidePoses : blueSidePoses;
 
@@ -138,14 +134,14 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 return xController.calculate(
                         getPose().getX(), getPose().nearest(sourcePoses).getX());
             case SCORE:
-				
-                var k = xController.calculate(
-                        getPose().getX(), AllianceFlip.flip(wantedScoringPos.pose, color).getX());
-						Logger.recordOutput("kx", k);
-				return Math.abs(k) < 0.02? 0 : k;
-			case INTAKE:
-
-			return detector.getTY() >= 0? xController.calculate(detector.getTY()) : 0;
+                var k =
+                        xController.calculate(
+                                getPose().getX(),
+                                AllianceFlip.flip(wantedScoringPos.pose, color).getX());
+                Logger.recordOutput("kx", k);
+                return Math.abs(k) < 0.02 ? 0 : k;
+            case INTAKE:
+                return detector.getTY() >= 0 ? xController.calculate(detector.getTY()) : 0;
 
             default:
                 return xController.calculate(
@@ -159,12 +155,14 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 return yController.calculate(
                         getPose().getY(), getPose().nearest(sourcePoses).getY());
             case SCORE:
-                var k = yController.calculate(
-                        getPose().getY(), AllianceFlip.flip(wantedScoringPos.pose, color).getY());
-						Logger.recordOutput("ky", k);
-				return Math.abs(k) < 0.02? 0 : k;
-			case INTAKE:
-				return detector.getTY() >= 0? yController.calculate(detector.getTX()) : 0;
+                var k =
+                        yController.calculate(
+                                getPose().getY(),
+                                AllianceFlip.flip(wantedScoringPos.pose, color).getY());
+                Logger.recordOutput("ky", k);
+                return Math.abs(k) < 0.02 ? 0 : k;
+            case INTAKE:
+                return detector.getTY() >= 0 ? yController.calculate(detector.getTX()) : 0;
 
             default:
                 return yController.calculate(
@@ -183,10 +181,11 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                         getPose().getRotation().getRadians(),
                         AllianceFlip.flip(wantedScoringPos.pose, color).getRotation().getRadians());
             case TEST:
-                
                 return rotController.calculate(getPose().getRotation().getRadians());
-			case INTAKE:
-			return detector.getTY() >= 0? rotController.calculate(Units.degreesToRadians(detector.getTX())) : 0;
+            case INTAKE:
+                return detector.getTY() >= 0
+                        ? rotController.calculate(Units.degreesToRadians(detector.getTX()))
+                        : 0;
 
             default:
                 return rotController.calculate(
@@ -223,9 +222,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         return new Twist2d(getX(), getY(), getRot());
     }
 
-	public Command setWantedScoringPos(ScoringPos pos){
-		return Commands.runOnce(() -> wantedScoringPos = pos);
-	}
+    public Command setWantedScoringPos(ScoringPos pos) {
+        return Commands.runOnce(() -> wantedScoringPos = pos);
+    }
 
     @Override
     public void onAllianceFound(Alliance color) {
@@ -255,7 +254,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     @Override
     public void periodic() {
         wantedSide = poseToSideMap.get(getPose().nearest(sidePoses));
-        
+
         // forscoring: 0.324 m away from the face
         setwantedScoringPosBySideLevel();
     }
@@ -386,11 +385,11 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 });
     }
 
-	public Pose2d getAlignPose(){
-		if(wantedMode == DriveMode.ALGAE){
-			return getPose().nearest(sidePoses);
-		}
+    public Pose2d getAlignPose() {
+        if (wantedMode == DriveMode.ALGAE) {
+            return getPose().nearest(sidePoses);
+        }
 
-		return AllianceFlip.flip(wantedScoringPos.pose, color);
-	}
+        return AllianceFlip.flip(wantedScoringPos.pose, color);
+    }
 }

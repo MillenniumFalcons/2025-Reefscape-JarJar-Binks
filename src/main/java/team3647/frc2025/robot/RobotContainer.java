@@ -6,15 +6,6 @@ package team3647.frc2025.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import java.lang.reflect.Field;
-import java.nio.file.attribute.GroupPrincipal;
-import java.security.AuthProvider;
-import java.security.PublicKey;
-import java.util.function.Supplier;
-import java.util.logging.Logger;
-
-import choreo.auto.AutoRoutine;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -33,7 +24,6 @@ import team3647.frc2025.constants.CoralerConstants;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants;
 import team3647.frc2025.constants.GlobalConstants;
-import team3647.frc2025.constants.LEDConstants;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.RollersConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
@@ -63,16 +53,13 @@ public class RobotContainer {
     public final Joysticks mainController = new Joysticks(0);
     public final Joysticks coController = new Joysticks(1);
 
-	public Field2d smartDashboardField = new Field2d();
+    public Field2d smartDashboardField = new Field2d();
 
     public RobotContainer() {
         configureBindings();
         configureDefaultCommands();
         configureAllianceObservers();
-		configureSmartDashboardLogging();
-
-		
-		   
+        configureSmartDashboardLogging();
 
         superstructure.setIsAlignedFunction(autoDrive::isAlignedToReef);
         elevator.setEncoderHeight(ElevatorConstants.kStartingHeight);
@@ -99,10 +86,11 @@ public class RobotContainer {
         mainController.leftBumper.whileTrue(superstructure.prepIntake().until(intakeUp));
         mainController.leftBumper.onFalse(superstructure.stowIntake());
         intakeUp.and(safeToIntakeUp).onTrue(superstructure.stowFromIntake().withTimeout(3));
-		
 
-        mainController.rightTrigger.onTrue(autoDrive.setDriveMode(DriveMode.SCORE))
-		.onFalse(autoDrive.setDriveMode(DriveMode.NONE));
+        mainController
+                .rightTrigger
+                .onTrue(autoDrive.setDriveMode(DriveMode.SCORE))
+                .onFalse(autoDrive.setDriveMode(DriveMode.NONE));
         mainController
                 .rightTrigger
                 .or(coController.buttonX)
@@ -118,11 +106,12 @@ public class RobotContainer {
         mainController.dPadRight.onTrue(superstructure.wristCommands.offsetUp());
         mainController.dPadLeft.onTrue(superstructure.wristCommands.offsetDown());
 
-        mainController.buttonX.whileTrue(superstructure.rollersCommands.setOpenLoop(-0.5)).onFalse(superstructure.rollersCommands.kill());
+        mainController
+                .buttonX
+                .whileTrue(superstructure.rollersCommands.setOpenLoop(-0.5))
+                .onFalse(superstructure.rollersCommands.kill());
 
-		
-
-		// mainController.leftTrigger.onTrue(autoDrive.setDriveMode(DriveMode.TEST)).onFalse(autoDrive.setDriveMode(DriveMode.NONE));
+        // mainController.leftTrigger.onTrue(autoDrive.setDriveMode(DriveMode.TEST)).onFalse(autoDrive.setDriveMode(DriveMode.NONE));
 
         // cocontroller selecting the branch you wanna score coral on
         coController.leftBumper.onTrue(autoDrive.setWantedBranch(Branch.ONE));
@@ -167,15 +156,15 @@ public class RobotContainer {
         coController.leftMidButton.onTrue(autoDrive.disableAutoDrive());
     }
 
-	private void configureSmartDashboardLogging(){
-		
-		SmartDashboard.putData("Autos", autoChooser);
-		SmartDashboard.putData("Field", smartDashboardField);
-	}
+    private void configureSmartDashboardLogging() {
 
-	public void updateRobotPoseForSmartdashboard(){
-		smartDashboardField.setRobotPose(swerve.getOdoPose());
-	}
+        SmartDashboard.putData("Autos", autoChooser);
+        SmartDashboard.putData("Field", smartDashboardField);
+    }
+
+    public void updateRobotPoseForSmartdashboard() {
+        smartDashboardField.setRobotPose(swerve.getOdoPose());
+    }
 
     private void configureDefaultCommands() {
         swerve.setDefaultCommand(
@@ -302,7 +291,7 @@ public class RobotContainer {
 
     public final AutoChooser autoChooser = new AutoChooser(autoCommands, swerve::setRobotPose);
 
-	private final GroupPrinter printer = GroupPrinter.getInstance();
+    private final GroupPrinter printer = GroupPrinter.getInstance();
 
     AprilTagPhotonVision frontLeft =
             new AprilTagPhotonVision(

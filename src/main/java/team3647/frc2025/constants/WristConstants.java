@@ -25,8 +25,8 @@ public class WristConstants {
 
     public static final Angle kStowWithPiece = Degree.of(87.68);
 
-	//tunnnnnoon
-	public static final Angle kSourceIntakeAngle = Degree.of(15);
+    // tunnnnnoon
+    public static final Angle kSourceIntakeAngle = Degree.of(15);
 
     // 90 degs/20 revolutions
     public static final double kNativeToDeg = 90 / 21.9182;
