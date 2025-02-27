@@ -183,7 +183,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                         getPose().getRotation().getRadians(),
                         AllianceFlip.flip(wantedScoringPos.pose, color).getRotation().getRadians());
             case TEST:
-                Logger.recordOutput("error", rotController.getError());
+                
                 return rotController.calculate(getPose().getRotation().getRadians());
 			case INTAKE:
 			return detector.getTY() >= 0? rotController.calculate(Units.degreesToRadians(detector.getTX())) : 0;
@@ -255,7 +255,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     @Override
     public void periodic() {
         wantedSide = poseToSideMap.get(getPose().nearest(sidePoses));
-        Logger.recordOutput("Robot/distance", ScoringPos.A1.pose.getX() - getPose().getX());
+        
         // forscoring: 0.324 m away from the face
         setwantedScoringPosBySideLevel();
     }
