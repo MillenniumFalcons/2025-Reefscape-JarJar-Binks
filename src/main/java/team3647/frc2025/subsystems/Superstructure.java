@@ -414,14 +414,14 @@ public class Superstructure {
         return Commands.sequence(
                 clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
                 elevatorCommands.setHeight(ElevatorConstants.kLevel4Height),
-                pivotCommands.setAngle(PivotConstants.kLevel4Angle));
+                pivotCommands.setAngle(PivotConstants.kLevel4Angle.plus(Degree.of(10))));
     }
 
     public Command scoreL3() {
         return Commands.sequence(
                 clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
                 elevatorCommands.setHeight(ElevatorConstants.kLevel3Height),
-                pivotCommands.setAngle(PivotConstants.kLevel3Angle));
+                pivotCommands.setAngle(PivotConstants.kLevel3Angle.plus(Degree.of(10))));
     }
 
     public Command scoreL2() {
