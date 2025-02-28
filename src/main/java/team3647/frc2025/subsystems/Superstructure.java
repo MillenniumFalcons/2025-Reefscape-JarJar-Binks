@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.security.PublicKey;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -153,12 +151,10 @@ public class Superstructure {
         MID,
         HIGH,
         INTAKE,
-		ALGAEHIGH,
-		ALGAELOW,
+        ALGAEHIGH,
+        ALGAELOW,
         NONE
     }
-
-	
 
     public void setIsAlignedFunction(BooleanSupplier isAligned) {
         this.isAligned = isAligned;
@@ -172,8 +168,6 @@ public class Superstructure {
     public ScoringPos getWantedScoringPos() {
         return wantedScoringPos;
     }
-
-
 
     public void logError(String message) {
         Logger.recordOutput("robot/robotErrors", message + Timer.getFPGATimestamp());
@@ -212,29 +206,23 @@ public class Superstructure {
                 elevatorCommands.setHeight(state.elevatorHeight));
     }
 
-	public Command prepAlgae(){
-		return Commands.sequence(
-			clearElevatorGoingUp(PivotConstants.kStowAngleUp),
-			pivotCommands.setAngle(PivotConstants.kStowAngleUp)
-		);
-	}
+    public Command prepAlgae() {
+        return Commands.sequence(
+                clearElevatorGoingUp(PivotConstants.kStowAngleUp),
+                pivotCommands.setAngle(PivotConstants.kStowAngleUp));
+    }
 
-	public Command takeOffAlgaeHigh(){
-		return Commands.sequence(
-			elevatorCommands.setHeight(ElevatorConstants.kHighAlgaeHeight),
-			pivotCommands.setAngle(PivotConstants.kAlgaeAngleHigh)
-			
-		);
-	}
+    public Command takeOffAlgaeHigh() {
+        return Commands.sequence(
+                elevatorCommands.setHeight(ElevatorConstants.kHighAlgaeHeight),
+                pivotCommands.setAngle(PivotConstants.kAlgaeAngleHigh));
+    }
 
-	public Command takeOffAlgaeLow(){
-		return Commands.sequence(
-			elevatorCommands.setHeight(ElevatorConstants.kLowAlgaeHeight),
-			pivotCommands.setAngle(PivotConstants.kAlgaeAngleLow)
-			
-		);
-	}
-	
+    public Command takeOffAlgaeLow() {
+        return Commands.sequence(
+                elevatorCommands.setHeight(ElevatorConstants.kLowAlgaeHeight),
+                pivotCommands.setAngle(PivotConstants.kAlgaeAngleLow));
+    }
 
     public Command prepL1() {
         return Commands.sequence(
@@ -313,11 +301,11 @@ public class Superstructure {
 
     public Command stowElevAndPivot() {
         return Commands.sequence(
-                clearElevatorGoingDown(),
-                Commands.parallel(
-                        pivotCommands.setAngle(PivotConstants.kStowAngle),
-                        elevatorCommands.setHeight(ElevatorConstants.kStowHeight)))
-						.alongWith(wristCommands.stow());
+                        clearElevatorGoingDown(),
+                        Commands.parallel(
+                                pivotCommands.setAngle(PivotConstants.kStowAngle),
+                                elevatorCommands.setHeight(ElevatorConstants.kStowHeight)))
+                .alongWith(wristCommands.stow());
     }
 
     public Command clearElevatorGoingDown(Angle finalPivotAngle) {
@@ -601,9 +589,6 @@ public class Superstructure {
                                 ElevatorConstants.kLevel4Height.plus(elevOffset)),
                         pivotCommands.setAngle(PivotConstants.kStowAngleUp.plus(pivotOffset))));
     }
-
-
-
 
     // public Command score(SuperstructureState state){
     // 	return Commands.sequence(

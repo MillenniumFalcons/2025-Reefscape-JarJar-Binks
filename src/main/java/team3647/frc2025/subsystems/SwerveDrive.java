@@ -187,7 +187,6 @@ public class SwerveDrive extends TunerSwerveDrivetrain
         this.maxSpeedMpS = maxSpeedMpS;
         this.maxRotRadPerSec = maxRotRadPerSec;
         this.kDt = kDt;
-        this.getPigeon2().setYaw(0);
 
         this.setpointGenerator = new SwerveSetpointGenerator(SwerveDriveConstants.kDriveKinematics);
 

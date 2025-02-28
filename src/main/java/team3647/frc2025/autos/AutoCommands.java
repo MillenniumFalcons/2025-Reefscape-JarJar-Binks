@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.AutoDrive;
 import team3647.frc2025.Util.PoseUtils;
 import team3647.frc2025.constants.AutoConstants;
@@ -90,7 +89,7 @@ public class AutoCommands implements AllianceObserver {
                 superstructure
                         .stowFromIntake()
                         .alongWith(autoDrive.setWantedScoringPos(ScoringPos.F2)),
-                Commands.waitUntil(superstructure::isAligned),
+                Commands.waitSeconds(1),
                 superstructure.prepL4().alongWith(superstructure.wristCommands.stow()),
                 superstructure.scoreL4(),
                 superstructure.stowFromL4());
@@ -212,9 +211,8 @@ public class AutoCommands implements AllianceObserver {
     public void onAllianceFound(Alliance color) {
 
         this.color = color;
-        Logger.recordOutput("haslogged", color);
+
         setIsRed();
-        Logger.recordOutput("isred", isRed);
     }
 
     public boolean isRed() {
@@ -233,9 +231,11 @@ public class AutoCommands implements AllianceObserver {
     AutoDrive autoDrive;
 
     public final AutoMode blueOne_s2d2;
+    public final AutoMode blueTwoS3_e1f2;
     public final AutoMode DT_One_s2d2;
 
     public final AutoMode redOne_s2d2;
+    public final AutoMode redTwoS3_e1f2;
 
     public List<AutoMode> redAutosList;
     public List<AutoMode> blueAutosList;
@@ -260,6 +260,11 @@ public class AutoCommands implements AllianceObserver {
         this.blueOne_s2d2 =
                 new AutoMode(
                         getOneS2_d2(), getInitial(s2_to_d2, Alliance.Blue), "blue one Piece mid");
+        this.blueTwoS3_e1f2 =
+                new AutoMode(
+                        getTwoS3_e1f2(),
+                        getInitial(s3_to_e1, Alliance.Blue),
+                        "blue two piece Left");
         this.DT_One_s2d2 =
                 new AutoMode(
                         getOneDT_s2e2(),
@@ -269,17 +274,20 @@ public class AutoCommands implements AllianceObserver {
         this.redOne_s2d2 =
                 new AutoMode(
                         getOneS2_d2(), getInitial(s2_to_d2, Alliance.Red), "red one Piece mid");
+        this.redTwoS3_e1f2 =
+                new AutoMode(
+                        getTwoS3_e1f2(), getInitial(s3_to_e1, Alliance.Red), "red one Piece Left");
 
         blueAutosList =
                 List.of(
                         new AutoMode(Commands.none(), new Pose2d(), "nothingBlue"),
                         blueOne_s2d2,
-                        DT_One_s2d2);
+                        blueTwoS3_e1f2);
         redAutosList =
                 List.of(
                         new AutoMode(Commands.none(), new Pose2d(), "nothingRed"),
                         redOne_s2d2,
-                        DT_One_s2d2);
+                        redTwoS3_e1f2);
     }
 
     public interface ChoreoController extends BiFunction<Pose2d, SwerveSample, ChassisSpeeds> {}

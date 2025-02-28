@@ -94,7 +94,10 @@ public class RobotContainer {
         mainController
                 .rightTrigger
                 .or(coController.buttonX)
-                .onFalse(superstructure.autoStowFromShot().andThen(superstructure.stowElevAndPivot()));
+                .onFalse(
+                        superstructure
+                                .autoStowFromShot()
+                                .andThen(superstructure.stowElevAndPivot().withTimeout(5)));
 
         mainController.rightMidButton.whileTrue(superstructure.stowElevAndPivot());
 
