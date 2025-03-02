@@ -255,6 +255,8 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     public void periodic() {
         wantedSide = poseToSideMap.get(getPose().nearest(sidePoses));
 
+		
+
         // forscoring: 0.324 m away from the face
         setwantedScoringPosBySideLevel();
     }

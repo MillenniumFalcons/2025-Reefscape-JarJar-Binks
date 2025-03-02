@@ -25,7 +25,7 @@ public class ElevatorConstants {
     // all heights measured as center dist from the pivot pivoting bar
     public static final Distance kLevel1Height = kStowHeight;
     public static final Distance kLevel2Height = kStowHeight;
-    public static final Distance kLevel3Height = kStowHeight;
+    public static final Distance kLevel3Height = kStartingHeight;
     public static final Distance kLevel4Height = Meters.of(1.529);
     // high needs tuning, low doesn't; tune for same angle at both heights
     public static final Distance kHighAlgaeHeight = Meters.of(1.368);
@@ -56,7 +56,7 @@ public class ElevatorConstants {
         kMasterConfig.Slot0.withKS(0);
         kMasterConfig.Slot0.withKV(0);
         kMasterConfig.Slot0.withKA(0);
-        kMasterConfig.Slot0.withKG(0.359);
+        kMasterConfig.Slot0.withKG(0.128);
         kMasterConfig.MotionMagic.MotionMagicExpo_kV = 0.01;
         kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.01000000149011612;
         // 121cm - 85cm @19.855

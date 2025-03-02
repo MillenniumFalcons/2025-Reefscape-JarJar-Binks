@@ -7,11 +7,11 @@ import team3647.frc2025.subsystems.Climb;
 public class ClimbCommands {
 
     public Command climbOut() {
-        return Commands.run(() -> climb.setOpenLoop(0.7), climb);
+        return Commands.run(() -> climb.setOpenLoop(0.9), climb);
     }
 
     public Command climbIn() {
-        return Commands.run(() -> climb.setOpenLoop(-0.4), climb);
+        return Commands.run(() -> climb.setOpenLoop(-0.9), climb);
     }
 
     public Command kill() {

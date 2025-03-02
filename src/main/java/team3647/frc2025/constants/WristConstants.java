@@ -43,7 +43,9 @@ public class WristConstants {
 
         kMasterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        ;
+
+        kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.0500000001490;
+		kMasterConfig.MotionMagic.MotionMagicExpo_kV = 0.119;
 
         kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
                 kMaxAngle.in(Degree) / kNativeToDeg;

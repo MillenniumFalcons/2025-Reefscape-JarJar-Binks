@@ -3,6 +3,7 @@ package team3647.frc2025.constants;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Radian;
 
+import com.ctre.phoenix.motorcontrol.StickyFaults;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -14,12 +15,14 @@ public class PivotConstants {
     public static final Angle kMinAngle = Radian.of(-1.584);
     public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561).minus(Degree.of(10));
     public static final Angle kLevel2Angle = Radian.of(-0.279);
-    public static final Angle kLevel3Angle = Radian.of(0.50);
-    public static final Angle kLevel4Angle = Radian.of(0.344);
+    public static final Angle kLevel3Angle = Radian.of(0.4650);
+    public static final Angle kLevel4Angle = Radian.of(0.251);
 
     public static final Angle kL2Prep = Radian.of(-0.1);
     public static final Angle KL1Prep = kLevel1Angle;
     public static final Angle kStartingAngle = kMinAngle;
+	public static final Angle kL4Prep = Radian.of(0.606);
+	public static final Angle kL3prep = Radian.of(0.601);
 
     public static final Angle klowLevelsStow = Radian.of(-0.045);
 
@@ -35,10 +38,10 @@ public class PivotConstants {
 
     public static final double kNativeToRad = 1 / (10.081055 / (Math.PI / 2));
 
-    public static final Angle kMaxAngle = Radian.of(9.60 / kNativeToRad);
+    public static final Angle kMaxAngle = Radian.of(1.4771008593051909);
 
     // -1.402692317215491
-    public static final Angle kHandoffAngle = Radian.of(-1.407);
+    public static final Angle kHandoffAngle = Radian.of(-1.407).minus(Degree.of(1.5));
 
     // public static final Angle kBadAngle = Radian.of(0);
     // public static final Angle kBadTolerance = Radian.of(0);
@@ -65,7 +68,7 @@ public class PivotConstants {
         kMasterConfig.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        kMasterConfig.CurrentLimits.StatorCurrentLimit = 60.0;
+        kMasterConfig.CurrentLimits.StatorCurrentLimit = 80.0;
         kMasterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =

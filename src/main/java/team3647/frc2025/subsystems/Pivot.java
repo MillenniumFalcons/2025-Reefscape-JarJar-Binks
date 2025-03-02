@@ -88,18 +88,10 @@ public class Pivot extends TalonFXSubsystem {
     }
 
     public Angle getMinAngle() {
-        if (getPosition() > kClearAngle.in(Radian)
-                && elevatorHeight.get().lt(ElevatorConstants.kClearHeight)) {
-            return kClearAngle;
-        }
         return minAngle;
     }
 
     public Angle getMaxAngle() {
-        if (getPosition() < kLowClearAngle.in(Radian)
-                && elevatorHeight.get().lt(ElevatorConstants.kClearHeight)) {
-            return kLowClearAngle;
-        }
         return maxAngle;
     }
 

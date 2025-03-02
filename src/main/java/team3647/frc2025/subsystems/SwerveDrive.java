@@ -649,7 +649,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 
         var rot = color == Alliance.Red ? Rotation2d.k180deg : Rotation2d.kZero;
 
-        setOperatorPerspectiveForward(rot);
+        // setOperatorPerspectiveForward(rot);
     }
 
     @Override

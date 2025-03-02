@@ -39,6 +39,7 @@ public class AutoCommands implements AllianceObserver {
     private final Trajectory<SwerveSample> src_to_e2;
     private final Trajectory<SwerveSample> s2_to_d2;
 
+
     private final PIDController rotController = new PIDController(5, 0, 0);
 
     public Command getFour_s3e1f1f2e2() {
@@ -232,10 +233,11 @@ public class AutoCommands implements AllianceObserver {
 
     public final AutoMode blueOne_s2d2;
     public final AutoMode blueTwoS3_e1f2;
-    public final AutoMode DT_One_s2d2;
+    public final AutoMode blueDT_One_s2d2;
 
     public final AutoMode redOne_s2d2;
     public final AutoMode redTwoS3_e1f2;
+	public final AutoMode redDT_One_s2d2;
 
     public List<AutoMode> redAutosList;
     public List<AutoMode> blueAutosList;
@@ -265,29 +267,37 @@ public class AutoCommands implements AllianceObserver {
                         getTwoS3_e1f2(),
                         getInitial(s3_to_e1, Alliance.Blue),
                         "blue two piece Left");
-        this.DT_One_s2d2 =
+        this.blueDT_One_s2d2 =
                 new AutoMode(
                         getOneDT_s2e2(),
                         getInitial(s2_to_d2, Alliance.Blue),
                         "blue one piece mid ONLY DT");
-
+		
+		this.redDT_One_s2d2 =
+				new AutoMode(
+					getOneDT_s2e2(),
+					getInitial(s2_to_d2, Alliance.Red),
+					"red one piece mid ONLY DT");		
         this.redOne_s2d2 =
                 new AutoMode(
                         getOneS2_d2(), getInitial(s2_to_d2, Alliance.Red), "red one Piece mid");
         this.redTwoS3_e1f2 =
                 new AutoMode(
                         getTwoS3_e1f2(), getInitial(s3_to_e1, Alliance.Red), "red one Piece Left");
+		
 
         blueAutosList =
                 List.of(
                         new AutoMode(Commands.none(), new Pose2d(), "nothingBlue"),
                         blueOne_s2d2,
-                        blueTwoS3_e1f2);
+                        blueTwoS3_e1f2,
+						blueDT_One_s2d2);
         redAutosList =
                 List.of(
                         new AutoMode(Commands.none(), new Pose2d(), "nothingRed"),
                         redOne_s2d2,
-                        redTwoS3_e1f2);
+                        redTwoS3_e1f2,
+						redDT_One_s2d2);
     }
 
     public interface ChoreoController extends BiFunction<Pose2d, SwerveSample, ChassisSpeeds> {}

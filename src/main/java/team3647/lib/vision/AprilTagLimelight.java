@@ -47,6 +47,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
                 robotToCamera.getRotation().getY(),
                 robotToCamera.getRotation().getZ());
         LimelightHelpers.setPipelineIndex(name, kAprilTagPipelineIndex);
+		LimelightHelpers.SetIMUMode(name, 1);
 
         this.baseStdDevs = baseStdDevs;
     }
