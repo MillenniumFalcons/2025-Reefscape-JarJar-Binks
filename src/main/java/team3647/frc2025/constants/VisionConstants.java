@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 
 public class VisionConstants {
-	public static final Vector<N3> baseStdDevs = VecBuilder.fill(0.05, 0.05, 0.1);
+	public static final Vector<N3> baseStdDevs = VecBuilder.fill(0.05, 0.05 , 0.05);
 
 	public static final String kCrossbarLLName = "limelight-xbar-asdfasdf";
 	public static final String kIntakeLLName = "limelight-coral";

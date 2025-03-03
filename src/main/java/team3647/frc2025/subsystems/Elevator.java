@@ -3,6 +3,7 @@ package team3647.frc2025.subsystems;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
@@ -121,6 +122,7 @@ public class Elevator extends TalonFXSubsystem {
     }
 
     public Distance getHeight() {
+		MotionMagicExpoVoltage volts = new MotionMagicExpoVoltage(null);
         return Meters.of(getPosition());
     }
 

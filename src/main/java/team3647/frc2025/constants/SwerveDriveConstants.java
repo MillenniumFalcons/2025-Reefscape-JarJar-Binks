@@ -28,8 +28,8 @@ public class SwerveDriveConstants {
     public static final boolean kTurnMotorInvertedBoolean = false;
 
     // physical possible max speed
-    public static final double kDrivePossibleMaxSpeedMPS = 5;
-    public static final double kRotPossibleMaxSpeedRadPerSec = 10;
+    public static final double kDrivePossibleMaxSpeedMPS = 5.6;
+    public static final double kRotPossibleMaxSpeedRadPerSec = 11.2;
 
     // public static final TalonFX kFrontLeftDrive =
     //         new TalonFX(GlobalConstants.SwerveDriveIds.kFrontLeftDriveId, "rio");
@@ -92,8 +92,8 @@ public class SwerveDriveConstants {
     public static final double shootingAccel = 13;
 
     static {
-        kTeleopKinematicLimits.kMaxDriveVelocity = 5; // TunerConstants.kSpeedAt12VoltsMps;
-        kTeleopKinematicLimits.kMaxDriveAcceleration = 5 / 0.1; // defaultAccel;
+        kTeleopKinematicLimits.kMaxDriveVelocity = 5.6; // TunerConstants.kSpeedAt12VoltsMps;
+        kTeleopKinematicLimits.kMaxDriveAcceleration = 5.6 / 0.1; // defaultAccel;
         kTeleopKinematicLimits.kMaxSteeringVelocity = Units.Degree.of(1500).in(Units.Radians);
     }
 

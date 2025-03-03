@@ -66,16 +66,12 @@ public class AutoCommands implements AllianceObserver {
     public Command scorePreload() {
         return Commands.sequence(
                 Commands.parallel(superstructure.wristCommands.setAngle(Degree.of(95))),
-                Commands.sequence(
-                        superstructure.clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
-                        Commands.parallel(
-                                superstructure.elevatorCommands.setHeight(
-                                        ElevatorConstants.kLevel4Height),
-                                superstructure.pivotCommands.setAngle(
-                                        PivotConstants.kStowAngleUp))),
-                Commands.waitSeconds(0.5),
+				Commands.waitSeconds(1),
                 superstructure.scoreL4(),
-                superstructure.stowFromL4());
+                superstructure.pivotCommands.setAngle(PivotConstants.kLevel4Angle),
+				Commands.waitSeconds(1),
+				superstructure.poopCoral(),
+				superstructure.stowElevAndPivot());
     }
 
     public Command getSuperstructureTwoS3_e1f2() {

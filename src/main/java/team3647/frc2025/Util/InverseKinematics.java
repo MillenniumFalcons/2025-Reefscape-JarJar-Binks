@@ -37,6 +37,10 @@ public class InverseKinematics {
         return new SuperstructureState(armAngle, Meters.of(elevatorHeight));
     }
 
+	public void getWristOutofthewayAngle(){
+		
+	}
+
     public static boolean getClawXYBad(SuperstructureState state) {
         var y =
                 state.elevatorHeight.in(Meter)

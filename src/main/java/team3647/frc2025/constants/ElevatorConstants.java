@@ -56,7 +56,7 @@ public class ElevatorConstants {
         kMasterConfig.Slot0.withKS(0);
         kMasterConfig.Slot0.withKV(0);
         kMasterConfig.Slot0.withKA(0);
-        kMasterConfig.Slot0.withKG(0.128);
+        kMasterConfig.Slot0.withKG(0.22);
         kMasterConfig.MotionMagic.MotionMagicExpo_kV = 0.01;
         kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.01000000149011612;
         // 121cm - 85cm @19.855
