@@ -69,17 +69,19 @@ public class SwerveDriveCommands implements AllianceObserver {
                     } else if (isAutoDrive
                             && (getMode.get().equals(DriveMode.SCORE)
                                     || getMode.get().equals(DriveMode.SRCINTAKE))) {
-							
+
                         motionXComponent = velocities.dx + motionXComponent * 0.3;
                         motionYComponent = velocities.dy + motionYComponent * 0.3;
                         motionTurnComponent = velocities.dtheta + motionTurnComponent + 0.2;
 
-						if (Math.abs(x.getAsDouble()) >= 0.1 || Math.abs(y.getAsDouble()) >= 0.1 || Math.abs(rot.getAsDouble()) >= 0.1) {
-							motionXComponent = ySquared * invert * kMaxSpeed.in(MetersPerSecond);
-							motionYComponent = -xSquared * invert * kMaxSpeed.in(MetersPerSecond);
-							motionTurnComponent = rot.getAsDouble() * -1 * kMaxSpeed.in(MetersPerSecond);
-
-						}
+                        if (Math.abs(x.getAsDouble()) >= 0.1
+                                || Math.abs(y.getAsDouble()) >= 0.1
+                                || Math.abs(rot.getAsDouble()) >= 0.1) {
+                            motionXComponent = ySquared * invert * kMaxSpeed.in(MetersPerSecond);
+                            motionYComponent = -xSquared * invert * kMaxSpeed.in(MetersPerSecond);
+                            motionTurnComponent =
+                                    rot.getAsDouble() * -1 * kMaxSpeed.in(MetersPerSecond);
+                        }
 
                         swerve.driveFieldOriented(
                                 motionXComponent, motionYComponent, motionTurnComponent);

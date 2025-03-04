@@ -92,12 +92,11 @@ public class RobotContainer {
                 .rightTrigger
                 .onTrue(autoDrive.setDriveMode(DriveMode.SCORE))
                 .onFalse(autoDrive.setDriveMode(DriveMode.NONE));
-        mainController
-                .rightTrigger
-                .onFalse(
-                        superstructure
-                                .autoStowFromShot()
-                                .andThen(superstructure.stowElevAndPivot().withTimeout(5)).unless(coController.buttonX));
+        mainController.rightTrigger.onFalse(
+                superstructure
+                        .autoStowFromShot()
+                        .andThen(superstructure.stowElevAndPivot().withTimeout(5))
+                        .unless(coController.buttonX));
 
         mainController.rightMidButton.whileTrue(superstructure.stowElevAndPivot());
 
@@ -112,24 +111,31 @@ public class RobotContainer {
         mainController
                 .buttonX
                 .whileTrue(superstructure.rollersCommands.setOpenLoop(-0.5))
-				.whileTrue(superstructure.coralerCommands.setOpenLoop(-0.3))
+                .whileTrue(superstructure.coralerCommands.setOpenLoop(-0.3))
                 .onFalse(superstructure.rollersCommands.kill());
 
-		mainController.leftTrigger.whileTrue(superstructure.prepAlgae());
+        mainController.leftTrigger.whileTrue(superstructure.prepAlgae());
 
-		mainController.leftTrigger.negate().and(algaePrepped).onTrue(superstructure.autoTakeOffAlgae());
-		mainController.leftTrigger.negate().and(algaePrepped.negate()).onTrue(superstructure.stowElevAndPivot());
+        mainController
+                .leftTrigger
+                .negate()
+                .and(algaePrepped)
+                .onTrue(superstructure.autoTakeOffAlgae());
+        mainController
+                .leftTrigger
+                .negate()
+                .and(algaePrepped.negate())
+                .onTrue(superstructure.stowElevAndPivot());
 
-		coController.leftTrigger.onTrue(superstructure.setWantedLevel(Level.ALGAELOW));
-		coController.rightTrigger.onTrue(superstructure.setWantedLevel(Level.ALGAEHIGH));
+        coController.leftTrigger.onTrue(superstructure.setWantedLevel(Level.ALGAELOW));
+        coController.rightTrigger.onTrue(superstructure.setWantedLevel(Level.ALGAEHIGH));
 
         // mainController.leftTrigger.onTrue(autoDrive.setDriveMode(DriveMode.TEST)).onFalse(autoDrive.setDriveMode(DriveMode.NONE));
 
         // cocontroller selecting the branch you wanna score coral on
         coController.leftBumper.onTrue(autoDrive.setWantedBranch(Branch.ONE));
         coController.rightBumper.onTrue(autoDrive.setWantedBranch(Branch.TWO));
-		coController.buttonX.whileTrue(superstructure.stowElevAndPivot());
-		
+        coController.buttonX.whileTrue(superstructure.stowElevAndPivot());
 
         // coController
         //         .buttonA
@@ -323,12 +329,12 @@ public class RobotContainer {
                     VisionConstants.backRightCamName,
                     VisionConstants.BackRight,
                     VisionConstants.baseStdDevs);
-	AprilTagPhotonVision backLeft = 
-			new AprilTagPhotonVision(
-				VisionConstants.backLeftCamName, 
-				VisionConstants.BackLeft,
-				VisionConstants.baseStdDevs,
-				(pose) -> true);
+    AprilTagPhotonVision backLeft =
+            new AprilTagPhotonVision(
+                    VisionConstants.backLeftCamName,
+                    VisionConstants.BackLeft,
+                    VisionConstants.baseStdDevs,
+                    (pose) -> true);
 
     AprilTagLimelight xBar =
             new AprilTagLimelight(
@@ -355,17 +361,14 @@ public class RobotContainer {
             new Trigger(
                     () -> {
                         return ((superstructure.isAligned()
-                                        || mainController.buttonY.getAsBoolean()));
+                                || mainController.buttonY.getAsBoolean()));
                     });
 
     Trigger safeToIntakeUp =
             new Trigger(mainController.leftBumper.and(() -> !DriverStation.isAutonomous()));
 
     Trigger safeToScore =
-            new Trigger(
-                    mainController
-                            .rightTrigger
-                            .and(() -> !DriverStation.isAutonomous()));
+            new Trigger(mainController.rightTrigger.and(() -> !DriverStation.isAutonomous()));
 
     Trigger intakeUp =
             new Trigger(
@@ -373,6 +376,10 @@ public class RobotContainer {
                                     superstructure.intakeCurrent().getAsBoolean()
                                             && wrist.getAngleDegs() < 20)
                     .or(mainController.buttonB);
-	Trigger algaePrepped = new Trigger(() -> pivot.angleReached(PivotConstants.kStowAngleUp, Degree.of(40)) && 
-	(superstructure.getWantedLevel() == Level.ALGAEHIGH || superstructure.getWantedLevel() == Level.ALGAELOW));
+    Trigger algaePrepped =
+            new Trigger(
+                    () ->
+                            pivot.angleReached(PivotConstants.kStowAngleUp, Degree.of(40))
+                                    && (superstructure.getWantedLevel() == Level.ALGAEHIGH
+                                            || superstructure.getWantedLevel() == Level.ALGAELOW));
 }

@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 import team3647.frc2025.Util.AutoDrive;
 import team3647.frc2025.Util.PoseUtils;
 import team3647.frc2025.constants.AutoConstants;
-import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
@@ -38,7 +37,6 @@ public class AutoCommands implements AllianceObserver {
     private final Trajectory<SwerveSample> f2_to_src;
     private final Trajectory<SwerveSample> src_to_e2;
     private final Trajectory<SwerveSample> s2_to_d2;
-
 
     private final PIDController rotController = new PIDController(5, 0, 0);
 
@@ -66,12 +64,12 @@ public class AutoCommands implements AllianceObserver {
     public Command scorePreload() {
         return Commands.sequence(
                 Commands.parallel(superstructure.wristCommands.setAngle(Degree.of(95))),
-				Commands.waitSeconds(1),
+                Commands.waitSeconds(1),
                 superstructure.scoreL4(),
                 superstructure.pivotCommands.setAngle(PivotConstants.kLevel4Angle),
-				Commands.waitSeconds(1),
-				superstructure.poopCoral(),
-				superstructure.stowElevAndPivot());
+                Commands.waitSeconds(1),
+                superstructure.poopCoral(),
+                superstructure.stowElevAndPivot());
     }
 
     public Command getSuperstructureTwoS3_e1f2() {
@@ -233,7 +231,7 @@ public class AutoCommands implements AllianceObserver {
 
     public final AutoMode redOne_s2d2;
     public final AutoMode redTwoS3_e1f2;
-	public final AutoMode redDT_One_s2d2;
+    public final AutoMode redDT_One_s2d2;
 
     public List<AutoMode> redAutosList;
     public List<AutoMode> blueAutosList;
@@ -268,32 +266,31 @@ public class AutoCommands implements AllianceObserver {
                         getOneDT_s2e2(),
                         getInitial(s2_to_d2, Alliance.Blue),
                         "blue one piece mid ONLY DT");
-		
-		this.redDT_One_s2d2 =
-				new AutoMode(
-					getOneDT_s2e2(),
-					getInitial(s2_to_d2, Alliance.Red),
-					"red one piece mid ONLY DT");		
+
+        this.redDT_One_s2d2 =
+                new AutoMode(
+                        getOneDT_s2e2(),
+                        getInitial(s2_to_d2, Alliance.Red),
+                        "red one piece mid ONLY DT");
         this.redOne_s2d2 =
                 new AutoMode(
                         getOneS2_d2(), getInitial(s2_to_d2, Alliance.Red), "red one Piece mid");
         this.redTwoS3_e1f2 =
                 new AutoMode(
                         getTwoS3_e1f2(), getInitial(s3_to_e1, Alliance.Red), "red one Piece Left");
-		
 
         blueAutosList =
                 List.of(
                         new AutoMode(Commands.none(), new Pose2d(), "nothingBlue"),
                         blueOne_s2d2,
                         blueTwoS3_e1f2,
-						blueDT_One_s2d2);
+                        blueDT_One_s2d2);
         redAutosList =
                 List.of(
                         new AutoMode(Commands.none(), new Pose2d(), "nothingRed"),
                         redOne_s2d2,
                         redTwoS3_e1f2,
-						redDT_One_s2d2);
+                        redDT_One_s2d2);
     }
 
     public interface ChoreoController extends BiFunction<Pose2d, SwerveSample, ChassisSpeeds> {}

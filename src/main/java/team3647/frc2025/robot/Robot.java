@@ -5,12 +5,10 @@
 package team3647.frc2025.robot;
 
 import com.ctre.phoenix6.SignalLogger;
-
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -91,14 +89,14 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
 
-		Logger.recordOutput("Match Time", Timer.getMatchTime());
+        Logger.recordOutput("Match Time", Timer.getMatchTime());
 
-		Logger.recordOutput("backRight", VisionConstants.BackRight);
-		Logger.recordOutput("kzero", Transform3d.kZero);
-		Logger.recordOutput("backLeft", VisionConstants.BackLeft);
-		Logger.recordOutput("LL", VisionConstants.LLCrossMount);
-		Logger.recordOutput("frontleft", VisionConstants.FrontLeft);
-		Logger.recordOutput("frontRight", VisionConstants.FrontRight);
+        Logger.recordOutput("backRight", VisionConstants.BackRight);
+        Logger.recordOutput("kzero", Transform3d.kZero);
+        Logger.recordOutput("backLeft", VisionConstants.BackLeft);
+        Logger.recordOutput("LL", VisionConstants.LLCrossMount);
+        Logger.recordOutput("frontleft", VisionConstants.FrontLeft);
+        Logger.recordOutput("frontRight", VisionConstants.FrontRight);
 
         m_robotContainer.updateRobotPoseForSmartdashboard();
         VirtualSubsystem.periodicAll();

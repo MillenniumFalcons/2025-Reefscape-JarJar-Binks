@@ -3,7 +3,6 @@ package team3647.frc2025.constants;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Radian;
 
-import com.ctre.phoenix.motorcontrol.StickyFaults;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -21,8 +20,8 @@ public class PivotConstants {
     public static final Angle kL2Prep = Radian.of(-0.1);
     public static final Angle KL1Prep = kLevel1Angle;
     public static final Angle kStartingAngle = kMinAngle;
-	public static final Angle kL4Prep = Radian.of(0.606);
-	public static final Angle kL3prep = Radian.of(0.601);
+    public static final Angle kL4Prep = Radian.of(0.606);
+    public static final Angle kL3prep = Radian.of(0.601);
 
     public static final Angle klowLevelsStow = Radian.of(-0.045);
 

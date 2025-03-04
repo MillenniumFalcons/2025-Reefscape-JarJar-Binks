@@ -10,7 +10,6 @@ public class RollersConstants {
     public static final TalonFXConfiguration kmasterConfg = new TalonFXConfiguration();
 
     static {
-		
         kMaster.getConfigurator().apply(kmasterConfg);
     }
 }

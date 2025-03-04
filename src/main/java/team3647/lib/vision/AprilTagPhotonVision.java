@@ -101,9 +101,9 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
 
         Logger.recordOutput("Robot/unfilteredVision", update.get().estimatedPose);
 
-		if (customHeuristics.apply(update.get())) {
-			return Optional.empty();
-		}
+        if (customHeuristics.apply(update.get())) {
+            return Optional.empty();
+        }
         double targetDistance =
                 result.getBestTarget()
                         .getBestCameraToTarget()

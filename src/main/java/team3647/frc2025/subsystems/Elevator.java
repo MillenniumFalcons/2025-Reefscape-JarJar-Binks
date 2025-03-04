@@ -122,7 +122,7 @@ public class Elevator extends TalonFXSubsystem {
     }
 
     public Distance getHeight() {
-		MotionMagicExpoVoltage volts = new MotionMagicExpoVoltage(null);
+        MotionMagicExpoVoltage volts = new MotionMagicExpoVoltage(null);
         return Meters.of(getPosition());
     }
 
