@@ -9,13 +9,13 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team3647.frc2025.Util.AutoDrive;
-import team3647.frc2025.Util.AutoDrive.DriveMode;
 import team3647.frc2025.autos.AutoCommands;
 import team3647.frc2025.commands.ClimbCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
@@ -84,51 +84,8 @@ public class RobotContainer {
         // mainController.rightMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kForward));
         // mainController.rightMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kReverse));
 
-        mainController.leftBumper.whileTrue(superstructure.prepIntake().until(intakeUp));
-        mainController.leftBumper.onFalse(superstructure.stowIntake());
-        intakeUp.and(safeToIntakeUp).onTrue(superstructure.stowFromIntake());
-
-        mainController
-                .rightTrigger
-                .onTrue(autoDrive.setDriveMode(DriveMode.SCORE))
-                .onFalse(autoDrive.setDriveMode(DriveMode.NONE));
-        mainController.rightTrigger.onFalse(
-                superstructure
-                        .autoStowFromShot()
-                        .andThen(superstructure.stowElevAndPivot().withTimeout(5))
-                        .unless(coController.buttonX));
-
-        mainController.rightMidButton.whileTrue(superstructure.stowElevAndPivot());
-
-        score.and(safeToScore).onTrue(superstructure.autoScoreByLevel());
-
-        mainController.dPadUp.whileTrue(climbCommands.climbIn()).onFalse(climbCommands.kill());
-        mainController.dPadDown.whileTrue(climbCommands.climbOut()).onFalse(climbCommands.kill());
-
-        mainController.dPadRight.onTrue(superstructure.wristCommands.offsetUp());
-        mainController.dPadLeft.onTrue(superstructure.wristCommands.offsetDown());
-
-        mainController
-                .buttonX
-                .whileTrue(superstructure.rollersCommands.setOpenLoop(-0.5))
-                .whileTrue(superstructure.coralerCommands.setOpenLoop(-0.3))
-                .onFalse(superstructure.rollersCommands.kill());
-
-        mainController.leftTrigger.whileTrue(superstructure.prepAlgae());
-
-        mainController
-                .leftTrigger
-                .negate()
-                .and(algaePrepped)
-                .onTrue(superstructure.autoTakeOffAlgae());
-        mainController
-                .leftTrigger
-                .negate()
-                .and(algaePrepped.negate())
-                .onTrue(superstructure.stowElevAndPivot());
-
-        coController.leftTrigger.onTrue(superstructure.setWantedLevel(Level.ALGAELOW));
-        coController.rightTrigger.onTrue(superstructure.setWantedLevel(Level.ALGAEHIGH));
+        mainController.rightTrigger.whileTrue(superstructure.autoScoreByLevel());
+        mainController.rightTrigger.onFalse(superstructure.stow());
 
         // mainController.leftTrigger.onTrue(autoDrive.setDriveMode(DriveMode.TEST)).onFalse(autoDrive.setDriveMode(DriveMode.NONE));
 
@@ -180,6 +137,7 @@ public class RobotContainer {
 
         SmartDashboard.putData("Autos", autoChooser);
         SmartDashboard.putData("Field", smartDashboardField);
+        printer.addDouble("Match Time", Timer::getMatchTime);
     }
 
     public void updateRobotPoseForSmartdashboard() {

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.commands.CoralerCommands;
@@ -59,11 +60,7 @@ public class Superstructure {
 
     private double wristOffset = 0;
 
-    private Map<Level, Command> kLevelToPrepMap;
-
-    private Map<Level, Command> kLevelToScoreMap;
-
-    private Map<Level, Command> stowFromShotMap;
+    private Map<Level, SuperstructureState> kLevelToScoreMap;
 
     public enum Side {
         A,
@@ -110,38 +107,17 @@ public class Superstructure {
                             false);
                     return false;
                 };
-        this.kLevelToPrepMap =
-                Map.of(
-                        Level.TROUGH,
-                        prepL1(),
-                        Level.LOW,
-                        prepL2(),
-                        Level.MID,
-                        prepL3(),
-                        Level.HIGH,
-                        prepL4());
 
         this.kLevelToScoreMap =
                 Map.of(
                         Level.TROUGH,
-                        scoreL1(),
+                        SuperstructureState.troughScore,
                         Level.LOW,
-                        scoreL2(),
+                        SuperstructureState.lowScore,
                         Level.MID,
-                        scoreL3(),
+                        SuperstructureState.midScore,
                         Level.HIGH,
-                        scoreL4());
-
-        this.stowFromShotMap =
-                Map.of(
-                        Level.TROUGH,
-                        poopCoral(),
-                        Level.LOW,
-                        poopCoral(),
-                        Level.MID,
-                        stowFromL3(),
-                        Level.HIGH,
-                        stowFromL4());
+                        SuperstructureState.highScore);
     }
 
     public enum Level {
@@ -149,7 +125,6 @@ public class Superstructure {
         LOW,
         MID,
         HIGH,
-        INTAKE,
         ALGAEHIGH,
         ALGAELOW,
         NONE
@@ -178,12 +153,21 @@ public class Superstructure {
      *
      * @return
      */
-    @Deprecated
-    public Command goToStateParalell(SuperstructureState state) {
+    public Command goToStateParalell(Supplier<SuperstructureState> state) {
 
-        return Commands.parallel(
-                elevatorCommands.setHeight(state.elevatorHeight),
-                pivotCommands.setAngle(state.pivotAngle));
+        return Commands.either(
+                Commands.parallel(
+                        // Commands.run(() -> Logger.recordOutput("monkeyballs",
+                        // state.get().elevatorHeight)),
+                        elevatorCommands.setHeight(() -> state.get().elevatorHeight),
+                        pivotCommands.setAngle(() -> state.get().pivotAngle),
+                        wristCommands.setAngle(() -> state.get().wristAngle)
+                        // Commands.run(() ->
+                        // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
+
+                        ),
+                Commands.none(),
+                () -> !state.get().equals(SuperstructureState.kInvalidState));
     }
 
     /**
@@ -242,10 +226,6 @@ public class Superstructure {
                         PivotConstants.kMinAngle.minus(Degree.of((5))).in(Radian),
                         PivotConstants.kClearAngle.in(Radian))
                 && elevator.getHeight().lt(ElevatorConstants.kClearHeight);
-    }
-
-    public Command autoStowFromShot() {
-        return Commands.select(stowFromShotMap, this::getWantedLevel);
     }
 
     //
@@ -495,16 +475,19 @@ public class Superstructure {
         // }
 
         // public Command letGoFromL4(){
-        // 	return pivotCommands.setAngle(PivotConstants.kLevel4Angle.minus(Radian.of(0.436)));
+        // return
+        // pivotCommands.setAngle(PivotConstants.kLevel4Angle.minus(Radian.of(0.436)));
         // }
         // public Command letGoFromL3(){
-        // 	return pivotCommands.setAngle(PivotConstants.kLevel3Angle.minus(Radian.of(0.2967)));
+        // return
+        // pivotCommands.setAngle(PivotConstants.kLevel3Angle.minus(Radian.of(0.2967)));
         // }
         // public Command letGoFromL2(){
-        // 	return pivotCommands.setAngle(PivotConstants.kLevel2Angle.minus(Radian.of(0.22)));
+        // return
+        // pivotCommands.setAngle(PivotConstants.kLevel2Angle.minus(Radian.of(0.22)));
         // }
         // public Command letGoFromL1(){
-        // 	return coralerCommands.setOpenLoop(-0.1).withTimeout(1);
+        // return coralerCommands.setOpenLoop(-0.1).withTimeout(1);
     }
 
     public Command prepIntake() {
@@ -580,11 +563,11 @@ public class Superstructure {
     }
 
     // public Command intake(){
-    // 	return Commands.parallel(
-    // 		wristcommands.setAngle(kHandoffAngle),
-    // 		pivotCommands.setAngle(PivotConstants.kIntakeAngle),
-    // 		rollersCommands.intake()
-    // 	);
+    // return Commands.parallel(
+    // wristcommands.setAngle(kHandoffAngle),
+    // pivotCommands.setAngle(PivotConstants.kIntakeAngle),
+    // rollersCommands.intake()
+    // );
     // }
 
     public Command prepL3() {
@@ -606,23 +589,37 @@ public class Superstructure {
     }
 
     // public Command score(SuperstructureState state){
-    // 	return Commands.sequence(
-    // 		goToStatePerpendicular(state),
-    // 		coralerCommands.spitOut()
-    // 	);
+    // return Commands.sequence(
+    // goToStatePerpendicular(state),
+    // coralerCommands.spitOut()
+    // );
     // }
 
     // public Command scoreAuto(){
-    // 	return score(wantedSuperstructureState);
+    // return score(wantedSuperstructureState);
     // }
 
-    public Command autoPrepByWantedLevel() {
+    public Command autoScoreByLevel() {
 
-        return Commands.select(kLevelToPrepMap, this::getWantedLevel);
+        return goToStateParalell(
+                () ->
+                        kLevelToScoreMap.getOrDefault(
+                                getWantedLevel(), SuperstructureState.kInvalidState));
     }
 
-    public Command autoScoreByLevel() {
-        return Commands.select(kLevelToScoreMap, this::getWantedLevel);
+    public Command stow() {
+        return Commands.either(
+                Commands.sequence(
+                        goToStateParalell(() -> SuperstructureState.toStow),
+                        goToStateParalell(() -> SuperstructureState.stow)),
+                goToStateParalell(() -> SuperstructureState.stow),
+                this::needToClear);
+    }
+
+    public boolean needToClear() {
+        // for future, use ik to fingure it out
+        return pivot.getAngle().gt(Radian.of(-0.7))
+                && elevator.getHeight().lt(ElevatorConstants.kClearHeight);
     }
 
     public Command setWantedLevel(Level wantedLevel) {

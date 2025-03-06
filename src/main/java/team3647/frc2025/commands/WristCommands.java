@@ -43,7 +43,7 @@ public class WristCommands {
     }
 
     public Command setAngle(Supplier<Angle> angle) {
-        return Commands.run(() -> wrist.setAngle(angle.get()), wrist);
+        return Commands.run(() -> wrist.setAngle(angle.get()), wrist).until(() -> true);
     }
 
     public Command holdPositionAtCall() {

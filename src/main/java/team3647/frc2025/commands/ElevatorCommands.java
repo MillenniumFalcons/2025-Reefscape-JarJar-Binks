@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.subsystems.Elevator;
 
@@ -37,7 +38,8 @@ public class ElevatorCommands {
 
     public Command setHeight(Distance height) {
         return Commands.run(() -> elevator.setHeight(height), elevator)
-                .until(() -> elevator.heightReached(height, Inches.of(1)));
+                .until(() -> elevator.heightReached(height, Inches.of(1)))
+                .alongWith(Commands.run(() -> Logger.recordOutput("elevDemand/@commands", height)));
     }
 
     public Command holdPositionAtCall() {

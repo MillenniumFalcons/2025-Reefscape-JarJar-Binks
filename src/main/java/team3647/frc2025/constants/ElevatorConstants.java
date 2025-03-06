@@ -27,6 +27,7 @@ public class ElevatorConstants {
     public static final Distance kLevel2Height = kStowHeight;
     public static final Distance kLevel3Height = kStartingHeight;
     public static final Distance kLevel4Height = Meters.of(1.529);
+
     // high needs tuning, low doesn't; tune for same angle at both heights
     public static final Distance kHighAlgaeHeight = Meters.of(1.368);
     public static final Distance kLowAlgaeHeight = kStartingHeight;

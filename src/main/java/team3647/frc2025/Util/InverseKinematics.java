@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import team3647.frc2025.constants.WristConstants;
 
 public class InverseKinematics {
 
@@ -34,7 +35,8 @@ public class InverseKinematics {
 
         var elevatorHeight = y.in(Meter) - armAddedHeight;
 
-        return new SuperstructureState(armAngle, Meters.of(elevatorHeight));
+        return new SuperstructureState(
+                armAngle, Meters.of(elevatorHeight), WristConstants.kStowAngle);
     }
 
     public void getWristOutofthewayAngle() {}

@@ -27,13 +27,13 @@ import org.littletonrobotics.junction.Logger;
 
 public abstract class TalonFXSubsystem implements PeriodicSubsystem {
 
-    private final TalonFX master;
-    private final List<TalonFX> followers = new ArrayList<>();
-    private final DutyCycleOut dutyCycle = new DutyCycleOut(0);
-    private final PositionDutyCycle positionDutyCycle = new PositionDutyCycle(0);
-    private final MotionMagicDutyCycle motionMagicDutyCycle = new MotionMagicDutyCycle(0);
-    private final VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
-    private final VoltageOut voltageOut = new VoltageOut(0);
+    protected final TalonFX master;
+    protected final List<TalonFX> followers = new ArrayList<>();
+    protected final DutyCycleOut dutyCycle = new DutyCycleOut(0);
+    protected final PositionDutyCycle positionDutyCycle = new PositionDutyCycle(0);
+    protected final MotionMagicDutyCycle motionMagicDutyCycle = new MotionMagicDutyCycle(0);
+    protected final VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0);
+    protected final VoltageOut voltageOut = new VoltageOut(0);
     protected final VelocityVoltage velocityVoltage = new VelocityVoltage(0);
     private final PositionVoltage positionVoltage = new PositionVoltage(0);
     private final MotionMagicExpoTorqueCurrentFOC motionMagicExpoTorqueCurrentFOC =
