@@ -14,8 +14,10 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team3647.frc2025.Util.AutoDrive;
+import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.autos.AutoCommands;
 import team3647.frc2025.commands.ClimbCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
@@ -78,14 +80,18 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        // // sysid
-        // mainController.leftMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveDynamTestFOC(Direction.kForward));
-        // mainController.leftMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveDynamTestFOC(Direction.kReverse));
-        // mainController.rightMidButton.and(mainController.buttonY).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kForward));
-        // mainController.rightMidButton.and(mainController.buttonX).whileTrue(swerve.runDriveQuasiTestFOC(Direction.kReverse));
+        // sysid
+        mainController.leftMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidDynamFor());
+        mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
+        mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
+        mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
 
         mainController.rightTrigger.whileTrue(superstructure.autoScoreByLevel());
         mainController.rightTrigger.onFalse(superstructure.stow());
+		mainController.dPadUp.whileTrue(Commands.sequence(
+			superstructure.goToStateParalell(() -> SuperstructureState.toStow),
+			superstructure.goToStateParalell(() -> SuperstructureState.stow)
+		));
 
         // mainController.leftTrigger.onTrue(autoDrive.setDriveMode(DriveMode.TEST)).onFalse(autoDrive.setDriveMode(DriveMode.NONE));
 

@@ -34,7 +34,7 @@ public class AllianceChecker {
 
         alliance.ifPresent(
                 color -> {
-                    Logger.recordOutput("monkey", cachedColor == color);
+                   
                     // DriverStation.reportError("Run method? " + (cachedColor != color), false);
                     // DriverStation.reportError("First run? " + firstRun, false);
                     if (cachedColor != color || firstRun) {

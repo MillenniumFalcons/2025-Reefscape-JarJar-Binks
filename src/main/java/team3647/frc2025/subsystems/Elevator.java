@@ -2,7 +2,9 @@ package team3647.frc2025.subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
@@ -53,18 +55,20 @@ public class Elevator extends TalonFXSubsystem {
                                 this,
                                 "elevator torque sysid"));
 
-        this.voltageSysid =
-                new SysIdRoutine(
-                        new Config(
-                                Units.Volts.of(0.9).per(Units.Second),
-                                Units.Volt.of(3),
-                                Units.Second.of(10),
-                                ModifiedSignalLogger.logState()),
-                        new Mechanism(
-                                (volts) -> this.setVoltage(volts.in(Units.Volt)),
-                                null,
-                                this,
-                                "elevator voltage sysid"));
+   	voltageSysid = new SysIdRoutine(
+        new SysIdRoutine.Config(
+            null,        // Use default ramp rate (1 V/s)
+            Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
+            null,        // Use default timeout (10 s)
+            // Log state with SignalLogger class
+            state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())
+        ),
+        new SysIdRoutine.Mechanism(
+            output -> setVoltage(output.in(Volts)),
+            null,
+            this
+        )
+    );
 
         // this.sim = new ElevatorSim(
         // 	DCMotor.getKrakenX60Foc(2),

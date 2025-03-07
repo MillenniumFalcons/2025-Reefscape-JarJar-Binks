@@ -111,7 +111,7 @@ public class Pivot extends TalonFXSubsystem {
     public void readPeriodicInputs() {
         // TODO Auto-generated method stub
         super.readPeriodicInputs();
-        Logger.recordOutput("pivot good", getAngle().gte(kClearAngle));
+    
     }
 
     @Override
