@@ -8,7 +8,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.lib.TalonFXSubsystem;
 
@@ -111,7 +110,6 @@ public class Pivot extends TalonFXSubsystem {
     public void readPeriodicInputs() {
         // TODO Auto-generated method stub
         super.readPeriodicInputs();
-    
     }
 
     @Override

@@ -49,6 +49,12 @@ public class SuperstructureState {
                     ElevatorConstants.kClearHeight,
                     WristConstants.kStowAngle);
 
+    public static SuperstructureState stowScore =
+            new SuperstructureState(
+                    InverseKinematics.getMinAngle(lowScore),
+                    ElevatorConstants.kLevel2Height,
+                    WristConstants.kStowAngle);
+
     public SuperstructureState(Angle pivotAngle, Distance elevatorHeight, Angle wristAngle) {
         this.pivotAngle = pivotAngle;
         this.elevatorHeight = elevatorHeight;

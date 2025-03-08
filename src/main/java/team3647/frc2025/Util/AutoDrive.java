@@ -1,7 +1,5 @@
 package team3647.frc2025.Util;
 
-import static edu.wpi.first.units.Units.Inches;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
@@ -13,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -23,6 +22,7 @@ import team3647.frc2025.subsystems.Superstructure.Branch;
 import team3647.frc2025.subsystems.Superstructure.Side;
 import team3647.lib.team6328.VirtualSubsystem;
 import team3647.lib.team9442.AllianceObserver;
+import team3647.lib.vision.AprilTagCamera;
 import team3647.lib.vision.NeuralDetector;
 
 public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
@@ -31,6 +31,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     private ScoringPos wantedScoringPos;
 
     private NeuralDetector detector;
+    private AprilTagCamera frontLL;
 
     private Side wantedSide = Side.A;
 
@@ -54,6 +55,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     private List<Pose2d> sidePoses;
 
     public boolean enabled = true;
+    public boolean isYAligned = false;
+    public boolean isRotAligned = false;
+    public double taTarget = 6.8;
 
     public AutoDrive(
             Supplier<Pose2d> odoPoseFunction,
@@ -64,7 +68,8 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
             PIDController rotController,
             List<Pose2d> redSidePoses,
             List<Pose2d> blueSidePoses,
-            NeuralDetector detector) {
+            NeuralDetector detector,
+            AprilTagCamera frontLL) {
         super();
         this.odoPoseFunction = odoPoseFunction;
         this.xController = xController;
@@ -76,11 +81,14 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         this.redSidePoses = redSidePoses;
         this.blueSidePoses = blueSidePoses;
         this.detector = detector;
+        this.frontLL = frontLL;
 
         this.sidePoses = color == Alliance.Red ? redSidePoses : blueSidePoses;
 
         this.sourcePoses = color == Alliance.Red ? redSourcePoses : blueSourcePoses;
         this.rotController.enableContinuousInput(-Math.PI, Math.PI);
+        this.yController.setTolerance(0.02);
+        this.rotController.setTolerance(0.02);
 
         this.poseToSideMap =
                 Map.of(
@@ -134,10 +142,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 return xController.calculate(
                         getPose().getX(), getPose().nearest(sourcePoses).getX());
             case SCORE:
-                var k =
-                        xController.calculate(
-                                getPose().getX(),
-                                AllianceFlip.flip(wantedScoringPos.pose, color).getX());
+                var k = xController.calculate(frontLL.getTa(), taTarget);
                 Logger.recordOutput("kx", k);
                 return Math.abs(k) < 0.02 ? 0 : k;
             case INTAKE:
@@ -155,11 +160,10 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 return yController.calculate(
                         getPose().getY(), getPose().nearest(sourcePoses).getY());
             case SCORE:
-                var k =
-                        yController.calculate(
-                                getPose().getY(),
-                                AllianceFlip.flip(wantedScoringPos.pose, color).getY());
+                var k = yController.calculate(frontLL.getTx(), 25.30);
+                isYAligned = yController.atSetpoint();
                 Logger.recordOutput("ky", k);
+
                 return Math.abs(k) < 0.02 ? 0 : k;
             case INTAKE:
                 return detector.getTY() >= 0 ? yController.calculate(detector.getTX()) : 0;
@@ -177,9 +181,11 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                         getPose().getRotation().getRadians(),
                         getPose().nearest(sourcePoses).getRotation().getRadians());
             case SCORE:
-                return rotController.calculate(
-                        getPose().getRotation().getRadians(),
-                        AllianceFlip.flip(wantedScoringPos.pose, color).getRotation().getRadians());
+                var k =
+                        rotController.calculate(
+                                getPose().getRotation().getRadians(),
+                                wantedScoringPos.pose.getRotation().getRadians());
+                return Math.abs(k) < 0.02 ? 0 : k;
             case TEST:
                 return rotController.calculate(getPose().getRotation().getRadians());
             case INTAKE:
@@ -198,6 +204,10 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         }
     }
 
+    public boolean hasScoringTarget() {
+        return frontLL.hasTarget();
+    }
+
     public Command pathFindToPose(Pose2d pose) {
         return AutoBuilder.pathfindToPose(
                 pose,
@@ -209,9 +219,16 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 0);
     }
 
-    public boolean isAlignedToReef() {
-        return PoseUtils.inCircle(
-                getPose(), AllianceFlip.flip(wantedScoringPos.pose, color), Inches.of(4));
+    public Command clearDriveMode() {
+        return setDriveMode(DriveMode.NONE);
+    }
+
+    public Trigger isAlignedToReef() {
+        return new Trigger(
+                () ->
+                        xController.atSetpoint()
+                                && yController.atSetpoint()
+                                && rotController.atSetpoint());
     }
 
     public DriveMode getWantedMode() {
@@ -254,6 +271,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     @Override
     public void periodic() {
         wantedSide = poseToSideMap.get(getPose().nearest(sidePoses));
+        Logger.recordOutput("wanjted side pose", wantedScoringPos.pose);
 
         // forscoring: 0.324 m away from the face
         setwantedScoringPosBySideLevel();

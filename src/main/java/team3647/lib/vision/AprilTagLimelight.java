@@ -38,16 +38,16 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         this.name = name;
         this.robotToCamera = robotToCamera;
         this.orientation = orientationSupplier;
-        LimelightHelpers.setCameraPose_RobotSpace(
-                name,
-                robotToCamera.getX(),
-                robotToCamera.getY(),
-                robotToCamera.getX(),
-                robotToCamera.getRotation().getX(),
-                robotToCamera.getRotation().getY(),
-                robotToCamera.getRotation().getZ());
+        // LimelightHelpers.setCameraPose_RobotSpace(
+        //         name,
+        //         robotToCamera.getX(),
+        //         robotToCamera.getY(),
+        //         robotToCamera.getX(),
+        //         robotToCamera.getRotation().getX(),
+        //         robotToCamera.getRotation().getY(),
+        //         robotToCamera.getRotation().getZ());
         LimelightHelpers.setPipelineIndex(name, kAprilTagPipelineIndex);
-        LimelightHelpers.SetIMUMode(name, 1);
+        LimelightHelpers.SetIMUMode(name, 3);
 
         this.baseStdDevs = baseStdDevs;
     }
@@ -153,6 +153,26 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         var bestTag = getBestTag(botPose.get().rawFiducials);
 
         return bestTag.id;
+    }
+
+    @Override
+    public double getTx() {
+        return LimelightHelpers.getTX(name);
+    }
+
+    @Override
+    public double getTy() {
+        return LimelightHelpers.getTY(name);
+    }
+
+    @Override
+    public double getTa() {
+        return LimelightHelpers.getTA(name);
+    }
+
+    @Override
+    public boolean hasTarget() {
+        return LimelightHelpers.getTV(name);
     }
 
     @Override

@@ -12,12 +12,13 @@ import edu.wpi.first.math.numbers.N3;
 public class VisionConstants {
     public static final Vector<N3> baseStdDevs = VecBuilder.fill(0.05, 0.05, 0.05);
 
-    public static final String kCrossbarLLName = "limelight-xbar-asdfasdf";
+    public static final String kCrossbarLLName = "limelight-xbar";
     public static final String kIntakeLLName = "limelight-coral";
     public static final String backRightCamName = "backRight";
     public static final String frontRightCamName = "frontRight";
     public static final String frontLeftCamName = "frontLeft";
     public static final String backLeftCamName = "backLeft";
+    public static final String frontLLName = "limelight-front";
 
     public static final Transform3d LLsideMount =
             new Transform3d(
@@ -60,4 +61,10 @@ public class VisionConstants {
                     Inches.of(8.35946),
                     Inches.of(28.72351),
                     new Rotation3d(Degrees.of(11.797), Degrees.of(10), Degrees.of(65)));
+    public static final Transform3d FrontLL =
+            new Transform3d(
+                    Inches.of(12.75),
+                    Inches.of(0),
+                    Inches.of(11_7.5),
+                    new Rotation3d(0, Math.toRadians(27.529), 0));
 }

@@ -5,6 +5,7 @@
 package team3647.frc2025.robot;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -18,7 +19,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.constants.LEDConstants;
 import team3647.lib.ModifiedSignalLogger;
@@ -66,9 +66,8 @@ public class Robot extends LoggedRobot {
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata
         // values may
         // be added.
-		SignalLogger.setPath("/home/lvuser/logs/ptuner");
-		ModifiedSignalLogger.setPath("/home/lvuser/logs/ptuner");
-
+        SignalLogger.setPath("/home/lvuser/logs/ptuner");
+        ModifiedSignalLogger.setPath("/home/lvuser/logs/ptuner");
 
         LiveWindow.disableAllTelemetry();
         LiveWindow.setEnabled(false);
@@ -91,12 +90,15 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
 
-
         Logger.recordOutput(
                 "Superstructure/shouldClear", m_robotContainer.superstructure.shouldClear());
-				InverseKinematics.getMinAngle(m_robotContainer.superstructure.getCurrentState());
-		
-		
+        InverseKinematics.getMinAngle(m_robotContainer.superstructure.getCurrentState());
+
+        Logger.recordOutput("Superstructure/has piece", m_robotContainer.superstructure.hasPeice());
+        Logger.recordOutput(
+                "monkey",
+                m_robotContainer.superstructure.hasPeice()
+                        && m_robotContainer.pivot.getAngle().gte(Units.Degrees.of(-0.35)));
 
         m_robotContainer.updateRobotPoseForSmartdashboard();
         VirtualSubsystem.periodicAll();

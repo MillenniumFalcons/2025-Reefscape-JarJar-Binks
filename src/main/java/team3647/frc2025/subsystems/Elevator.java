@@ -55,20 +55,19 @@ public class Elevator extends TalonFXSubsystem {
                                 this,
                                 "elevator torque sysid"));
 
-   	voltageSysid = new SysIdRoutine(
-        new SysIdRoutine.Config(
-            null,        // Use default ramp rate (1 V/s)
-            Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
-            null,        // Use default timeout (10 s)
-            // Log state with SignalLogger class
-            state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())
-        ),
-        new SysIdRoutine.Mechanism(
-            output -> setVoltage(output.in(Volts)),
-            null,
-            this
-        )
-    );
+        voltageSysid =
+                new SysIdRoutine(
+                        new SysIdRoutine.Config(
+                                null, // Use default ramp rate (1 V/s)
+                                Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent
+                                // brownout
+                                null, // Use default timeout (10 s)
+                                // Log state with SignalLogger class
+                                state ->
+                                        SignalLogger.writeString(
+                                                "SysIdTranslation_State", state.toString())),
+                        new SysIdRoutine.Mechanism(
+                                output -> setVoltage(output.in(Volts)), null, this));
 
         // this.sim = new ElevatorSim(
         // 	DCMotor.getKrakenX60Foc(2),

@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radian;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
-
 import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.commands.CoralerCommands;
@@ -38,7 +36,7 @@ public class Superstructure {
     private final Coraler coraler;
     private final Elevator elevator;
     private final Pivot pivot;
-	private final Wrist wrist;
+    private final Wrist wrist;
 
     public final CoralerCommands coralerCommands;
     public final ElevatorCommands elevatorCommands;
@@ -54,7 +52,7 @@ public class Superstructure {
 
     private Level wantedLevel;
 
- 
+    private boolean hasPeice = true;
 
     private ScoringPos wantedScoringPos = ScoringPos.NONE;
 
@@ -90,7 +88,7 @@ public class Superstructure {
         this.coraler = coraler;
         this.elevator = elevator;
         this.pivot = pivot;
-		this.wrist = wrist;
+        this.wrist = wrist;
 
         this.coralerCommands = new CoralerCommands(this.coraler);
         this.elevatorCommands = new ElevatorCommands(this.elevator);
@@ -140,10 +138,10 @@ public class Superstructure {
         DriverStation.reportError("IsAligned function has been set, all is well", false);
     }
 
-	public boolean shouldClear(){
-		return pivot.getAngle().gt(Radian.of(-0.7))
+    public boolean shouldClear() {
+        return pivot.getAngle().gt(Radian.of(-0.7))
                 && elevator.getHeight().lt(ElevatorConstants.kClearHeight);
-	}
+    }
 
     public boolean isAligned() {
         return isAligned.getAsBoolean();
@@ -170,11 +168,18 @@ public class Superstructure {
                         // Commands.run(() -> Logger.recordOutput("monkeyballs",
                         // state.get().elevatorHeight)),
                         elevatorCommands.setHeight(() -> state.get().elevatorHeight),
-                        pivotCommands.setAngle(() -> MathUtil.clamp(state.get().pivotAngle.in(Radian), getPivotMinAngle(), pivot.getMaxAngle().in(Radian))),
-                        wristCommands.setAngle(() -> {
-							return state.get().wristAngle.equals(WristConstants.idrc) ? 
-								getCurrentState().wristAngle : state.get().wristAngle;
-						})
+                        pivotCommands.setAngle(
+                                () ->
+                                        MathUtil.clamp(
+                                                state.get().pivotAngle.in(Radian),
+                                                getPivotMinAngle(),
+                                                pivot.getMaxAngle().in(Radian))),
+                        wristCommands.setAngle(
+                                () -> {
+                                    return state.get().wristAngle.equals(WristConstants.idrc)
+                                            ? getCurrentState().wristAngle
+                                            : state.get().wristAngle;
+                                })
                         // Commands.run(() ->
                         // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
 
@@ -183,29 +188,52 @@ public class Superstructure {
                 () -> !state.get().equals(SuperstructureState.kInvalidState));
     }
 
-	public double getPivotMinAngle(){
-		return InverseKinematics.getMinAngle(getCurrentState()).in(Radian);
-	}
+    public Command goToStatePerpendicular(Supplier<SuperstructureState> state) {
 
-    /**
-     * For Scoring only
-     *
-     * @param state
-     * @return
-     */
-    @Deprecated
-    public Command goToStatePerpendicular(SuperstructureState state) {
-        if (state.equals(SuperstructureState.kInvalidState)) {
-            logError("Invalid state given to gotoState function!!");
-            return Commands.none();
-        }
-		
+        return Commands.either(
+                Commands.parallel(
+                        // Commands.run(() -> Logger.recordOutput("monkeyballs",
+                        // state.get().elevatorHeight)),
+                        Commands.waitSeconds(0.1)
+                                .andThen(
+                                        elevatorCommands.setHeight(
+                                                () -> state.get().elevatorHeight)),
+                        pivotCommands.setAngle(
+                                () ->
+                                        MathUtil.clamp(
+                                                state.get().pivotAngle.in(Radian),
+                                                getPivotMinAngle(),
+                                                pivot.getMaxAngle().in(Radian))),
+                        wristCommands.setAngle(
+                                () -> {
+                                    return state.get().wristAngle.equals(WristConstants.idrc)
+                                            ? getCurrentState().wristAngle
+                                            : state.get().wristAngle;
+                                })
+                        // Commands.run(() ->
+                        // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
 
-        return Commands.sequence(
-                clearElevatorGoingUp(),
-                pivotCommands.setAngle(state.pivotAngle),
-                // Commands.waitUntil(isAligned),
-                elevatorCommands.setHeight(state.elevatorHeight));
+                        ),
+                Commands.none(),
+                () -> !state.get().equals(SuperstructureState.kInvalidState));
+    }
+
+    public boolean hasPeice() {
+        // implememtation neded
+        return hasPeice;
+        // for now no logic cause no handoff code
+    }
+
+    public Command setPeice() {
+        return Commands.runOnce(() -> this.hasPeice = true);
+    }
+
+    public Command setNoPeice() {
+        return Commands.runOnce(() -> this.hasPeice = false);
+    }
+
+    public double getPivotMinAngle() {
+        return InverseKinematics.getMinAngle(getCurrentState()).in(Radian);
     }
 
     public Command autoTakeOffAlgae() {
@@ -225,9 +253,9 @@ public class Superstructure {
                 pivotCommands.setAngle(PivotConstants.kAlgaeAngleHigh));
     }
 
-	public SuperstructureState getCurrentState(){
-		return new SuperstructureState(pivot.getAngle(), elevator.getHeight(), wrist.getAngle());
-	}
+    public SuperstructureState getCurrentState() {
+        return new SuperstructureState(pivot.getAngle(), elevator.getHeight(), wrist.getAngle());
+    }
 
     public Command takeOffAlgaeLow() {
         return Commands.sequence(
@@ -454,7 +482,9 @@ public class Superstructure {
     }
 
     public Command poopCoral() {
-        return coralerCommands.setOpenLoop(-0.3).withTimeout(0.1);
+        return Commands.waitSeconds(0.15)
+                .andThen(coralerCommands.setOpenLoop(-0.3).withTimeout(0.1))
+                .withTimeout(0.3);
     }
 
     public Command stowFromL4() {
@@ -611,17 +641,6 @@ public class Superstructure {
                         pivotCommands.setAngle(PivotConstants.kStowAngleUp.plus(pivotOffset))));
     }
 
-    // public Command score(SuperstructureState state){
-    // return Commands.sequence(
-    // goToStatePerpendicular(state),
-    // coralerCommands.spitOut()
-    // );
-    // }
-
-    // public Command scoreAuto(){
-    // return score(wantedSuperstructureState);
-    // }
-
     public Command autoScoreByLevel() {
 
         return goToStateParalell(
@@ -633,13 +652,11 @@ public class Superstructure {
     public Command stow() {
         return Commands.either(
                 Commands.sequence(
-                        goToStateParalell(() -> SuperstructureState.toStow),
+                        goToStatePerpendicular(() -> SuperstructureState.toStow),
                         goToStateParalell(() -> SuperstructureState.stow)),
                 goToStateParalell(() -> SuperstructureState.stow),
                 this::shouldClear);
     }
-
- 
 
     public Command setWantedLevel(Level wantedLevel) {
         return Commands.runOnce(
@@ -651,8 +668,6 @@ public class Superstructure {
     public Level getWantedLevel() {
         return wantedLevel;
     }
-
-
 
     public Command pivotOffsetUp() {
         return Commands.runOnce(() -> pivotOffset.mut_plus(Degree.of(1)));

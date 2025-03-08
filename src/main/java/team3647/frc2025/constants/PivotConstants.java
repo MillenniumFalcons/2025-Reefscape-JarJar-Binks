@@ -13,7 +13,7 @@ import edu.wpi.first.units.measure.Angle;
 public class PivotConstants {
     public static final Angle kMinAngle = Radian.of(-1.584);
     public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561).minus(Degree.of(10));
-    public static final Angle kLevel2Angle = Radian.of(-0.279).plus(Degree.of(20));
+    public static final Angle kLevel2Angle = Radian.of(-0.279).plus(Degree.of(25));
     public static final Angle kLevel3Angle = Radian.of(0.4650).plus(Degree.of(25));
     public static final Angle kLevel4Angle = Radian.of(0.251).plus(Degree.of(30));
 
@@ -57,12 +57,12 @@ public class PivotConstants {
     static {
         kMasterConfig.Slot0.withKP(2);
         kMasterConfig.Slot0.withKI(0);
-        kMasterConfig.Slot0.withKD(0);
+        kMasterConfig.Slot0.withKD(0.1);
         kMasterConfig.Slot0.withGravityType(GravityTypeValue.Arm_Cosine);
         kMasterConfig.Slot0.withKS(0);
         kMasterConfig.Slot0.withKV(0);
         kMasterConfig.Slot0.withKA(0);
-        kMasterConfig.Slot0.withKG(0.3);
+        kMasterConfig.Slot0.withKG(0.288);
 
         kMasterConfig.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

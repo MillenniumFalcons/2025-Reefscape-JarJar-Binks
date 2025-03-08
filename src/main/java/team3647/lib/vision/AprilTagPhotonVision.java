@@ -90,7 +90,12 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
     }
 
     public Optional<VisionMeasurement> QueueToInputs() {
-        var result = this.getLatestResult();
+        var resultList = this.getAllUnreadResults();
+        if (resultList.size() <= 0) {
+            return Optional.empty();
+        }
+
+        var result = resultList.get(0);
         if (!result.hasTargets()) {
             return Optional.empty();
         }
@@ -159,6 +164,50 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
                         stdDevs,
                         getName());
         return Optional.of(measurement);
+    }
+
+    @Override
+    public double getTx() {
+        var resultList = this.getAllUnreadResults();
+        if (resultList.size() <= 0) {
+            return 0;
+        }
+
+        var result = resultList.get(0);
+        if (!result.hasTargets()) return 0;
+
+        return result.getBestTarget().yaw;
+    }
+
+    @Override
+    public double getTy() {
+        var resultList = this.getAllUnreadResults();
+        if (resultList.size() <= 0) {
+            return 0;
+        }
+
+        var result = resultList.get(0);
+        if (!result.hasTargets()) return 0;
+
+        return result.getBestTarget().pitch;
+    }
+
+    @Override
+    public double getTa() {
+        var resultList = this.getAllUnreadResults();
+        if (resultList.size() <= 0) {
+            return 0;
+        }
+
+        var result = resultList.get(0);
+        if (!result.hasTargets()) return 0;
+
+        return result.getBestTarget().area;
+    }
+
+    @Override
+    public boolean hasTarget() {
+        return this.getAllUnreadResults().get(0).hasTargets();
     }
 
     public int getTagNum() {

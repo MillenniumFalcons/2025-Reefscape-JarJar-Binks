@@ -10,5 +10,13 @@ public interface AprilTagCamera {
 
     public String getName();
 
+    public double getTx();
+
+    public double getTy();
+
+    public double getTa();
+
+    public boolean hasTarget();
+
     public Optional<Pose3d> camPose();
 }

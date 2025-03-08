@@ -412,7 +412,6 @@ public class SwerveDrive extends TunerSwerveDrivetrain
         Logger.recordOutput("Robot/targets", periodicIO.targets);
         Logger.recordOutput("Robot/states", periodicIO.states);
         Logger.recordOutput("Robot/pose", periodicIO.pose);
-        Logger.recordOutput("rawHeading", periodicIO.heading);
 
         Logger.recordOutput(
                 "operatorpserpective",
