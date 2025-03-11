@@ -17,11 +17,11 @@ public class AutoConstants {
                     "kEmtpy", List.of(kEmptySample), List.of(1), List.of(kEmptyEventMarker));
 
     public static final PIDController xController = new PIDController(5, 0, 0.1);
-    public static final PIDController yController = new PIDController(4, 0, 0.1);
+    public static final PIDController yController = new PIDController(4, 0, 0.0);
     public static final PIDController rotController = new PIDController(5, 0, 0);
 
     public static final PIDController teleopXController = new PIDController(0.1, 0, 0);
-    public static final PIDController teleopYController = new PIDController(0.05, 0, 0);
+    public static final PIDController teleopYController = new PIDController(0.1, 0, 0.05);
     public static final PIDController teleopRotController = new PIDController(0.05, 0, 0);
 
     public static final PIDController AutoXController = new PIDController(6, 0, 0.1);

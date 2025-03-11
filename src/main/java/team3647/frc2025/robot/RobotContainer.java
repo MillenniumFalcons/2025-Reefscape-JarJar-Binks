@@ -81,39 +81,28 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-        // sysid
-        mainController
-                .leftMidButton
-                .and(mainController.buttonY)
-                .whileTrue(elevator.elevSysidDynamFor());
-        mainController
-                .leftMidButton
-                .and(mainController.buttonX)
-                .whileTrue(elevator.elevSysidDynamBack());
-        mainController
-                .rightMidButton
-                .and(mainController.buttonY)
-                .whileTrue(elevator.elevSysidQuasiFor());
-        mainController
-                .rightMidButton
-                .and(mainController.buttonX)
-                .whileTrue(elevator.elevSysidQuasiBack());
+		// coController.dPadUp.whileTrue(elevator.elevSysidQuasiFor());
+		// coController.dPadDown.whileTrue(elevator.elevSysidQuasiBack());
+		// coController.dPadRight.whileTrue(elevator.elevSysidDynamFor());
+		// coController.dPadLeft.whileTrue(elevator.elevSysidDynamBack());
+
+        
 
         mainController.rightTrigger.whileTrue(superstructure.autoScoreByLevel());
         mainController.rightTrigger.onFalse(
                 superstructure
                         .stow()
-                        .alongWith(superstructure.poopCoral(), superstructure.setNoPeice()));
+                        .alongWith(superstructure.poopCoral().withTimeout(0.3), superstructure.setNoPeice()));
         coController.buttonB.whileTrue(
                 superstructure.goToStateParalell(superstructure::getCurrentState));
 
-        mainController.dPadUp.whileTrue(
+        mainController.dPadDown.whileTrue(
                 Commands.sequence(
                                 superstructure.goToStateParalell(() -> SuperstructureState.toStow),
                                 superstructure.goToStateParalell(() -> SuperstructureState.stow))
                         .alongWith(superstructure.setNoPeice()));
 
-        mainController.dPadDown.onTrue(superstructure.setPeice());
+        mainController.dPadUp.onTrue(superstructure.setPeice());
 
         // cocontroller selecting the branch you wanna score coral on
         coController.leftBumper.onTrue(autoDrive.setWantedBranch(Branch.ONE));
@@ -161,6 +150,7 @@ public class RobotContainer {
         coController.rightMidButton.onTrue(autoDrive.enableAutoDrive());
 
         coController.leftMidButton.onTrue(autoDrive.disableAutoDrive());
+		
     }
 
     private void configureSmartDashboardLogging() {
@@ -183,7 +173,8 @@ public class RobotContainer {
                         autoDrive::getVelocities,
                         autoDrive::getWantedMode,
                         autoDrive::getAutoDriveEnabled,
-                        autoDrive::hasScoringTarget));
+                        autoDrive::hasScoringTarget,
+						coController.leftJoyStickPress));
         elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
         pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
         coraler.setDefaultCommand(superstructure.coralerCommands.kill());
@@ -286,7 +277,7 @@ public class RobotContainer {
                     FieldConstants.redSources,
                     FieldConstants.blueSources,
                     AutoConstants.teleopXController,
-                    AutoConstants.teleopYController,
+                    AutoConstants.yController,
                     AutoConstants.rotController,
                     FieldConstants.redReefSides,
                     FieldConstants.blueReefSides,

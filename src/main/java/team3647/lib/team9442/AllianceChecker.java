@@ -30,15 +30,16 @@ public class AllianceChecker {
                 RobotBase.isReal()
                         ? DriverStation.getAlliance()
                         : Simshit.toAlliance(DriverStationSim.getAllianceStationId());
+						// DriverStation.reportError("DIME", false);
 
         alliance.ifPresent(
                 color -> {
-
+						// DriverStation.reportError("ILOVEWHENUCOUNTME" + color.toString(), false);
                     // DriverStation.reportError("Run method? " + (cachedColor != color), false);
                     // DriverStation.reportError("First run? " + firstRun, false);
                     if (cachedColor != color || firstRun) {
-                        // DriverStation.reportError("Ran mathod. First run = " + firstRun + "
-                        // colorcheck = " + (cachedColor != color), false);
+                        DriverStation.reportError("Ran mathod. First run = " + firstRun + "colorcheck = " + (cachedColor != color), false);
+
                         observers.forEach(observer -> observer.onAllianceFound(color));
 
                         if (firstRun) firstRun = false;

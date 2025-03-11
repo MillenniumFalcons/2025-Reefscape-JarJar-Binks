@@ -8,8 +8,13 @@ import edu.wpi.first.units.measure.Distance;
 
 public class PoseUtils {
 
-    public static boolean inCircle(Pose2d pose, Pose2d center, double radius) {
-        return Math.abs(pose.getTranslation().getDistance(center.getTranslation())) <= radius;
+    public static boolean inCircle(Pose2d pose, Pose2d center, double radiusM) {
+        return Math.abs(pose.getTranslation().getDistance(center.getTranslation())) <= radiusM;
+    }
+
+	public static boolean aligned(Pose2d pose, Pose2d center, double radiusM, double rotThresholdDeg) {
+        return Math.abs(pose.getTranslation().getDistance(center.getTranslation())) <= radiusM
+			&& Math.abs(pose.getRotation().minus(center.getRotation()).getDegrees()) <= rotThresholdDeg;
     }
 
     public static boolean inCircle(Pose2d pose, Pose2d center, Distance radius) {

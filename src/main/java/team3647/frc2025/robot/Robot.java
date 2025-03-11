@@ -66,8 +66,8 @@ public class Robot extends LoggedRobot {
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata
         // values may
         // be added.
-        SignalLogger.setPath("/home/lvuser/logs/ptuner");
-        ModifiedSignalLogger.setPath("/home/lvuser/logs/ptuner");
+        SignalLogger.setPath("/home/lvuser/logs");
+        ModifiedSignalLogger.setPath("/home/lvuser/logs");
 
         LiveWindow.disableAllTelemetry();
         LiveWindow.setEnabled(false);
@@ -107,13 +107,14 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
+		m_robotContainer.front.setIMUMode(1);
         SignalLogger.stop();
         ModifiedSignalLogger.stop();
     }
 
     @Override
     public void disabledPeriodic() {
-        m_robotContainer.allianceChecker.periodic();
+		m_robotContainer.allianceChecker.periodic();
     }
 
     @Override
@@ -121,11 +122,13 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+	
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
+	
     }
 
     @Override
@@ -139,6 +142,7 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+		m_robotContainer.front.setIMUMode(4);
     }
 
     @Override

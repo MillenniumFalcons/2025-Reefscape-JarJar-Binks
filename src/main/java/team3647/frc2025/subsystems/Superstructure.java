@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.InverseKinematics;
@@ -74,8 +75,13 @@ public class Superstructure {
     }
 
     public enum Branch {
-        ONE,
-        TWO
+        ONE(-1),
+        TWO(1);
+
+		public final int sign;
+		Branch(int sign){
+			this.sign = sign;
+		}
     }
 
     public Superstructure(
@@ -153,14 +159,9 @@ public class Superstructure {
 
     public void logError(String message) {
         Logger.recordOutput("robot/robotErrors", message + Timer.getFPGATimestamp());
-        DriverStation.reportError(message, false);
+        DriverStation.reportError(message, true);
     }
 
-    /**
-     * NOTE: WILL CHANGE BASED ON INTAKE GEOMETRY
-     *
-     * @return
-     */
     public Command goToStateParalell(Supplier<SuperstructureState> state) {
 
         return Commands.either(
@@ -188,6 +189,11 @@ public class Superstructure {
                 () -> !state.get().equals(SuperstructureState.kInvalidState));
     }
 
+	/**
+	 * delayed elevator
+	 * @param state
+	 * @return gotostate with a delayed elevator
+	 */
     public Command goToStatePerpendicular(Supplier<SuperstructureState> state) {
 
         return Commands.either(
@@ -218,8 +224,43 @@ public class Superstructure {
                 () -> !state.get().equals(SuperstructureState.kInvalidState));
     }
 
+		/**
+	 * delayed elevator
+	 * @param state
+	 * @return gotostate with a delayed elevator
+	 */
+    public Command goToStatePerpendicular(Supplier<SuperstructureState> state, DoubleSupplier delay) {
+
+        return Commands.either(
+                Commands.parallel(
+                        // Commands.run(() -> Logger.recordOutput("monkeyballs",
+                        // state.get().elevatorHeight)),
+                        Commands.waitSeconds(delay.getAsDouble())
+                                .andThen(
+                                        elevatorCommands.setHeight(
+                                                () -> state.get().elevatorHeight)),
+                        pivotCommands.setAngle(
+                                () ->
+                                        MathUtil.clamp(
+                                                state.get().pivotAngle.in(Radian),
+                                                getPivotMinAngle(),
+                                                pivot.getMaxAngle().in(Radian))),
+                        wristCommands.setAngle(
+                                () -> {
+                                    return state.get().wristAngle.equals(WristConstants.idrc)
+                                            ? getCurrentState().wristAngle
+                                            : state.get().wristAngle;
+                                })
+                        // Commands.run(() ->
+                        // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
+
+                        ),
+                Commands.none(),
+                () -> !state.get().equals(SuperstructureState.kInvalidState));
+    }
+
     public boolean hasPeice() {
-        // implememtation neded
+        // TODO: implememtation neded
         return hasPeice;
         // for now no logic cause no handoff code
     }
@@ -236,22 +277,7 @@ public class Superstructure {
         return InverseKinematics.getMinAngle(getCurrentState()).in(Radian);
     }
 
-    public Command autoTakeOffAlgae() {
-        return Commands.either(
-                takeOffAlgaeHigh(), takeOffAlgaeLow(), () -> wantedLevel == Level.ALGAEHIGH);
-    }
-
-    public Command prepAlgae() {
-        return Commands.sequence(
-                clearElevatorGoingUp(PivotConstants.kStowAngleUp),
-                pivotCommands.setAngle(PivotConstants.kStowAngleUp));
-    }
-
-    public Command takeOffAlgaeHigh() {
-        return Commands.sequence(
-                elevatorCommands.setHeight(ElevatorConstants.kHighAlgaeHeight),
-                pivotCommands.setAngle(PivotConstants.kAlgaeAngleHigh));
-    }
+    
 
     public SuperstructureState getCurrentState() {
         return new SuperstructureState(pivot.getAngle(), elevator.getHeight(), wrist.getAngle());
@@ -263,14 +289,6 @@ public class Superstructure {
                 pivotCommands.setAngle(PivotConstants.kAlgaeAngleLow));
     }
 
-    public Command prepL1() {
-        return Commands.sequence(
-                clearElevatorGoingUp(PivotConstants.KL1Prep),
-                Commands.parallel(
-                        elevatorCommands.setHeight(
-                                ElevatorConstants.kLevel1Height.plus(elevOffset)),
-                        pivotCommands.setAngle(PivotConstants.KL1Prep.plus(pivotOffset))));
-    }
 
     public boolean shouldClearGoingUp() {
         return pivot.angleWithin(
@@ -280,108 +298,7 @@ public class Superstructure {
     }
 
     //
-    public Command clearElevatorGoingUp() {
-        return Commands.either(
-                Commands.sequence(
-                                Commands.deadline(
-                                        elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                                        pivotCommands.setAngle(PivotConstants.kStartingAngle)),
-                                pivotCommands.setAngle(PivotConstants.kClearAngle),
-                                elevatorCommands.setHeight(ElevatorConstants.kStowHeight))
-                        .alongWith(Commands.run(() -> Logger.recordOutput("toclear?", true))),
-                Commands.none()
-                        .alongWith(Commands.runOnce(() -> Logger.recordOutput("toClear?", false))),
-                () ->
-                        pivot.angleWithin(
-                                        PivotConstants.kStartingAngle.in(Radian),
-                                        PivotConstants.kClearAngle.in(Radian))
-                                && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
-    }
-
-    public Command clearElevatorGoingUp(Angle finalAngle) {
-        return Commands.either(
-                Commands.sequence(
-                        Commands.deadline(
-                                elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                                pivotCommands.setAngle(PivotConstants.kStartingAngle)),
-                        pivotCommands
-                                .setAngle(
-                                        MathUtil.clamp(
-                                                finalAngle.in(Radian),
-                                                PivotConstants.kClearAngle.in(Radian),
-                                                PivotConstants.kMaxAngle.in(Radian)))
-                                .withTimeout(0.5),
-                        elevatorCommands.setHeight(ElevatorConstants.kStowHeight)),
-                Commands.none(),
-                () ->
-                        pivot.angleWithin(
-                                        PivotConstants.kStartingAngle.in(Radian),
-                                        PivotConstants.kClearAngle.in(Radian))
-                                && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
-    }
-
-    public Command clearElevatorGoingDown() {
-        return Commands.either(
-                Commands.sequence(
-                        elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                        pivotCommands.setAngle(PivotConstants.kStartingAngle),
-                        elevatorCommands.setHeight(ElevatorConstants.kStowHeight)),
-                Commands.none(),
-                () ->
-                        pivot.angleWithin(
-                                        PivotConstants.kClearAngle.in(Radian),
-                                        PivotConstants.kMaxAngle.in(Radian))
-                                || elevator.getHeight().gt(ElevatorConstants.kClearHeight));
-    }
-
-    public Command stowElevAndPivot() {
-        return Commands.sequence(
-                        clearElevatorGoingDown(),
-                        Commands.parallel(
-                                pivotCommands.setAngle(PivotConstants.kStowAngle),
-                                elevatorCommands.setHeight(ElevatorConstants.kStowHeight)))
-                .alongWith(wristCommands.stow());
-    }
-
-    public Command clearElevatorGoingDown(Angle finalPivotAngle) {
-        return Commands.either(
-                Commands.sequence(
-                        elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                        pivotCommands.setAngle(
-                                MathUtil.clamp(
-                                        finalPivotAngle.in(Radian),
-                                        PivotConstants.kMinAngle.in(Radian),
-                                        1.4)),
-                        elevatorCommands.setHeight(ElevatorConstants.kStowHeight)),
-                Commands.none(),
-                () ->
-                        pivot.angleWithin(
-                                        PivotConstants.kClearAngle.in(Radian),
-                                        PivotConstants.kMaxAngle.in(Radian))
-                                || elevator.getHeight().gt(ElevatorConstants.kClearHeight));
-    }
-
-    public Command clearElevatorGoingDown(Angle finalPivotAngle, Distance finalElevHeight) {
-        return Commands.either(
-                Commands.sequence(
-                        elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                        pivotCommands.setAngle(
-                                MathUtil.clamp(
-                                        finalPivotAngle.in(Radian),
-                                        PivotConstants.kMinAngle.in(Radian),
-                                        1.4)),
-                        elevatorCommands.setHeight(
-                                MathUtil.clamp(
-                                        finalElevHeight.in(Meter),
-                                        ElevatorConstants.kStowHeight.in(Meter),
-                                        ElevatorConstants.kMaxHeight.in(Meter)))),
-                Commands.none(),
-                () ->
-                        pivot.angleWithin(
-                                        PivotConstants.kClearAngle.in(Radian),
-                                        PivotConstants.kMaxAngle.in(Radian))
-                                || elevator.getHeight().gt(ElevatorConstants.kClearHeight));
-    }
+   
 
     public Command stowc() {
         return Commands.sequence(
@@ -444,15 +361,7 @@ public class Superstructure {
                                 && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
     }
 
-    public Command prepL2() {
-        return Commands.sequence(
-                clearElevatorGoingUp(PivotConstants.kL2Prep),
-                Commands.parallel(
-                        elevatorCommands.setHeight(
-                                ElevatorConstants.kLevel2Height.plus(elevOffset)),
-                        pivotCommands.setAngle(PivotConstants.kL2Prep.plus(pivotOffset))));
-    }
-
+  
     public Command scoreL4() {
         return Commands.sequence(
                 clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
@@ -474,13 +383,7 @@ public class Superstructure {
                 pivotCommands.setAngle(PivotConstants.kLevel2Angle));
     }
 
-    public Command scoreL1() {
-        return Commands.sequence(
-                clearElevatorGoingUp(PivotConstants.KL1Prep),
-                elevatorCommands.setHeight(ElevatorConstants.kLevel1Height),
-                pivotCommands.setAngle(PivotConstants.kLevel1Angle));
-    }
-
+    
     public Command poopCoral() {
         return Commands.waitSeconds(0.15)
                 .andThen(coralerCommands.setOpenLoop(-0.3).withTimeout(0.1))
@@ -496,23 +399,7 @@ public class Superstructure {
         return Commands.parallel(pivotCommands.setAngle(PivotConstants.kLevel3Angle), poopCoral());
     }
 
-    public Command stowAll() {
-        return Commands.either(
-                Commands.parallel(
-                        elevatorCommands.setHeight(ElevatorConstants.kStowHeight),
-                        pivotCommands.setAngle(PivotConstants.kStowAngleUp),
-                        coralerCommands.kill(),
-                        rollersCommands.kill()),
-                Commands.sequence(
-                        clearElevatorGoingDown()
-                                .alongWith(coralerCommands.kill(), rollersCommands.kill()),
-                        wristCommands.setAngle(WristConstants.kStowAngle)),
-                () ->
-                        !(pivot.angleWithin(
-                                        PivotConstants.kStartingAngle.in(Radian),
-                                        PivotConstants.kClearAngle.in(Radian))
-                                && elevator.getHeight().lt(ElevatorConstants.kClearHeight)));
-    }
+    
 
     public MutDistance getElevOffset() {
         return elevOffset;
@@ -522,37 +409,9 @@ public class Superstructure {
         return pivotOffset;
     }
 
-    public Command stowHigh() {
-        return Commands.sequence(
-                clearElevatorGoingUp(), pivotCommands.setAngle(PivotConstants.kStowAngleUp));
-        // }
+   
 
-        // public Command letGoFromL4(){
-        // return
-        // pivotCommands.setAngle(PivotConstants.kLevel4Angle.minus(Radian.of(0.436)));
-        // }
-        // public Command letGoFromL3(){
-        // return
-        // pivotCommands.setAngle(PivotConstants.kLevel3Angle.minus(Radian.of(0.2967)));
-        // }
-        // public Command letGoFromL2(){
-        // return
-        // pivotCommands.setAngle(PivotConstants.kLevel2Angle.minus(Radian.of(0.22)));
-        // }
-        // public Command letGoFromL1(){
-        // return coralerCommands.setOpenLoop(-0.1).withTimeout(1);
-    }
-
-    public Command prepIntake() {
-        return Commands.sequence(
-                        wristCommands.goToIntake().withTimeout(1),
-                        clearElevatorGoingDown(
-                                PivotConstants.kHandoffAngle, ElevatorConstants.kHandoffHeight),
-                        Commands.sequence(
-                                elevatorCommands.setHeight(ElevatorConstants.kHandoffHeight),
-                                (pivotCommands.setAngle(PivotConstants.kHandoffAngle))))
-                .alongWith(rollersCommands.setOpenLoop(-0.30));
-    }
+   
 
     public Trigger intakeCurrent() {
         return new Trigger(() -> rollersCommands.currentGreater(currentLimit)).debounce(0.0);
@@ -623,23 +482,7 @@ public class Superstructure {
     // );
     // }
 
-    public Command prepL3() {
-        return Commands.sequence(
-                clearElevatorGoingUp(PivotConstants.kStowAngleUp),
-                Commands.parallel(
-                        elevatorCommands.setHeight(
-                                ElevatorConstants.kLevel3Height.plus(elevOffset)),
-                        pivotCommands.setAngle(PivotConstants.kStowAngleUp.plus(pivotOffset))));
-    }
-
-    public Command prepL4() {
-        return Commands.sequence(
-                clearElevatorGoingUp(PivotConstants.kStowAngleUp),
-                Commands.parallel(
-                        elevatorCommands.setHeight(
-                                ElevatorConstants.kLevel4Height.plus(elevOffset)),
-                        pivotCommands.setAngle(PivotConstants.kStowAngleUp.plus(pivotOffset))));
-    }
+    
 
     public Command autoScoreByLevel() {
 
@@ -654,7 +497,7 @@ public class Superstructure {
                 Commands.sequence(
                         goToStatePerpendicular(() -> SuperstructureState.toStow),
                         goToStateParalell(() -> SuperstructureState.stow)),
-                goToStateParalell(() -> SuperstructureState.stow),
+                goToStatePerpendicular(() -> SuperstructureState.stow, () -> 0.3),
                 this::shouldClear);
     }
 

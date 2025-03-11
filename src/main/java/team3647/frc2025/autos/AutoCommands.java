@@ -68,8 +68,7 @@ public class AutoCommands implements AllianceObserver {
                 superstructure.scoreL4(),
                 superstructure.pivotCommands.setAngle(PivotConstants.kLevel4Angle),
                 Commands.waitSeconds(1),
-                superstructure.poopCoral(),
-                superstructure.stowElevAndPivot());
+                superstructure.poopCoral());
     }
 
     public Command getSuperstructureTwoS3_e1f2() {
@@ -85,7 +84,6 @@ public class AutoCommands implements AllianceObserver {
                         .stowFromIntake()
                         .alongWith(autoDrive.setWantedScoringPos(ScoringPos.F2)),
                 Commands.waitSeconds(1),
-                superstructure.prepL4().alongWith(superstructure.wristCommands.stow()),
                 superstructure.scoreL4(),
                 superstructure.stowFromL4());
     }

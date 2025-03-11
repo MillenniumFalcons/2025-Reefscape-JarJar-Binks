@@ -18,7 +18,7 @@ public class GlobalConstants {
     // obv need tuinng theyre alll 0
     public class PivotIds {
         public static final int kMasterId = 21;
-        public static final int kFollowerId = 55;
+     
     }
 
     public class ElevatorIds {
@@ -28,10 +28,6 @@ public class GlobalConstants {
 
     public class CoralerIds {
         public static final int kMasterId = 20;
-    }
-
-    public class IntakeIds {
-        public static final int kMasterId = 55;
     }
 
     public class WristIds {
