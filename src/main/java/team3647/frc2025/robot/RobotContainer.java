@@ -4,10 +4,9 @@
 
 package team3647.frc2025.robot;
 
+import edu.wpi.first.units.Units;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
