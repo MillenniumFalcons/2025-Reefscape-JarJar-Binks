@@ -44,8 +44,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
-
-import java.security.PublicKey;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -438,10 +436,8 @@ public class SwerveDrive extends TunerSwerveDrivetrain
         readPeriodicInputs();
         writePeriodicOutputs();
 
-		Logger.recordOutput("HEADING", this.getHeading());
+        Logger.recordOutput("HEADING", this.getHeading());
     }
-
-	
 
     public void setisAccel() {
         if (getVel() > periodicIO.cachedVel + 0.02) {

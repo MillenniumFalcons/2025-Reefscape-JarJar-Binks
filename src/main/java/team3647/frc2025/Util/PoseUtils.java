@@ -12,9 +12,11 @@ public class PoseUtils {
         return Math.abs(pose.getTranslation().getDistance(center.getTranslation())) <= radiusM;
     }
 
-	public static boolean aligned(Pose2d pose, Pose2d center, double radiusM, double rotThresholdDeg) {
+    public static boolean aligned(
+            Pose2d pose, Pose2d center, double radiusM, double rotThresholdDeg) {
         return Math.abs(pose.getTranslation().getDistance(center.getTranslation())) <= radiusM
-			&& Math.abs(pose.getRotation().minus(center.getRotation()).getDegrees()) <= rotThresholdDeg;
+                && Math.abs(pose.getRotation().minus(center.getRotation()).getDegrees())
+                        <= rotThresholdDeg;
     }
 
     public static boolean inCircle(Pose2d pose, Pose2d center, Distance radius) {

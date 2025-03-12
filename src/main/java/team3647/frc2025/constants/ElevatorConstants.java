@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -47,7 +46,7 @@ public class ElevatorConstants {
 
     public static final TalonFXConfiguration kMasterConfig = new TalonFXConfiguration();
 
-	public static final TalonFXConfiguration kSlaveConfig;
+    public static final TalonFXConfiguration kSlaveConfig;
 
     // multiply native by this to get meters 121 - 85 cm @ 19.855 native
 
@@ -87,12 +86,11 @@ public class ElevatorConstants {
                 kStartingHeight.in(Meters) / kNativeToMeters; // native units
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
-		kSlaveConfig = kMasterConfig;
-		kSlaveConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 36.5;
-		kSlaveConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
-		kSlaveConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
-		kSlaveConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
-
+        kSlaveConfig = kMasterConfig;
+        kSlaveConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 36.5;
+        kSlaveConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+        kSlaveConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+        kSlaveConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
         kMaster.getConfigurator().apply(kMasterConfig);
 

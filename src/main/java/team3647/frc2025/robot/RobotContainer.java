@@ -81,18 +81,18 @@ public class RobotContainer {
 
     private void configureBindings() {
 
-		// coController.dPadUp.whileTrue(elevator.elevSysidQuasiFor());
-		// coController.dPadDown.whileTrue(elevator.elevSysidQuasiBack());
-		// coController.dPadRight.whileTrue(elevator.elevSysidDynamFor());
-		// coController.dPadLeft.whileTrue(elevator.elevSysidDynamBack());
-
-        
+        // coController.dPadUp.whileTrue(elevator.elevSysidQuasiFor());
+        // coController.dPadDown.whileTrue(elevator.elevSysidQuasiBack());
+        // coController.dPadRight.whileTrue(elevator.elevSysidDynamFor());
+        // coController.dPadLeft.whileTrue(elevator.elevSysidDynamBack());
 
         mainController.rightTrigger.whileTrue(superstructure.autoScoreByLevel());
         mainController.rightTrigger.onFalse(
                 superstructure
                         .stow()
-                        .alongWith(superstructure.poopCoral().withTimeout(0.3), superstructure.setNoPeice()));
+                        .alongWith(
+                                superstructure.poopCoral().withTimeout(0.3),
+                                superstructure.setNoPeice()));
         coController.buttonB.whileTrue(
                 superstructure.goToStateParalell(superstructure::getCurrentState));
 
@@ -150,7 +150,6 @@ public class RobotContainer {
         coController.rightMidButton.onTrue(autoDrive.enableAutoDrive());
 
         coController.leftMidButton.onTrue(autoDrive.disableAutoDrive());
-		
     }
 
     private void configureSmartDashboardLogging() {
@@ -174,7 +173,7 @@ public class RobotContainer {
                         autoDrive::getWantedMode,
                         autoDrive::getAutoDriveEnabled,
                         autoDrive::hasScoringTarget,
-						coController.leftJoyStickPress));
+                        coController.leftJoyStickPress));
         elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
         pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
         coraler.setDefaultCommand(superstructure.coralerCommands.kill());

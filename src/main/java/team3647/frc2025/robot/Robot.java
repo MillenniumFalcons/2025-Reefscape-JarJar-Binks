@@ -107,14 +107,14 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
-		m_robotContainer.front.setIMUMode(1);
+        m_robotContainer.front.setIMUMode(1);
         SignalLogger.stop();
         ModifiedSignalLogger.stop();
     }
 
     @Override
     public void disabledPeriodic() {
-		m_robotContainer.allianceChecker.periodic();
+        m_robotContainer.allianceChecker.periodic();
     }
 
     @Override
@@ -122,13 +122,12 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
-	
+
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
-	
     }
 
     @Override
@@ -142,7 +141,7 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-		m_robotContainer.front.setIMUMode(4);
+        m_robotContainer.front.setIMUMode(4);
     }
 
     @Override

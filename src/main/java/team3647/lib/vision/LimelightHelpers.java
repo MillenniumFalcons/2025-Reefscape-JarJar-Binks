@@ -21,7 +21,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
 import edu.wpi.first.wpilibj.DriverStation;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -611,7 +610,7 @@ public class LimelightHelpers {
      */
     public static Pose3d toPose3D(double[] inData) {
         if (inData.length < 6) {
-			DriverStation.reportWarning("bad LL 3d pose data!!", false);
+            DriverStation.reportWarning("bad LL 3d pose data!!", false);
             // System.err.println("Bad LL 3D Pose Data!");
             return Pose3d.kZero;
         }

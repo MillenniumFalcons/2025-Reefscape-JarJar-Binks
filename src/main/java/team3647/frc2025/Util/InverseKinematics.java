@@ -1,19 +1,14 @@
 package team3647.frc2025.Util;
 
-import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
-import static edu.wpi.first.units.Units.Rotation;
-
-import java.net.http.HttpResponse.PushPromiseHandler;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.Units;
@@ -28,28 +23,31 @@ import team3647.frc2025.constants.WristConstants;
 public class InverseKinematics {
 
     public static Distance armLenOffset = Inches.of(1);
-	public static double kWristStartingAngleDeg = 119;
+    public static double kWristStartingAngleDeg = 119;
     public static Distance armLength =
             Units.Centimeter.of(71)
                     .plus(armLenOffset); // Units.Inches.of(25.500).plus(Inches.of(2));
     public static Distance elevatorXOffset = Inches.of(4.875);
 
-	public static Translation2d startingWristTopPos = new Translation2d(elevatorXOffset, armLenOffset);
+    public static Translation2d startingWristTopPos =
+            new Translation2d(elevatorXOffset, armLenOffset);
 
     // the highest tip of the wirst, make it a variable function
     private static Translation2d wristTopPos(SuperstructureState currentState) {
         // real top pos at stow angle
-        return startingWristTopPos.rotateBy(Rotation2d.fromDegrees(kWristStartingAngleDeg - currentState.wristAngle.in(Degree)));
+        return startingWristTopPos.rotateBy(
+                Rotation2d.fromDegrees(
+                        kWristStartingAngleDeg - currentState.wristAngle.in(Degree)));
     }
 
-	public SuperstructureState getMinClearStateGoingUP(SuperstructureState wantedState){
-		var trans = forwardKinematics(wantedState);
-		var clearheightTotal = wristTopPos(wantedState).getY();
+    public SuperstructureState getMinClearStateGoingUP(SuperstructureState wantedState) {
+        var trans = forwardKinematics(wantedState);
+        var clearheightTotal = wristTopPos(wantedState).getY();
 
-		var state = getIK(new Translation2d(trans.getX(), clearheightTotal));
+        var state = getIK(new Translation2d(trans.getX(), clearheightTotal));
 
-		return state;
-	}
+        return state;
+    }
 
     public static boolean shouldClear(SuperstructureState currentState) {
         return currentState.pivotAngle.gt(Radian.of(-0.7))
@@ -58,7 +56,8 @@ public class InverseKinematics {
 
     private static Translation2d minPos(SuperstructureState currentState) {
         // should pivot around wrist
-		//use MatBuilder.fill(N2.instance,N1.instance, minpos.x, minpos.y).times(getRotationMatrix(normalize(currentState.wristAngle)));
+        // use MatBuilder.fill(N2.instance,N1.instance, minpos.x,
+        // minpos.y).times(getRotationMatrix(normalize(currentState.wristAngle)));
         SuperstructureState minState =
                 new SuperstructureState(
                         PivotConstants.kLevel1Angle.minus(Degree.of(3.0)),
@@ -71,7 +70,7 @@ public class InverseKinematics {
     }
 
     public static Matrix<N2, N2> getRotationMatrix(Angle theta) {
-		
+
         return MatBuilder.fill(
                 N2.instance,
                 N2.instance,
@@ -80,8 +79,6 @@ public class InverseKinematics {
                 Math.sin(theta.in(Radian)),
                 Math.cos(theta.in(Radian)));
     }
-
-
 
     public static SuperstructureState getIK(Translation2d pose) {
         var x = pose.getMeasureX();
@@ -98,8 +95,7 @@ public class InverseKinematics {
 
         var elevatorHeight = y.in(Meter) - armAddedHeight;
 
-        return new SuperstructureState(
-                armAngle, Meters.of(elevatorHeight), WristConstants.idrc);
+        return new SuperstructureState(armAngle, Meters.of(elevatorHeight), WristConstants.idrc);
     }
 
     public static Translation2d forwardKinematics(SuperstructureState state) {
@@ -132,8 +128,6 @@ public class InverseKinematics {
         var armAngle = Radian.of(Math.atan(dx / dy));
 
         Logger.recordOutput("calculated min angle", armAngle);
-
-		
 
         return armAngle;
     }

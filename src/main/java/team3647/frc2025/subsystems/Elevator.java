@@ -5,9 +5,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
@@ -17,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
+import org.littletonrobotics.junction.Logger;
 import team3647.lib.ModifiedSignalLogger;
 import team3647.lib.TalonFXSubsystem;
 
@@ -144,9 +142,9 @@ public class Elevator extends TalonFXSubsystem {
     @Override
     public void readPeriodicInputs() {
         super.readPeriodicInputs();
-		Logger.recordOutput("SYSID/position", master.getPosition().getValueAsDouble());
-		Logger.recordOutput("SYSID/velocity", master.getVelocity().getValueAsDouble());
-		Logger.recordOutput("SYSID/voltage", master.getMotorVoltage().getValueAsDouble());
+        Logger.recordOutput("SYSID/position", master.getPosition().getValueAsDouble());
+        Logger.recordOutput("SYSID/velocity", master.getVelocity().getValueAsDouble());
+        Logger.recordOutput("SYSID/voltage", master.getMotorVoltage().getValueAsDouble());
         // Logger.recordOutput("elevDemand/elevademad",
         // this.master.getClosedLoopReference().getValueAsDouble());
     }
