@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Radian;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -78,10 +77,11 @@ public class Superstructure {
         ONE(-1),
         TWO(1);
 
-		public final int sign;
-		Branch(int sign){
-			this.sign = sign;
-		}
+        public final int sign;
+
+        Branch(int sign) {
+            this.sign = sign;
+        }
     }
 
     public Superstructure(
@@ -189,11 +189,12 @@ public class Superstructure {
                 () -> !state.get().equals(SuperstructureState.kInvalidState));
     }
 
-	/**
-	 * delayed elevator
-	 * @param state
-	 * @return gotostate with a delayed elevator
-	 */
+    /**
+     * delayed elevator
+     *
+     * @param state
+     * @return gotostate with a delayed elevator
+     */
     public Command goToStatePerpendicular(Supplier<SuperstructureState> state) {
 
         return Commands.either(
@@ -224,12 +225,14 @@ public class Superstructure {
                 () -> !state.get().equals(SuperstructureState.kInvalidState));
     }
 
-		/**
-	 * delayed elevator
-	 * @param state
-	 * @return gotostate with a delayed elevator
-	 */
-    public Command goToStatePerpendicular(Supplier<SuperstructureState> state, DoubleSupplier delay) {
+    /**
+     * delayed elevator
+     *
+     * @param state
+     * @return gotostate with a delayed elevator
+     */
+    public Command goToStatePerpendicular(
+            Supplier<SuperstructureState> state, DoubleSupplier delay) {
 
         return Commands.either(
                 Commands.parallel(
@@ -277,8 +280,6 @@ public class Superstructure {
         return InverseKinematics.getMinAngle(getCurrentState()).in(Radian);
     }
 
-    
-
     public SuperstructureState getCurrentState() {
         return new SuperstructureState(pivot.getAngle(), elevator.getHeight(), wrist.getAngle());
     }
@@ -289,7 +290,6 @@ public class Superstructure {
                 pivotCommands.setAngle(PivotConstants.kAlgaeAngleLow));
     }
 
-
     public boolean shouldClearGoingUp() {
         return pivot.angleWithin(
                         PivotConstants.kMinAngle.minus(Degree.of((5))).in(Radian),
@@ -298,7 +298,6 @@ public class Superstructure {
     }
 
     //
-   
 
     public Command stowc() {
         return Commands.sequence(
@@ -361,7 +360,6 @@ public class Superstructure {
                                 && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
     }
 
-  
     public Command scoreL4() {
         return Commands.sequence(
                 clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
@@ -383,7 +381,6 @@ public class Superstructure {
                 pivotCommands.setAngle(PivotConstants.kLevel2Angle));
     }
 
-    
     public Command poopCoral() {
         return Commands.waitSeconds(0.15)
                 .andThen(coralerCommands.setOpenLoop(-0.3).withTimeout(0.1))
@@ -399,8 +396,6 @@ public class Superstructure {
         return Commands.parallel(pivotCommands.setAngle(PivotConstants.kLevel3Angle), poopCoral());
     }
 
-    
-
     public MutDistance getElevOffset() {
         return elevOffset;
     }
@@ -408,10 +403,6 @@ public class Superstructure {
     public MutAngle getPivotOffset() {
         return pivotOffset;
     }
-
-   
-
-   
 
     public Trigger intakeCurrent() {
         return new Trigger(() -> rollersCommands.currentGreater(currentLimit)).debounce(0.0);
@@ -482,8 +473,6 @@ public class Superstructure {
     // );
     // }
 
-    
-
     public Command autoScoreByLevel() {
 
         return goToStateParalell(
@@ -526,5 +515,9 @@ public class Superstructure {
 
     public Command elevOffsetDown() {
         return Commands.runOnce(() -> elevOffset.mut_minus(Inch.of(1)));
+    }
+
+    public boolean isIntaking() {
+        return wrist.angleReached(12, 3);
     }
 }

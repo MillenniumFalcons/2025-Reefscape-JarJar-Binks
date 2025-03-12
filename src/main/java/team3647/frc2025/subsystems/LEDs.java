@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.Map;
+import team3647.frc2025.Util.LEDTriggers;
 import team3647.frc2025.constants.LEDConstants;
 import team3647.lib.team6328.VirtualSubsystem;
 
@@ -15,18 +16,37 @@ public class LEDs extends VirtualSubsystem {
 
     /** Creates a new LEDSubsystem. */
     private Map<String, Animation> colors =
-            Map.of("aligned", LEDConstants.BREATHE_GREEN, "intaking", LEDConstants.SOLID_YELLOW);
+            Map.of(
+                    "aligned",
+                    LEDConstants.FLASH_YELLOW,
+                    "intaking",
+                    LEDConstants.SOLID_YELLOW,
+                    "hasPiece",
+                    LEDConstants.SOLID_ORANGE,
+                    "climbing",
+                    LEDConstants.SOLID_PURPLE);
 
     String defaultState = "red";
 
     String LEDState = defaultState;
 
+    private LEDTriggers triggers;
+
     private CANdle m_candle;
 
-    public LEDs(CANdle candle) {
+    public LEDs(CANdle candle, LEDTriggers triggers) {
         this.m_candle = candle;
         m_candle.configBrightnessScalar(1);
         m_candle.configLEDType(LEDStripType.GRB);
+
+        this.triggers = triggers;
+
+        triggers.alignedTrigger.onTrue(setState("aligned"));
+        triggers.alignedTrigger.onFalse(setState(defaultState));
+        triggers.intakingTrigger.onTrue(setState("intaking"));
+        triggers.intakingTrigger.onFalse(setState(defaultState));
+        triggers.pieceTrigger.onTrue(setState("hasPiece"));
+        triggers.pieceTrigger.onFalse(setState(defaultState));
     }
 
     private void setAnimation(Animation animation) {
