@@ -18,7 +18,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.constants.LEDConstants;
 import team3647.lib.ModifiedSignalLogger;
@@ -66,9 +65,8 @@ public class Robot extends LoggedRobot {
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata
         // values may
         // be added.
-		SignalLogger.setPath("/home/lvuser/logs/ptuner");
-		ModifiedSignalLogger.setPath("/home/lvuser/logs/ptuner");
-
+        SignalLogger.setPath("/home/lvuser/logs/ptuner");
+        ModifiedSignalLogger.setPath("/home/lvuser/logs/ptuner");
 
         LiveWindow.disableAllTelemetry();
         LiveWindow.setEnabled(false);
@@ -91,12 +89,9 @@ public class Robot extends LoggedRobot {
 
         Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
 
-
         Logger.recordOutput(
                 "Superstructure/shouldClear", m_robotContainer.superstructure.shouldClear());
-				InverseKinematics.getMinAngle(m_robotContainer.superstructure.getCurrentState());
-		
-		
+        InverseKinematics.getMinAngle(m_robotContainer.superstructure.getCurrentState());
 
         m_robotContainer.updateRobotPoseForSmartdashboard();
         VirtualSubsystem.periodicAll();

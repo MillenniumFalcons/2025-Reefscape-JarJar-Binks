@@ -4,9 +4,10 @@
 
 package team3647.frc2025.robot;
 
-import edu.wpi.first.units.Units;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -80,17 +81,29 @@ public class RobotContainer {
     private void configureBindings() {
 
         // sysid
-        mainController.leftMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidDynamFor());
-        mainController.leftMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidDynamBack());
-        mainController.rightMidButton.and(mainController.buttonY).whileTrue(elevator.elevSysidQuasiFor());
-        mainController.rightMidButton.and(mainController.buttonX).whileTrue(elevator.elevSysidQuasiBack());
+        mainController
+                .leftMidButton
+                .and(mainController.buttonY)
+                .whileTrue(elevator.elevSysidDynamFor());
+        mainController
+                .leftMidButton
+                .and(mainController.buttonX)
+                .whileTrue(elevator.elevSysidDynamBack());
+        mainController
+                .rightMidButton
+                .and(mainController.buttonY)
+                .whileTrue(elevator.elevSysidQuasiFor());
+        mainController
+                .rightMidButton
+                .and(mainController.buttonX)
+                .whileTrue(elevator.elevSysidQuasiBack());
 
         mainController.rightTrigger.whileTrue(superstructure.autoScoreByLevel());
         mainController.rightTrigger.onFalse(superstructure.stow());
-		mainController.dPadUp.whileTrue(Commands.sequence(
-			superstructure.goToStateParalell(() -> SuperstructureState.toStow),
-			superstructure.goToStateParalell(() -> SuperstructureState.stow)
-		));
+        mainController.dPadUp.whileTrue(
+                Commands.sequence(
+                        superstructure.goToStateParalell(() -> SuperstructureState.toStow),
+                        superstructure.goToStateParalell(() -> SuperstructureState.stow)));
 
         // mainController.leftTrigger.onTrue(autoDrive.setDriveMode(DriveMode.TEST)).onFalse(autoDrive.setDriveMode(DriveMode.NONE));
 

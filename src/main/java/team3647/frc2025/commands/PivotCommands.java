@@ -30,7 +30,7 @@ public class PivotCommands {
                 .until(() -> pivot.angleReached(Radian.of(angleRads), Degree.of(2)));
     }
 
-	public Command setAngle(DoubleSupplier angleRads) {
+    public Command setAngle(DoubleSupplier angleRads) {
         return Commands.run(() -> pivot.setAngleRads(angleRads.getAsDouble()), pivot)
                 .until(() -> pivot.angleReached(Radian.of(angleRads.getAsDouble()), Degree.of(2)));
     }

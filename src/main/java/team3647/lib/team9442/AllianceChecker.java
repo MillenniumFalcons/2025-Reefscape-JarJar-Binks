@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import team3647.lib.utils.Simshit;
 
 public class AllianceChecker {
@@ -34,7 +33,7 @@ public class AllianceChecker {
 
         alliance.ifPresent(
                 color -> {
-                   
+
                     // DriverStation.reportError("Run method? " + (cachedColor != color), false);
                     // DriverStation.reportError("First run? " + firstRun, false);
                     if (cachedColor != color || firstRun) {

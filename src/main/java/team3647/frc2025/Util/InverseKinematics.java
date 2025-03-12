@@ -7,15 +7,12 @@ import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
 
-import java.util.logging.LogRecord;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
@@ -28,27 +25,24 @@ public class InverseKinematics {
                     .plus(armLenOffset); // Units.Inches.of(25.500).plus(Inches.of(2));
     public static Distance elevatorXOffset = Inches.of(4.875);
 
-   private static SuperstructureState minState = 
-			new SuperstructureState(
-				PivotConstants.kLevel1Angle.minus(Degree.of(1)), 
-				ElevatorConstants.kLevel1Height, 
-				WristConstants.idrc);
+    private static SuperstructureState minState =
+            new SuperstructureState(
+                    PivotConstants.kLevel1Angle.minus(Degree.of(1)),
+                    ElevatorConstants.kLevel1Height,
+                    WristConstants.idrc);
 
-	private static Translation2d minPos = forwardKinematics(minState);
+    private static Translation2d minPos = forwardKinematics(minState);
 
-	//the highest tip of the wirst, make it a variable function
-	private static Translation2d wristTopPos() { 
-		//real top pos at stow angle 
-		return new Translation2d(Inches.of(8.006), Inches.of(20.980));
-	}
+    // the highest tip of the wirst, make it a variable function
+    private static Translation2d wristTopPos() {
+        // real top pos at stow angle
+        return new Translation2d(Inches.of(8.006), Inches.of(20.980));
+    }
 
-	public static boolean shouldClear(SuperstructureState currentState){
-		return currentState.pivotAngle.gt(Radian.of(-0.7))
-		&& currentState.elevatorHeight.lt(ElevatorConstants.kClearHeight);
-	}
-
-
-
+    public static boolean shouldClear(SuperstructureState currentState) {
+        return currentState.pivotAngle.gt(Radian.of(-0.7))
+                && currentState.elevatorHeight.lt(ElevatorConstants.kClearHeight);
+    }
 
     public static SuperstructureState getIK(Translation2d pose) {
         var x = pose.getMeasureX();
@@ -69,45 +63,38 @@ public class InverseKinematics {
                 armAngle, Meters.of(elevatorHeight), WristConstants.kStowAngle);
     }
 
+    public static Translation2d forwardKinematics(SuperstructureState state) {
+        var x = armLength.in(Meters) * Math.sin(state.pivotAngle.in(Radian));
+        var y =
+                state.elevatorHeight.in(Meters)
+                        + (armLength.in(Meters) * Math.cos(state.pivotAngle.in(Radian)));
 
-	public static Translation2d forwardKinematics(SuperstructureState state){
-		var x = armLength.in(Meters) * Math.sin(state.pivotAngle.in(Radian));
-		var y = state.elevatorHeight.in(Meters) + (armLength.in(Meters) * Math.cos(state.pivotAngle.in(Radian)));
+        return new Translation2d(x, y);
+    }
 
-		return new Translation2d(x,y);
-	}
+    public static Angle getMinAngle(SuperstructureState currentState) {
+        if (currentState.elevatorHeight.gte(ElevatorConstants.kClearHeight)
+                || !shouldClear(currentState)) {
+            var armAngle = Radian.of(-Math.PI / 2.0);
+            Logger.recordOutput("calculated min angle", armAngle);
+            return armAngle;
+        }
 
+        var phi = minState.pivotAngle.unaryMinus();
+        var dx = armLength.in(Meters) * Math.sin(phi.in(Radian));
 
-	public static Angle getMinAngle(SuperstructureState currentState){
-		if (currentState.elevatorHeight.gte(ElevatorConstants.kClearHeight) || !shouldClear(currentState)) {
-			var armAngle = Radian.of(-Math.PI/2.0);
-			Logger.recordOutput("calculated min angle", armAngle);
-			return armAngle;
-		}
+        var elev = currentState.elevatorHeight;
+        var dy = elev.in(Meters) - minPos.getY();
 
-		
+        Logger.recordOutput("dy", dy);
+        Logger.recordOutput("dx", dx);
 
-		var phi = minState.pivotAngle.unaryMinus();
-		var dx = armLength.in(Meters) * Math.sin(phi.in(Radian));
-		
+        var armAngle = Radian.of(Math.atan(dx / dy));
 
-		var elev = currentState.elevatorHeight;
-		var dy = elev.in(Meters) - minPos.getY();
-	
-		Logger.recordOutput("dy", dy);
-		Logger.recordOutput("dx", dx);
-		
+        Logger.recordOutput("calculated min angle", armAngle);
 
-		var armAngle = Radian.of(Math.atan(dx/dy));
-
-		
-
-		Logger.recordOutput("calculated min angle", armAngle);
-		
-		return armAngle;
-
-
-	}
+        return armAngle;
+    }
 
     public void getWristOutofthewayAngle() {}
 

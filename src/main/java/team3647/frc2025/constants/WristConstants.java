@@ -25,7 +25,7 @@ public class WristConstants {
 
     public static final Angle kStowWithPiece = Degree.of(87.68);
 
-	public static final Angle idrc = Degree.of(-100);
+    public static final Angle idrc = Degree.of(-100);
 
     // tunnnnnoon
     public static final Angle kSourceIntakeAngle = Degree.of(100);
