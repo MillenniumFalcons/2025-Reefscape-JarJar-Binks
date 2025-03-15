@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Distance;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
+import team3647.frc2025.subsystems.Pivot;
 
 public class SuperstructureState {
     public Angle pivotAngle;
@@ -16,44 +17,62 @@ public class SuperstructureState {
 
     public static SuperstructureState kInvalidState =
             new SuperstructureState(Degree.of(-100), Meters.of(-1), Degree.of(-100));
-    public static SuperstructureState troughScore =
+    public static SuperstructureState TroughScore =
             new SuperstructureState(
                     PivotConstants.kLevel1Angle,
                     ElevatorConstants.kLevel1Height,
                     WristConstants.kStowAngle);
-    public static SuperstructureState lowScore =
+    public static SuperstructureState LowScore =
             new SuperstructureState(
                     PivotConstants.kLevel2Angle,
                     ElevatorConstants.kLevel2Height,
                     WristConstants.kStowAngle);
-    public static SuperstructureState midScore =
+    public static SuperstructureState MidScore =
             new SuperstructureState(
                     PivotConstants.kLevel3Angle,
                     ElevatorConstants.kLevel3Height,
                     WristConstants.kStowAngle);
-    public static SuperstructureState highScore =
+    public static SuperstructureState HighScore =
             new SuperstructureState(
                     PivotConstants.kLevel4Angle,
                     ElevatorConstants.kLevel4Height,
                     WristConstants.kStowAngle);
 
-    public static SuperstructureState stow =
+    public static SuperstructureState Stow =
             new SuperstructureState(
                     PivotConstants.kStowAngle,
                     ElevatorConstants.kStowHeight,
                     WristConstants.kStowAngle);
 
-    public static SuperstructureState toStow =
+    public static SuperstructureState ToStow =
             new SuperstructureState(
                     PivotConstants.kStowAngle,
                     ElevatorConstants.kClearHeight,
                     WristConstants.kStowAngle);
 
-    public static SuperstructureState stowScore =
+    public static SuperstructureState StowScore =
             new SuperstructureState(
-                    InverseKinematics.getMinAngle(lowScore),
+                    InverseKinematics.getMinAngle(LowScore),
                     ElevatorConstants.kLevel2Height,
                     WristConstants.kStowAngle);
+
+	public static SuperstructureState Intake = 
+			new SuperstructureState(
+				PivotConstants.kStowAngle, 
+				ElevatorConstants.kHandoffHeight, 
+				WristConstants.kIntakeAngle);
+
+	public static SuperstructureState Transfer = 
+			new SuperstructureState(
+				PivotConstants.kStowAngle, 
+				ElevatorConstants.kHandoffHeight, 
+				WristConstants.kHandoffAngle);
+
+	public static SuperstructureState Handoff = 
+			new SuperstructureState(
+				PivotConstants.kStowAngle, 
+				ElevatorConstants.kStartingHeight, 
+				WristConstants.kStowWithPiece);
 
     public SuperstructureState(Angle pivotAngle, Distance elevatorHeight, Angle wristAngle) {
         this.pivotAngle = pivotAngle;
@@ -67,6 +86,10 @@ public class SuperstructureState {
 
     public SuperstructureState withElevatorHeight(Distance elevatorHeight) {
         return new SuperstructureState(this.pivotAngle, elevatorHeight, this.wristAngle);
+    }
+
+	public SuperstructureState withWristAngle(Angle wristAngle) {
+        return new SuperstructureState(this.pivotAngle, this.elevatorHeight, wristAngle);
     }
 
     @Override

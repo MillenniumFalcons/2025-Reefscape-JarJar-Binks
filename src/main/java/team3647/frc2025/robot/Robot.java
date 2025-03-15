@@ -81,28 +81,11 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        Logger.recordOutput(
-                "Superstructure/pivotoffset", m_robotContainer.superstructure.getPivotOffset());
-        Logger.recordOutput(
-                "Superstructure/elevOffset", m_robotContainer.superstructure.getElevOffset());
-        Logger.recordOutput(
-                "Superstructure/Level", m_robotContainer.superstructure.getWantedLevel());
 
-        Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
-
-        Logger.recordOutput(
-                "Superstructure/shouldClear", m_robotContainer.superstructure.shouldClear());
-        InverseKinematics.getMinAngle(m_robotContainer.superstructure.getCurrentState());
-
-        Logger.recordOutput("Superstructure/has piece", m_robotContainer.superstructure.hasPeice());
-        Logger.recordOutput(
-                "monkey",
-                m_robotContainer.superstructure.hasPeice()
-                        && m_robotContainer.pivot.getAngle().gte(Units.Degrees.of(-0.35)));
 
         m_robotContainer.updateRobotPoseForSmartdashboard();
         VirtualSubsystem.periodicAll();
-        LEDConstants.m_candle.animate(LEDConstants.RAINBOW);
+       
     }
 
     @Override

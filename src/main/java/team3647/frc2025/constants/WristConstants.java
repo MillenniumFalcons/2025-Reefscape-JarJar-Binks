@@ -13,25 +13,25 @@ import edu.wpi.first.units.measure.Angle;
 
 public class WristConstants {
 
-    public static final Angle kIntakeAngle = Units.Degree.of(12);
-    public static final Angle kStowAngle = Units.Degree.of(104.5);
+    public static final Angle kIntakeAngle = Units.Degree.of(-1.19);
+    public static final Angle kStowAngle = Units.Degree.of(90);
 
-    public static final Angle kStartingAngle = Units.Degree.of(119.3658320339946);
+    public static final Angle kStartingAngle = Units.Degree.of(109.6);
 
     public static final Angle kMaxAngle = kStartingAngle;
-    public static final Angle kMinAngle = Units.Degree.of(0);
+    public static final Angle kMinAngle = Units.Degree.of(-7);
 
-    public static final Angle kHandoffAngle = Degree.of(70.64007184240722);
+    public static final Angle kHandoffAngle = Degree.of(60);
 
-    public static final Angle kStowWithPiece = Degree.of(87.68);
+    public static final Angle kStowWithPiece = Degree.of(55);
 
     public static final Angle idrc = Degree.of(-100);
 
     // tunnnnnoon
-    public static final Angle kSourceIntakeAngle = Degree.of(100);
+    public static final Angle kSourceIntakeAngle = Degree.of(90);
 
     // 90 degs/20 revolutions
-    public static final double kNativeToDeg = 90 / 21.9182;
+    public static final double kNativeToDeg = 90 / 10.9633;
 
     public static final TalonFX kMaster =
             new TalonFX(GlobalConstants.WristIds.kMasterId, GlobalConstants.kSubsystemCanbusName);
@@ -39,11 +39,12 @@ public class WristConstants {
 
     static {
         kMasterConfig.Slot0.kP = 20;
-        kMasterConfig.Slot0.kS = 0.31;
+		kMasterConfig.Slot0.kD = 0.2;
+        kMasterConfig.Slot0.kS = 0.1;
         kMasterConfig.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
         kMasterConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-        kMasterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        kMasterConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         kMasterConfig.MotionMagic.MotionMagicExpo_kA = 0.0500000001490;

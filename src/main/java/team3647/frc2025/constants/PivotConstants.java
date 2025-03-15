@@ -11,7 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
-    public static final Angle kMinAngle = Radian.of(-1.584);
+    public static final Angle kMinAngle = Radian.of(-1.6927);
     public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561).minus(Degree.of(10));
     public static final Angle kLevel2Angle = Radian.of(-0.279).plus(Degree.of(25));
     public static final Angle kLevel3Angle = Radian.of(0.4650).plus(Degree.of(25));
@@ -19,7 +19,7 @@ public class PivotConstants {
 
     public static final Angle kL2Prep = Radian.of(-0.1);
     public static final Angle KL1Prep = kLevel1Angle;
-    public static final Angle kStartingAngle = kMinAngle;
+    public static final Angle kStartingAngle = Radian.of(-1.5369);
     public static final Angle kL4Prep = Radian.of(0.606);
     public static final Angle kL3prep = Radian.of(0.601);
 

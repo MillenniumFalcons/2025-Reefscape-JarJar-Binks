@@ -23,9 +23,9 @@ public class ElevatorConstants {
     public static final Distance kMaxHeight = Meters.of(84.27 * kNativeToMeters);
 
     // all heights measured as center dist from the pivot pivoting bar
-    public static final Distance kLevel1Height = kStartingHeight;
-    public static final Distance kLevel2Height = kStartingHeight;
-    public static final Distance kLevel3Height = kStartingHeight;
+    public static final Distance kLevel1Height = kStowHeight;
+    public static final Distance kLevel2Height = kStowHeight;
+    public static final Distance kLevel3Height = kStowHeight;
     public static final Distance kLevel4Height = Meters.of(1.529);
 
     // high needs tuning, low doesn't; tune for same angle at both heights

@@ -21,6 +21,8 @@ public class Pivot extends TalonFXSubsystem {
 
     double kG;
 
+	
+
     public Pivot(
             TalonFX master,
             Angle maxAngle,
