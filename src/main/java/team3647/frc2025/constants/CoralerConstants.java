@@ -17,7 +17,7 @@ public class CoralerConstants {
 
         kMasterConfig.MotorOutput.withInverted(InvertedValue.CounterClockwise_Positive);
 
-        kMasterConfig.CurrentLimits.StatorCurrentLimit = 60.0;
+        kMasterConfig.CurrentLimits.StatorCurrentLimit = 50.0;
         kMasterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         kMaster.getConfigurator().apply(kMasterConfig);

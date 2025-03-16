@@ -2,19 +2,27 @@ package team3647.frc2025.subsystems;
 
 import static edu.wpi.first.units.Units.Degree;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import team3647.frc2025.Util.InverseKinematics;
+import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.constants.WristConstants;
 import team3647.lib.TalonFXSubsystem;
 
 public class Wrist extends TalonFXSubsystem {
 
     Angle minAngle, maxAngle;
-	double angle = 0;
+
+	private final Supplier<Angle> getPivotAngle;
+	private final Supplier<Distance> getElevHeight;
+	
 
     public Wrist(
             TalonFX master,
@@ -23,31 +31,42 @@ public class Wrist extends TalonFXSubsystem {
             double nominalVoltage,
             Angle minAngle,
             Angle maxAngle,
+			Supplier<Distance> elevHeight,
+			Supplier<Angle> pivotAngle,
             double kDt) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
 
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;
+
+		this.getElevHeight = elevHeight;
+		this.getPivotAngle =pivotAngle;
     }
 
     public void setAngle(Angle angle) {
-		this.angle = angle.in(Degree);
+		
         setPositionExpoVoltage(
-                MathUtil.clamp(angle.in(Units.Degree), minAngle.in(Degree), maxAngle.in(Degree)),
+                MathUtil.clamp(angle.in(Units.Degree), minAngle.in(Degree), getMaxAngle().in(Degree)),
                 0);
     }
 
     public void setEncoderAngle(Angle angle) {
-		this.angle =angle.in(Degree);
+		
         setEncoder(angle.in(Degree));
     }
 
+	public Angle getMaxAngle() {
+		return InverseKinematics.getWristOutofTheWayMaxAngle(
+			new SuperstructureState(getPivotAngle.get(), getElevHeight.get(), getAngle()), 
+			maxAngle);
+	}
+
     public Angle getAngle() {
-        return Degree.of(angle);
+        return Degree.of(getPosition());
     }
 
     public double getAngleDegs() {
-        return angle;
+        return getPosition();
     }
 
     public boolean angleWithin(double lowBound, double highBound) {
@@ -62,7 +81,6 @@ public class Wrist extends TalonFXSubsystem {
 	public void periodic() {
 		// TODO Auto-generated method stub
 		super.periodic();
-		Logger.recordOutput("IK/wristAngle", getAngle().in(Degree));
 	}
 
     @Override

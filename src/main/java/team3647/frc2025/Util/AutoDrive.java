@@ -124,8 +124,8 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                     .pose;
             // return frontLL.QueueToInputs().get().pose;
         }
-        DriverStation.reportError(
-                "@getposeautodrive " + frontLL.QueueToInputs().isPresent(), false);
+        // DriverStation.reportError(
+        //         "@getposeautodrive " + frontLL.QueueToInputs().isPresent(), false);
         return odoPoseFunction.get();
     }
 
@@ -163,7 +163,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 Logger.recordOutput("kx", k);
                 return Math.abs(k) < 0.02 ? 0 : k;
             case INTAKE:
-                return detector.getTY() >= 0 ? xController.calculate(detector.getTY()) : 0;
+                return detector.getTY() >= 0 ? xController.calculate(Math.toRadians(0), detector.getTY()) : 0;
 
             default:
                 return xController.calculate(
@@ -184,7 +184,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 Logger.recordOutput("ky", k);
                 return Math.abs(k) < 0.04 ? 0 : k;
             case INTAKE:
-                return detector.getTY() >= 0 ? yController.calculate(detector.getTX()) : 0;
+                return detector.getTY() >= 0 ? yController.calculate(Math.toRadians(detector.getTX()), 0) : 0;
 
             default:
                 return yController.calculate(
@@ -291,7 +291,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     public void periodic() {
         wantedSide = poseToSideMap.get(getPose().nearest(sidePoses));
         Logger.recordOutput("wanjted side pose", wantedScoringPos.pose);
-        Logger.recordOutput("getpose", getPose());
+        // Logger.recordOutput("getpose", getPose());
 
         // forscoring: 0.324 m away from the face
         setwantedScoringPosBySideLevel();

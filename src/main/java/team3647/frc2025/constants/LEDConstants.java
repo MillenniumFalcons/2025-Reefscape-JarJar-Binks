@@ -2,6 +2,7 @@ package team3647.frc2025.constants;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.ColorFlowAnimation;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
@@ -18,6 +19,7 @@ public class LEDConstants {
 
     static {
         m_candle.configVBatOutput(VBatOutputMode.On);
+		m_candle.configLEDType(LEDStripType.BRG);
     }
 
     // LED Counts

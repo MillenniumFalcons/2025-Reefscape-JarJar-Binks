@@ -20,17 +20,17 @@ public class SuperstructureState {
     public static SuperstructureState TroughScore =
             new SuperstructureState(
                     PivotConstants.kLevel1Angle,
-                    ElevatorConstants.kLevel1Height,
+                    ElevatorConstants.kLowScoreHeight,
                     WristConstants.kStowAngle);
     public static SuperstructureState LowScore =
             new SuperstructureState(
                     PivotConstants.kLevel2Angle,
-                    ElevatorConstants.kLevel2Height,
+                    ElevatorConstants.kLowScoreHeight,
                     WristConstants.kStowAngle);
     public static SuperstructureState MidScore =
             new SuperstructureState(
                     PivotConstants.kLevel3Angle,
-                    ElevatorConstants.kLevel3Height,
+                    ElevatorConstants.kLowScoreHeight,
                     WristConstants.kStowAngle);
     public static SuperstructureState HighScore =
             new SuperstructureState(
@@ -53,7 +53,7 @@ public class SuperstructureState {
     public static SuperstructureState StowScore =
             new SuperstructureState(
                     InverseKinematics.getMinAngle(LowScore),
-                    ElevatorConstants.kLevel2Height,
+                    ElevatorConstants.kLowScoreHeight,
                     WristConstants.kStowAngle);
 
 	public static SuperstructureState Intake = 

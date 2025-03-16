@@ -17,15 +17,14 @@ public class ElevatorConstants {
 
     public static final Distance kStartingHeight = Meters.of(0.85);
     public static final Distance kStowHeight = kStartingHeight.plus(Centimeter.of(5));
+	public static final Distance kLowScoreHeight = kStartingHeight.plus(Meters.of(0.03));
 
     public static final Distance kHandoffHeight = kStowHeight.plus(Inches.of(3));
 
     public static final Distance kMaxHeight = Meters.of(84.27 * kNativeToMeters);
 
     // all heights measured as center dist from the pivot pivoting bar
-    public static final Distance kLevel1Height = kStowHeight;
-    public static final Distance kLevel2Height = kStowHeight;
-    public static final Distance kLevel3Height = kStowHeight;
+
     public static final Distance kLevel4Height = Meters.of(1.529);
 
     // high needs tuning, low doesn't; tune for same angle at both heights

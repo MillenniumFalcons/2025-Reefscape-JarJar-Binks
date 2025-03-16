@@ -16,6 +16,7 @@ import team3647.lib.team6328.VirtualSubsystem;
 public class RobotTracker extends VirtualSubsystem {
 	private final Superstructure superstructure;
 	private final AutoDrive autoDrive;
+	private SuperstructureState currentState = SuperstructureState.kInvalidState;
 
 	public RobotTracker(Superstructure superstructure, AutoDrive autoDrive) {
 		super();
@@ -33,20 +34,22 @@ public class RobotTracker extends VirtualSubsystem {
 				"Superstructure/Level", superstructure.getWantedLevel());
 
 		Logger.recordOutput("Robot/drive mode", autoDrive.getWantedMode());
+
 		// debug
-		superstructure.getStateScoreAuto();
+		// superstructure.getStateScoreAuto();
+		currentState = superstructure.getCurrentState();
+		// Logger.recordOutput("zeropose", Pose2d.kZero);
 
-		Logger.recordOutput("zeropose", Pose2d.kZero);
+		// Logger.recordOutput("IK/lookaheadgood?",
+		// 		InverseKinematics.shouldWristOutOftheway(superstructure.getCurrentState()));
+		// Logger.recordOutput("IK/potential wrist angle", InverseKinematics.getWristOutofTheWayMaxAngle(superstructure.getCurrentState(), WristConstants.kStowAngle).in(Degree));
+		// Logger.recordOutput("IK/wristTopPos/x", InverseKinematics.wristTopPos(superstructure.getCurrentState()).getMeasureX().in(Inches));
+		// Logger.recordOutput("IK/wristTopPos/y", InverseKinematics.wristTopPos(superstructure.getCurrentState()).getMeasureY().in(Inches));
+		// Logger.recordOutput("IK/wristTopPos/translation", InverseKinematics.wristTopPos(superstructure.getCurrentState()));
+		// Logger.recordOutput("thingy", InverseKinematics.getWristOutofTheWayMaxAngle(superstructure.getCurrentState(), WristConstants.kStowAngle));
 
-		Logger.recordOutput("IK/lookaheadgood?",
-				InverseKinematics.shouldWristOutOftheway(superstructure.getCurrentState()));
-		Logger.recordOutput("IK/potential wrist angle", InverseKinematics.getWristOutofTheWayMaxAngle(superstructure.getCurrentState(), WristConstants.kStowAngle).in(Degree));
-		Logger.recordOutput("IK/wristTopPos/x", InverseKinematics.wristTopPos(superstructure.getCurrentState()).getMeasureX().in(Inches));
-		Logger.recordOutput("IK/wristTopPos/y", InverseKinematics.wristTopPos(superstructure.getCurrentState()).getMeasureY().in(Inches));
-		Logger.recordOutput("IK/wristTopPos/translation", InverseKinematics.wristTopPos(superstructure.getCurrentState()));
-
-
-		Logger.recordOutput("IKTEST/elevthing", InverseKinematics.getMinClearStateGoingUP(SuperstructureState.LowScore).elevatorHeight);
+		Logger.recordOutput("DEBUG/pivot/minangle", InverseKinematics.getMinAngle(currentState));
+		
 
 	}
 

@@ -21,6 +21,7 @@ import team3647.frc2025.constants.FieldConstants;
 import team3647.lib.team6328.VirtualSubsystem;
 import team3647.lib.vision.LimelightHelpers.PoseEstimate;
 import team3647.lib.vision.LimelightHelpers.RawFiducial;
+import team3647.lib.vision.old.Limelight;
 
 public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamera {
 
@@ -57,6 +58,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         this.name = name;
         this.robotToCamera = robotToCamera;
         this.orientation = orientationSupplier;
+		setIMUMode(3);
         // LimelightHelpers.setCameraPose_RobotSpace(
         //         name,
         //         robotToCamera.getX(),
@@ -74,7 +76,9 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     @Override
     public Optional<Pose3d> camPose() {
 
-        var robotPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+        var robotPose = VisionController.hasReset? 
+				LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name):
+				LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         if (robotPose.isEmpty()) {
             return Optional.empty();
         }
@@ -88,11 +92,11 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         LimelightHelpers.SetRobotOrientation(
                 name,
                 angle.yaw.in(Degree),
-                angle.yawRate.in(DegreesPerSecond),
-                angle.pitch.in(Degree),
-                angle.pitchRate.in(DegreesPerSecond),
-                angle.roll.in(Degree),
-                angle.rollRate.in(DegreesPerSecond));
+               0,
+                0,
+                0,
+                0,
+                0);
     }
 
     @Override
@@ -106,14 +110,15 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
             LimelightHelpers.setThrottle(name);
             // setIMUMode(2);
         }
-        setIMUMode(4);
-
-        Logger.recordOutput("td", getTd());
-        Logger.recordOutput("tv", LimelightHelpers.getTV(name));
+		
+		setIMUMode(VisionController.hasReset? 4 : 3);
+		Logger.recordOutput("DEBUG/autoAlign/hasreset", VisionController.hasReset);
 
         getDX().ifPresentOrElse(
                         pose -> Logger.recordOutput("name", pose),
                         () -> Logger.recordOutput("name", Pose2d.kZero));
+		
+		
     }
 
     public RawFiducial getBestTagDist(RawFiducial[] fiducials) {
@@ -150,7 +155,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     }
 
     public Optional<Pose2d> getDX() {
-        var estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+        var estimate = VisionController.hasReset? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name) : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
 
         if (estimate.isEmpty()) return Optional.empty();
 
@@ -168,7 +173,8 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     @Override
     public Optional<VisionMeasurement> QueueToInputs() {
         setOrientation();
-        var botPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+        var botPose = 
+		LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
         if (botPose.isEmpty()) {
             return Optional.empty();
         }

@@ -9,12 +9,13 @@ import team3647.frc2025.subsystems.Coraler;
 public class CoralerCommands {
 
     public Command intake() {
-        return Commands.run(() -> coraler.setDutyCycle(0.8), coraler);
+        return Commands.run(() -> coraler.setDutyCycle(1.0), coraler);
     }
 
     public Command spitOut() {
         return Commands.run(() -> coraler.setDutyCycle(-0.5), coraler);
     }
+
 
     public Command stow() {
         return Commands.run(() -> coraler.setDutyCycle(0.2), coraler);

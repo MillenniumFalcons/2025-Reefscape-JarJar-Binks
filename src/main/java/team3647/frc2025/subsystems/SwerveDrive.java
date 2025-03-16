@@ -1,5 +1,7 @@
 package team3647.frc2025.subsystems;
 
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pound;
 import static edu.wpi.first.units.Units.Second;
@@ -436,7 +438,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
         readPeriodicInputs();
         writePeriodicOutputs();
 
-        Logger.recordOutput("HEADING", this.getHeading());
+        // Logger.recordOutput("HEADING", this.getHeading());
     }
 
     public void setisAccel() {
@@ -451,11 +453,11 @@ public class SwerveDrive extends TunerSwerveDrivetrain
     public Orientation getPigeonOrientation() {
         return new Orientation(
                 periodicIO.pose.getRotation().getMeasure(),
-                getPigeon2().getPitch().getValue(),
-                getPigeon2().getRoll().getValue(),
-                getPigeon2().getAngularVelocityZWorld().getValue(),
-                getPigeon2().getAngularVelocityXWorld().getValue(),
-                getPigeon2().getAngularVelocityYWorld().getValue());
+                Degree.zero(),
+                Degree.zero(),
+                DegreesPerSecond.zero(),
+                DegreesPerSecond.zero(),
+                DegreesPerSecond.zero());
     }
 
     public boolean getIsAccel() {

@@ -191,6 +191,28 @@ public class Superstructure {
 				() -> !state.get().equals(SuperstructureState.kInvalidState));
 	}
 
+
+	
+	public Command goToStateParalellNoWrist(Supplier<SuperstructureState> state) {
+
+		return Commands.either(
+				Commands.parallel(
+						// Commands.run(() -> Logger.recordOutput("monkeyballs",
+						// state.get().elevatorHeight)),
+						elevatorCommands.setHeight(() -> state.get().elevatorHeight),
+						pivotCommands.setAngle(
+								() -> MathUtil.clamp(
+										state.get().pivotAngle.in(Radian),
+										pivot.getMinAngle().in(Radian),
+										pivot.getMaxAngle().in(Radian)))
+				// Commands.run(() ->
+				// Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
+
+				),
+				Commands.none(),
+				() -> !state.get().equals(SuperstructureState.kInvalidState));
+	}
+
 	/**
 	 * delayed elevator
 	 *
@@ -224,15 +246,36 @@ public class Superstructure {
 				() -> !state.get().equals(SuperstructureState.kInvalidState));
 	}
 
+
+	public Command goToStateNoWrist(Supplier<SuperstructureState> state){
+		return Commands.either(
+				Commands.parallel(
+						// Commands.run(() -> Logger.recordOutput("monkeyballs",
+						// state.get().elevatorHeight)),
+						Commands.waitSeconds(0.1)
+								.andThen(
+										elevatorCommands.setHeight(
+												() -> state.get().elevatorHeight)),
+						
+						(pivotCommands.setAngle(
+							() -> state.get().pivotAngle))
+						// Commands.either(
+						// 		Commands.none(),
+						// 		wristCommands.setAngle(state.get().wristAngle),
+						// 		() -> state.get().wristAngle.equals(WristConstants.idrc))
+				// Commands.run(() ->
+				// Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
+
+				),
+				Commands.none(),
+				() -> !state.get().equals(SuperstructureState.kInvalidState));
+	}
+
 	public SuperstructureState getStateScoreAuto() {
 		var prelimWantedState = kLevelToScoreMap.getOrDefault(getWantedLevel(), SuperstructureState.kInvalidState);
 
-		if (prelimWantedState.elevatorHeight.lte(Meter.of(0.9)) && shouldClearGoingUp()) {
-			Logger.recordOutput("IK/elevatorHeight", InverseKinematics.getMinClearStateGoingUP(prelimWantedState).elevatorHeight);
-			return InverseKinematics.getMinClearStateGoingUP(prelimWantedState);
-
-		}
-		Logger.recordOutput("IK/elevatorHeight", prelimWantedState.elevatorHeight.in(Meter));
+		
+		
 		return prelimWantedState;
 	}
 
@@ -253,16 +296,12 @@ public class Superstructure {
 								.andThen(
 										elevatorCommands.setHeight(
 												() -> state.get().elevatorHeight)),
-						Commands.waitUntil(() -> elevator.getHeight().gte(ElevatorConstants.kStowHeight))
-						.andThen(pivotCommands.setAngle(
-							() -> MathUtil.clamp(
-									state.get().pivotAngle.in(Radian),
-									getPivotMinAngle(),
-									pivot.getMaxAngle().in(Radian)))),
-						Commands.either(
-								Commands.none(),
-								wristCommands.setAngle(state.get().wristAngle),
-								() -> state.get().wristAngle.equals(WristConstants.idrc))
+						(pivotCommands.setAngle(
+							() -> state.get().pivotAngle))
+						// Commands.either(
+						// 		Commands.none(),
+						// 		wristCommands.setAngle(state.get().wristAngle),
+						// 		() -> state.get().wristAngle.equals(WristConstants.idrc))
 				// Commands.run(() ->
 				// Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
 
@@ -315,7 +354,7 @@ public class Superstructure {
 	public Command transfer() {
 		return Commands.parallel(
 				goToStateParalell(() -> SuperstructureState.Transfer),
-				rollersCommands.setOpenLoop(0.3, -0.1));
+				rollersCommands.setOpenLoop(0.6, -0.3));
 	}
 
 	public Command handoff() {
@@ -395,14 +434,14 @@ public class Superstructure {
 	public Command scoreL3() {
 		return Commands.sequence(
 				clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
-				elevatorCommands.setHeight(ElevatorConstants.kLevel3Height),
+				elevatorCommands.setHeight(ElevatorConstants.kLowScoreHeight),
 				pivotCommands.setAngle(PivotConstants.kL3prep));
 	}
 
 	public Command scoreL2() {
 		return Commands.sequence(
 				clearElevatorGoingUpNoDown(PivotConstants.kL2Prep),
-				elevatorCommands.setHeight(ElevatorConstants.kLevel2Height),
+				elevatorCommands.setHeight(ElevatorConstants.kLowScoreHeight),
 				pivotCommands.setAngle(PivotConstants.kLevel2Angle));
 	}
 
@@ -513,6 +552,21 @@ public class Superstructure {
 						goToStateParalell(() -> SuperstructureState.Stow)),
 				goToStatePerpendicular(() -> SuperstructureState.Stow, () -> 0.3),
 				this::shouldClear);
+	}
+
+	public Command sequencialStow(){
+		return Commands.sequence(
+						goToStateNoWrist(() -> SuperstructureState.ToStow),
+						goToStateParalellNoWrist(() -> SuperstructureState.Stow));
+	}
+
+	public Command paralellStow(){
+		return Commands.either(
+			Commands.sequence(
+					goToStateNoWrist(() -> SuperstructureState.ToStow),
+					goToStateParalellNoWrist(() -> SuperstructureState.Stow)),
+			goToStatePerpendicular(() -> SuperstructureState.Stow, () -> 0.3),
+			this::shouldClear);
 	}
 
 	public Command stowWristAuto() {

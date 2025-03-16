@@ -17,13 +17,8 @@ import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
-
-import org.dyn4j.geometry.Rectangle;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.ElevatorConstants;
-import team3647.frc2025.constants.PivotConstants;
-import team3647.frc2025.constants.WristConstants;
 
 public class InverseKinematics {
 	public static final double kNativeToMeters = (1.21 - 0.85) / 19.855;
@@ -34,7 +29,9 @@ public class InverseKinematics {
 
 
     public static Distance armLenOffset = Inches.of(1);
-    public static double kWristStartingAngleDeg = 109.59999999999998;
+
+    public static double kWristStartingAngleDeg = 118.739;
+
     public static Distance armLength =
             Units.Centimeter.of(71)
                     .plus(armLenOffset); // Units.Inches.of(25.500).plus(Inches.of(2));
@@ -44,7 +41,11 @@ public class InverseKinematics {
             new Translation2d(Inches.of(4.594), Inches.of(20.489));
 
 	private static Rectangle2d rect = 
-				new Rectangle2d(new Pose2d(Inches.of(10), Inches.of(12), Rotation2d.kZero), Inches.of(13), Inches.of(16));
+				new Rectangle2d(new Pose2d(Inches.of(10), Inches.of(12), Rotation2d.kZero), Inches.of(10), Inches.of(13));
+	
+	private static SuperstructureState minState = 
+		SuperstructureState.TroughScore
+			.withPivotAngle(SuperstructureState.TroughScore.pivotAngle.minus(Degree.of(3)));
 
     // the highest tip of the wirst, make it a variable function
     public static Translation2d wristTopPos(SuperstructureState currentState) {
@@ -54,6 +55,12 @@ public class InverseKinematics {
                         (kWristStartingAngleDeg - currentState.wristAngle.in(Degree))));
     }
 
+	@Deprecated
+	/**
+	 * WARNING: DOESN'T WORK, DON'T USE
+	 * @param wantedState
+	 * @return
+	 */
     public static SuperstructureState getMinClearStateGoingUP(SuperstructureState wantedState) {
         var trans = forwardKinematics(wantedState);
         var clearheightTotal = wristTopPos(wantedState).getY();
@@ -69,19 +76,15 @@ public class InverseKinematics {
     }
 
     public static boolean shouldClear(SuperstructureState currentState) {
-        return currentState.pivotAngle.gt(Radian.of(-0.7))
-                && currentState.elevatorHeight.lt(ElevatorConstants.kClearHeight);
+        return currentState.pivotAngle.gte(Radian.of(-0.7))
+                && currentState.elevatorHeight.lte(ElevatorConstants.kClearHeight);
     }
 
     private static Translation2d minPos(SuperstructureState currentState) {
         // should pivot around wrist
         // use MatBuilder.fill(N2.instance,N1.instance, minpos.x,
         // minpos.y).times(getRotationMatrix(normalize(currentState.wristAngle)));
-        SuperstructureState minState =
-                new SuperstructureState(
-                        PivotConstants.kLevel1Angle.minus(Degree.of(3.0)),
-                        ElevatorConstants.kLevel1Height,
-                        WristIdrc);
+
 
         Translation2d minPos = forwardKinematics(minState);
 
@@ -130,9 +133,9 @@ public class InverseKinematics {
             return armAngle;
         }
         var minPos = minPos(currentState);
-        var minState = getIK(minPos);
+    
 
-        var phi = minState.pivotAngle.unaryMinus();
+        var phi = minState.pivotAngle;
         var dx = armLength.in(Meters) * Math.sin(phi.in(Radian));
 
         var elev = currentState.elevatorHeight;
@@ -152,6 +155,13 @@ public class InverseKinematics {
 		return currenState
 				.withElevatorHeight(currenState.elevatorHeight.plus(Inches.of(5)))
 				.withPivotAngle(currenState.pivotAngle.plus(Degree.of(5)));
+				
+	}
+
+	public static SuperstructureState lookAheadEstimateDown(SuperstructureState currenState){
+		return currenState
+				.withElevatorHeight(currenState.elevatorHeight.minus(Inches.of(8)))
+				.withPivotAngle(currenState.pivotAngle.minus(Degree.of(8)));
 				
 	}
 
@@ -175,4 +185,8 @@ public class InverseKinematics {
 
 		
 	}
+
+
+
+
 }

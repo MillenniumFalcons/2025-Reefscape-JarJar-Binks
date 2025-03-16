@@ -16,6 +16,7 @@ public class VisionController extends VirtualSubsystem {
     private final Consumer<Pose2d> resetPose;
     private final Function<VisionMeasurement, Boolean> shouldAddData;
     private final ArrayList<VisionMeasurement> list = new ArrayList<>();
+	public static boolean hasReset = false;
     private int count;
 
     public VisionController(
@@ -53,7 +54,7 @@ public class VisionController extends VirtualSubsystem {
                 if (count > 4) {
 
                     resetPose.accept(getInputs.pose);
-
+					hasReset = true;
                     Logger.recordOutput("Robot/Reset", getInputs.pose);
                     break;
                 }
