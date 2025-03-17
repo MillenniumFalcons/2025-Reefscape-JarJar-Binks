@@ -1,14 +1,14 @@
 package team3647.frc2025.constants;
 
-import static edu.wpi.first.units.Units.Centimeter;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import static edu.wpi.first.units.Units.Centimeter;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorConstants {
@@ -28,8 +28,11 @@ public class ElevatorConstants {
     public static final Distance kLevel4Height = Meters.of(1.529);
 
     // high needs tuning, low doesn't; tune for same angle at both heights
-    public static final Distance kHighAlgaeHeight = Meters.of(1.368);
-    public static final Distance kLowAlgaeHeight = kStartingHeight;
+    
+    // change this one to low algae cuz the old low algae worked for high
+//     public static final Distance kHighAlgaeHeight = Meters.of(1.368);
+    
+    public static final Distance kHighAlgaeHeight = kStartingHeight;
 
     public static final Distance kIntakeHeight = kStartingHeight;
 

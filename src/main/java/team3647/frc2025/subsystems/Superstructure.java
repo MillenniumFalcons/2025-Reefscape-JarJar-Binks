@@ -57,12 +57,15 @@ public class Superstructure {
 
 	private boolean hasPeice = true;
 
+	private boolean hasAlgae = false;
+
 	private ScoringPos wantedScoringPos = ScoringPos.NONE;
 
 	private Trigger overridePiece;
 
 	private double currentLimit = 47;
 	private double SeagullCurrentLimit = 15;
+	private double algaeCurrentLimit = 50;
 
 	private double wristOffset = 0;
 
@@ -331,12 +334,30 @@ public class Superstructure {
 	public SuperstructureState getCurrentState() {
 		return new SuperstructureState(pivot.getAngle(), elevator.getHeight(), wrist.getAngle());
 	}
+	
+	//algae stuff
 
-	public Command takeOffAlgaeLow() {
-		return Commands.sequence(
-				elevatorCommands.setHeight(ElevatorConstants.kLowAlgaeHeight),
-				pivotCommands.setAngle(PivotConstants.kAlgaeAngleLow));
+	public Command takeOffAlgaeHigh() {
+		return Commands.parallel(
+				elevatorCommands.setHeight(ElevatorConstants.kHighAlgaeHeight),
+				pivotCommands.setAngle(PivotConstants.kAlgaeAngleHigh),
+				coralerCommands.intake()
+				);
 	}
+
+	public Command setHasAlgae() {
+		return Commands.runOnce(() -> this.hasAlgae = true);
+	}
+
+	public Command setNoAlgae() {
+		return Commands.runOnce(() -> this.hasAlgae = false);
+	}
+
+	public boolean getAlgae() {
+		return hasAlgae;
+	}
+	
+	//end of algae stuff
 
 	public boolean shouldClearGoingUp() {
 		return pivot.angleWithin(
@@ -470,6 +491,10 @@ public class Superstructure {
 
 	public boolean intakeCurrent() {
 		return rollers.getMasterCurrent() > currentLimit;
+	}
+
+	public boolean coralerAlgaeCurrent() {
+		return coraler.getMasterCurrent() > algaeCurrentLimit;
 	}
 
 	public Command stowFromIntake() {

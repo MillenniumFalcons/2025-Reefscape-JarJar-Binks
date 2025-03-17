@@ -4,16 +4,12 @@
 
 package team3647.frc2025.robot;
 
-import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotation;
-
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.DriverStation;
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,14 +18,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import team3647.frc2025.Util.AutoDrive;
-import team3647.frc2025.Util.LEDTriggers;
 import team3647.frc2025.Util.AutoDrive.DriveMode;
+import team3647.frc2025.Util.LEDTriggers;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.autos.AutoCommands;
 import team3647.frc2025.commands.ClimbCommands;
-import team3647.frc2025.commands.CoralerCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
-import team3647.frc2025.commands.WristCommands;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.ClimbConstants;
 import team3647.frc2025.constants.CoralerConstants;
@@ -93,6 +87,25 @@ public class RobotContainer {
 	} // 0.6324678425924254
 
 	private void configureBindings() {
+
+		//algae stuff
+
+		mainController.rightBumper.onTrue(superstructure.takeOffAlgaeHigh()
+			.until(() -> superstructure.coralerAlgaeCurrent())
+			.andThen(
+				superstructure.coralerCommands.setOpenLoop(0.2).alongWith(superstructure.setHasAlgae())
+			));
+
+		algaeReadyToScore.whileTrue(superstructure.coralerCommands.setOpenLoop(0.2));
+		
+		//not done yet also random keybind still needa make pivot go up and then shoot it out
+		algaeReadyToScore.and(mainController.buttonA).onTrue(
+			superstructure.elevatorCommands.setHeight(Meters.of(2))
+		);
+		
+		// mainController.rightBumper.onFalse(superstructure.paralellStow());
+
+		//real stuff
 
 		mainController.leftBumper.whileTrue(superstructure.intake());
 		intakeUp.onTrue(superstructure.transfer()).onTrue(autoDrive.setDriveMode(DriveMode.NONE));
@@ -417,4 +430,8 @@ public class RobotContainer {
 			() -> pivot.angleReached(PivotConstants.kStowAngleUp, Degree.of(40))
 					&& (superstructure.getWantedLevel() == Level.ALGAEHIGH
 							|| superstructure.getWantedLevel() == Level.ALGAELOW));
+
+	Trigger algaeReadyToScore = new Trigger(
+		() -> superstructure.getAlgae()
+	);
 }

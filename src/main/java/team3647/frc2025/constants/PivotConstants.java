@@ -1,13 +1,13 @@
 package team3647.frc2025.constants;
 
-import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Radian;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Radian;
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
@@ -25,8 +25,9 @@ public class PivotConstants {
 
     public static final Angle klowLevelsStow = Radian.of(-0.045);
 
-    public static final Angle kAlgaeAngleHigh = Radian.of(0.1988);
-    public static final Angle kAlgaeAngleLow = Radian.of(0.290);
+    //idk what the low one is so change this
+//     public static final Angle kAlgaeAngleHigh = Radian.of(0.1988);
+    public static final Angle kAlgaeAngleHigh = Radian.of(0.290);
 
     public static final Angle kClearAngle = Radian.of(-0.4);
     // lowclearangle = max angle when the pivot is blocked by the intake going up
