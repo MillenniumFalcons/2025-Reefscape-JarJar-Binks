@@ -2,13 +2,11 @@ package team3647.frc2025.Util;
 
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
-import team3647.frc2025.subsystems.Pivot;
 
 public class SuperstructureState {
     public Angle pivotAngle;
@@ -37,6 +35,14 @@ public class SuperstructureState {
                     PivotConstants.kLevel4Angle,
                     ElevatorConstants.kLevel4Height,
                     WristConstants.kStowAngle);
+
+        //gg more algae stuff
+        public static SuperstructureState HighAlgae = 
+                new SuperstructureState(
+                        PivotConstants.kAlgaeAngleHigh, 
+                        ElevatorConstants.kHighAlgaeHeight, 
+                        WristConstants.kStowAngle);
+        //end algae stuff
 
     public static SuperstructureState Stow =
             new SuperstructureState(

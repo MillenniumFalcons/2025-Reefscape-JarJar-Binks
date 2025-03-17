@@ -337,12 +337,31 @@ public class Superstructure {
 	
 	//algae stuff
 
+	//unimplemented lmao
+	public Command autoTakeOffByLevel() {
+		return takeOffAlgaeHigh();
+	}
+
 	public Command takeOffAlgaeHigh() {
 		return Commands.parallel(
 				elevatorCommands.setHeight(ElevatorConstants.kHighAlgaeHeight),
 				pivotCommands.setAngle(PivotConstants.kAlgaeAngleHigh),
 				coralerCommands.intake()
 				);
+	}
+
+	public Command scoreAlgaeBarge() {
+		return goToStateParalellNoWrist(
+			() -> new SuperstructureState(PivotConstants.kMaxAngle, ElevatorConstants.kMaxHeight, WristConstants.idrc)
+		);
+	}
+
+	public Command stowAlgaeBarge() {
+		return Commands.parallel(
+			stow(), 
+			Commands.sequence(Commands.waitSeconds(0.025), 
+				coralerCommands.setOpenLoop(-1.0).withTimeout(0.5))
+		);
 	}
 
 	public Command setHasAlgae() {
@@ -594,6 +613,7 @@ public class Superstructure {
 			this::shouldClear);
 	}
 
+	@Deprecated
 	public Command stowWristAuto() {
 		return wristCommands.setAngle(
 				() -> InverseKinematics.getWristOutofTheWayMaxAngle(getCurrentState(), WristConstants.kStowAngle));

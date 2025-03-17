@@ -32,7 +32,7 @@ public class ElevatorConstants {
     // change this one to low algae cuz the old low algae worked for high
 //     public static final Distance kHighAlgaeHeight = Meters.of(1.368);
     
-    public static final Distance kHighAlgaeHeight = kStartingHeight;
+    public static final Distance kHighAlgaeHeight = kStartingHeight.plus(Meters.of(0.2));
 
     public static final Distance kIntakeHeight = kStartingHeight;
 

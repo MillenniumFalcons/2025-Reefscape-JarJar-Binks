@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
 import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -90,21 +89,23 @@ public class RobotContainer {
 
 		//algae stuff
 
-		mainController.rightBumper.onTrue(superstructure.takeOffAlgaeHigh()
+		mainController.rightBumper.onTrue(superstructure.autoTakeOffByLevel()
 			.until(() -> superstructure.coralerAlgaeCurrent())
 			.andThen(
 				superstructure.coralerCommands.setOpenLoop(0.2).alongWith(superstructure.setHasAlgae())
 			));
 
+		// mainController.rightBumper.and(algaeReadyToScore).onFalse(superstructure.paralellStow());
+
 		algaeReadyToScore.whileTrue(superstructure.coralerCommands.setOpenLoop(0.2));
 		
 		//not done yet also random keybind still needa make pivot go up and then shoot it out
-		algaeReadyToScore.and(mainController.buttonA).onTrue(
-			superstructure.elevatorCommands.setHeight(Meters.of(2))
+		algaeReadyToScore.and(mainController.buttonA).whileTrue(
+			superstructure.scoreAlgaeBarge()
 		);
-		
-		// mainController.rightBumper.onFalse(superstructure.paralellStow());
 
+		mainController.buttonA.and(algaeReadyToScore).onFalse(superstructure.stowAlgaeBarge());
+		
 		//real stuff
 
 		mainController.leftBumper.whileTrue(superstructure.intake());
@@ -114,7 +115,8 @@ public class RobotContainer {
 
 		seagullCurrent
 		.and(() -> !superstructure.intakeCurrent()).onTrue(superstructure.handoff().alongWith(superstructure.setPeice()));
-		coralerCurrent.onTrue(superstructure.stow());
+		coralerCurrent.and(mainController.rightBumper.negate())
+		.onTrue(superstructure.stow());
 
 		mainController.leftBumper.onFalse(superstructure.stowWristAuto().alongWith(
 			superstructure.coralerCommands.kill(),
