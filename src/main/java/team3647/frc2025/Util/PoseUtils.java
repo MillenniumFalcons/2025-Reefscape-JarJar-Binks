@@ -32,7 +32,7 @@ public class PoseUtils {
                 && point.getY() < highY;
     }
 
-	public static boolean inRect(Translation2d point, Rectangle2d rect){
-		return  rect.contains(point);
-	}
+    public static boolean inRect(Translation2d point, Rectangle2d rect) {
+        return rect.contains(point);
+    }
 }

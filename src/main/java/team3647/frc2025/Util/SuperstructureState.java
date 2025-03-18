@@ -2,6 +2,7 @@ package team3647.frc2025.Util;
 
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import team3647.frc2025.constants.ElevatorConstants;
@@ -36,13 +37,13 @@ public class SuperstructureState {
                     ElevatorConstants.kLevel4Height,
                     WristConstants.kStowAngle);
 
-        //gg more algae stuff
-        public static SuperstructureState HighAlgae = 
-                new SuperstructureState(
-                        PivotConstants.kAlgaeAngleHigh, 
-                        ElevatorConstants.kHighAlgaeHeight, 
-                        WristConstants.kStowAngle);
-        //end algae stuff
+    // gg more algae stuff
+    public static SuperstructureState HighAlgae =
+            new SuperstructureState(
+                    PivotConstants.kAlgaeAngleHigh,
+                    ElevatorConstants.kHighAlgaeHeight,
+                    WristConstants.kStowAngle);
+    // end algae stuff
 
     public static SuperstructureState Stow =
             new SuperstructureState(
@@ -62,23 +63,23 @@ public class SuperstructureState {
                     ElevatorConstants.kLowScoreHeight,
                     WristConstants.kStowAngle);
 
-	public static SuperstructureState Intake = 
-			new SuperstructureState(
-				PivotConstants.kStowAngle, 
-				ElevatorConstants.kHandoffHeight, 
-				WristConstants.kIntakeAngle);
+    public static SuperstructureState Intake =
+            new SuperstructureState(
+                    PivotConstants.kStowAngle,
+                    ElevatorConstants.kHandoffHeight,
+                    WristConstants.kIntakeAngle);
 
-	public static SuperstructureState Transfer = 
-			new SuperstructureState(
-				PivotConstants.kStowAngle, 
-				ElevatorConstants.kHandoffHeight, 
-				WristConstants.kHandoffAngle);
+    public static SuperstructureState Transfer =
+            new SuperstructureState(
+                    PivotConstants.kStowAngle,
+                    ElevatorConstants.kHandoffHeight,
+                    WristConstants.kHandoffAngle);
 
-	public static SuperstructureState Handoff = 
-			new SuperstructureState(
-				PivotConstants.kStowAngle, 
-				ElevatorConstants.kStartingHeight, 
-				WristConstants.kStowWithPiece);
+    public static SuperstructureState Handoff =
+            new SuperstructureState(
+                    PivotConstants.kStowAngle,
+                    ElevatorConstants.kStartingHeight,
+                    WristConstants.kStowWithPiece);
 
     public SuperstructureState(Angle pivotAngle, Distance elevatorHeight, Angle wristAngle) {
         this.pivotAngle = pivotAngle;
@@ -94,7 +95,7 @@ public class SuperstructureState {
         return new SuperstructureState(this.pivotAngle, elevatorHeight, this.wristAngle);
     }
 
-	public SuperstructureState withWristAngle(Angle wristAngle) {
+    public SuperstructureState withWristAngle(Angle wristAngle) {
         return new SuperstructureState(this.pivotAngle, this.elevatorHeight, wristAngle);
     }
 

@@ -7,14 +7,13 @@ public class LEDTriggers {
 
     Superstructure superstructure;
 
-  
-
     public final Trigger alignedTrigger = new Trigger(() -> superstructure.isAligned());
     public final Trigger pieceTrigger = new Trigger(() -> superstructure.hasPeice());
     public final Trigger intakingTrigger = new Trigger(() -> superstructure.isIntaking());
+
     // public final Trigger climbingTrigger = new Trigger(() -> );
-	
-	public LEDTriggers(Superstructure superstructure) {
-		this.superstructure = superstructure;
-	}
+
+    public LEDTriggers(Superstructure superstructure) {
+        this.superstructure = superstructure;
+    }
 }

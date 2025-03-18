@@ -2,7 +2,6 @@ package team3647.frc2025.constants;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;

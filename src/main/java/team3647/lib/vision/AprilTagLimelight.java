@@ -1,7 +1,6 @@
 package team3647.lib.vision;
 
 import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Millisecond;
 import static edu.wpi.first.units.Units.Second;
 
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -24,15 +22,14 @@ import team3647.frc2025.constants.FieldConstants;
 import team3647.lib.team6328.VirtualSubsystem;
 import team3647.lib.vision.LimelightHelpers.PoseEstimate;
 import team3647.lib.vision.LimelightHelpers.RawFiducial;
-import team3647.lib.vision.old.Limelight;
 
 public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamera {
 
     public final String name;
     public final Transform3d robotToCamera;
 
-	public boolean useMt2 = false;
-	public boolean convergeToMT1 = false;
+    public boolean useMt2 = false;
+    public boolean convergeToMT1 = false;
 
     private final int kAprilTagPipelineIndex = 0;
 
@@ -64,7 +61,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         this.name = name;
         this.robotToCamera = robotToCamera;
         this.orientation = orientationSupplier;
-		setIMUMode(3);
+        setIMUMode(3);
         // LimelightHelpers.setCameraPose_RobotSpace(
         //         name,
         //         robotToCamera.getX(),
@@ -82,9 +79,10 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     @Override
     public Optional<Pose3d> camPose() {
 
-        var robotPose = VisionController.hasReset? 
-				LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name):
-				LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+        var robotPose =
+                VisionController.hasReset
+                        ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name)
+                        : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         if (robotPose.isEmpty()) {
             return Optional.empty();
         }
@@ -95,39 +93,33 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
     public void setOrientation() {
         var angle = orientation.get();
-        LimelightHelpers.SetRobotOrientation(
-                name,
-                angle.yaw.in(Degree),
-               0,
-                0,
-                0,
-                0,
-                0);
+        LimelightHelpers.SetRobotOrientation(name, angle.yaw.in(Degree), 0, 0, 0, 0, 0);
     }
 
-	private boolean isMultitag(){
-		var sampleMaybe = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+    private boolean isMultitag() {
+        var sampleMaybe = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
 
-		if (sampleMaybe.isEmpty()) {
-			return false;
-		}
+        if (sampleMaybe.isEmpty()) {
+            return false;
+        }
 
-		var sample = sampleMaybe.get();
-		return sample.tagCount > 1;
-	}
+        var sample = sampleMaybe.get();
+        return sample.tagCount > 1;
+    }
 
-	public Command setConvergeToMT1(){
-		return Commands.runOnce(() -> convergeToMT1 = true);
-	}
-	public Command setConvergeToGyro(){
-		return Commands.runOnce(() -> convergeToMT1 = false);
-	}
+    public Command setConvergeToMT1() {
+        return Commands.runOnce(() -> convergeToMT1 = true);
+    }
+
+    public Command setConvergeToGyro() {
+        return Commands.runOnce(() -> convergeToMT1 = false);
+    }
 
     @Override
     public void periodic() {
         setOrientation();
 
-		useMt2 = VisionController.hasReset && !isMultitag();
+        useMt2 = VisionController.hasReset && !isMultitag();
         if (DriverStation.isEnabled()) {
             LimelightHelpers.cancelThrottle(name);
             // setIMUMode(1);
@@ -136,20 +128,16 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
             LimelightHelpers.setThrottle(name);
             // setIMUMode(2);
         }
-		
-		setIMUMode((!VisionController.hasReset || convergeToMT1)? 3 : 4);
 
-		
-		
-		Logger.recordOutput("DEBUG/autoAlign/hasreset", VisionController.hasReset);
-		Logger.recordOutput("DEBUG/autoAlign/useMT2", useMt2);
-		Logger.recordOutput("DEBUG/autoAlign/is not multitag", !isMultitag());
+        setIMUMode((!VisionController.hasReset || convergeToMT1) ? 3 : 4);
+
+        Logger.recordOutput("DEBUG/autoAlign/hasreset", VisionController.hasReset);
+        Logger.recordOutput("DEBUG/autoAlign/useMT2", useMt2);
+        Logger.recordOutput("DEBUG/autoAlign/is not multitag", !isMultitag());
 
         getDX().ifPresentOrElse(
                         pose -> Logger.recordOutput("name", pose),
                         () -> Logger.recordOutput("name", Pose2d.kZero));
-		
-		
     }
 
     public RawFiducial getBestTagDist(RawFiducial[] fiducials) {
@@ -186,7 +174,10 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     }
 
     public Optional<Pose2d> getDX() {
-        var estimate = useMt2? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name) : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+        var estimate =
+                useMt2
+                        ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name)
+                        : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
 
         if (estimate.isEmpty()) return Optional.empty();
 
@@ -204,8 +195,10 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     @Override
     public Optional<VisionMeasurement> QueueToInputs() {
         setOrientation();
-        var botPose = VisionController.hasReset?
-		LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name) : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+        var botPose =
+                VisionController.hasReset
+                        ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name)
+                        : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         if (botPose.isEmpty()) {
             return Optional.empty();
         }
@@ -227,9 +220,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
             return Optional.empty();
         }
 
-        var stdDevs =
-                baseStdDevs
-                        .times(result.avgTagDist / Math.pow(result.tagCount, 3));
+        var stdDevs = baseStdDevs.times(result.avgTagDist / Math.pow(result.tagCount, 3));
 
         var ambiguityScore = 1 / (result.tagCount * 100 + (1 - bestTag.ambiguity));
 

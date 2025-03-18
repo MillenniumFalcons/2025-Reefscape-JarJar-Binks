@@ -8,9 +8,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.lib.TalonFXSubsystem;
 
@@ -23,8 +20,6 @@ public class Pivot extends TalonFXSubsystem {
     private final Supplier<Distance> elevatorHeight;
 
     double kG, angle = 0;
-
-	
 
     public Pivot(
             TalonFX master,
@@ -52,7 +47,7 @@ public class Pivot extends TalonFXSubsystem {
 
     public void setAngle(Angle angle) {
         // Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
-		this.angle = angle.in(Radian);
+        this.angle = angle.in(Radian);
         super.setPositionExpoVoltage(
                 MathUtil.clamp(
                         angle.in(Radian), getMinAngle().in(Radian), getMaxAngle().in(Radian)),
@@ -61,7 +56,7 @@ public class Pivot extends TalonFXSubsystem {
 
     public void setAngleRads(double angle) {
         // Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
-	
+
         super.setPositionExpoVoltage(
                 MathUtil.clamp(angle, getMinAngle().in(Radian), getMaxAngle().in(Radian)), 0);
     }
@@ -115,8 +110,9 @@ public class Pivot extends TalonFXSubsystem {
     public void readPeriodicInputs() {
         // TODO Auto-generated method stub
         super.readPeriodicInputs();
-		// Logger.recordOutput("DEBUG/pivot/demand", this.master.getClosedLoopReference().getValueAsDouble() * positionConversion);
-		
+        // Logger.recordOutput("DEBUG/pivot/demand",
+        // this.master.getClosedLoopReference().getValueAsDouble() * positionConversion);
+
     }
 
     @Override

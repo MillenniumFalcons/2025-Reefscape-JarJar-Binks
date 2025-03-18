@@ -7,34 +7,40 @@ import team3647.frc2025.subsystems.Seagull;
 
 public class RollersCommands {
     Rollers rollers;
-	Seagull seagull;
+    Seagull seagull;
 
     public RollersCommands(Rollers rollers, Seagull seagull) {
         this.rollers = rollers;
-		this.seagull = seagull;
+        this.seagull = seagull;
     }
 
     public Command setOpenLoop(double output) {
-        return Commands.run(() -> {
-			rollers.setOpenLoop(output);
-			seagull.setOpenLoop(output);
-		}, rollers, seagull);
+        return Commands.run(
+                () -> {
+                    rollers.setOpenLoop(output);
+                    seagull.setOpenLoop(output);
+                },
+                rollers,
+                seagull);
     }
 
-	public Command setOpenLoop(double rollersOut, double seagullOut) {
-        return Commands.run(() -> {
-			rollers.setOpenLoop(rollersOut);
-			seagull.setOpenLoop(seagullOut);
-		}, rollers, seagull);
+    public Command setOpenLoop(double rollersOut, double seagullOut) {
+        return Commands.run(
+                () -> {
+                    rollers.setOpenLoop(rollersOut);
+                    seagull.setOpenLoop(seagullOut);
+                },
+                rollers,
+                seagull);
     }
 
     public boolean currentGreater(double current) {
         return rollers.getMasterCurrent() >= current;
     }
 
-	public boolean seagullCurrentGreater(double current){
-		return seagull.getMasterCurrent() > current;
-	}
+    public boolean seagullCurrentGreater(double current) {
+        return seagull.getMasterCurrent() > current;
+    }
 
     public Command kill() {
         return setOpenLoop(0).withTimeout(0.3);

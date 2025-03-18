@@ -5,7 +5,6 @@
 package team3647.frc2025.robot;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -19,8 +18,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import team3647.frc2025.Util.InverseKinematics;
-import team3647.frc2025.constants.LEDConstants;
 import team3647.lib.ModifiedSignalLogger;
 import team3647.lib.team6328.VirtualSubsystem;
 
@@ -82,10 +79,8 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-
         m_robotContainer.updateRobotPoseForSmartdashboard();
         VirtualSubsystem.periodicAll();
-       
     }
 
     @Override

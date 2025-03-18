@@ -15,7 +15,6 @@ public class GlobalConstants {
 
     public static double kNominalVoltage = 11.0;
 
-   
     public class PivotIds {
         public static final int kMasterId = 21;
     }
@@ -35,7 +34,7 @@ public class GlobalConstants {
 
     public class RollersIds {
         public static final int kMasterId = 25;
-		public static final int kSeagullId = 27;
+        public static final int kSeagullId = 27;
     }
 
     public class ClimbIds {

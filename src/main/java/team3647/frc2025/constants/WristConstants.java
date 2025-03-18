@@ -16,9 +16,9 @@ public class WristConstants {
     public static final Angle kIntakeAngle = Units.Degree.of(2);
     public static final Angle kStowAngle = Units.Degree.of(85);
 
-    public static final Angle kStartingAngle = Degree.of(122.058);//Units.Degree.of(125.38)
-	
-	;
+    public static final Angle kStartingAngle = Degree.of(122.058); // Units.Degree.of(125.38)
+
+    ;
 
     public static final Angle kMaxAngle = kStartingAngle;
     public static final Angle kMinAngle = Units.Degree.of(-7);
@@ -41,7 +41,7 @@ public class WristConstants {
 
     static {
         kMasterConfig.Slot0.kP = 20;
-		kMasterConfig.Slot0.kD = 0.2;
+        kMasterConfig.Slot0.kD = 0.2;
         kMasterConfig.Slot0.kS = 0.1;
         kMasterConfig.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;
         kMasterConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;

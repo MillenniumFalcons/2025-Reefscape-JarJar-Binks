@@ -164,7 +164,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 Logger.recordOutput("DEBUG/autoAlign/kx", k);
                 return Math.abs(k) < 0.04 ? 0 : k;
             case INTAKE:
-                return detector.getTY() >= 0 ? xController.calculate(Math.toRadians(0), detector.getTY()) : 0;
+                return detector.getTY() >= 0
+                        ? xController.calculate(Math.toRadians(0), detector.getTY())
+                        : 0;
 
             default:
                 return xController.calculate(
@@ -185,7 +187,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 Logger.recordOutput("DEBUG/autoAlign/ky", k);
                 return Math.abs(k) < 0.04 ? 0 : k;
             case INTAKE:
-                return detector.getTY() >= 0 ? yController.calculate(Math.toRadians(detector.getTX()), 0) : 0;
+                return detector.getTY() >= 0
+                        ? yController.calculate(Math.toRadians(detector.getTX()), 0)
+                        : 0;
 
             default:
                 return yController.calculate(
@@ -200,11 +204,14 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                         getPose().getRotation().getRadians(),
                         getPose().nearest(sourcePoses).getRotation().getRadians());
             case SCORE:
-                var k = rotController.calculate(
-                        getOdoRot().getRadians(),
-                        AllianceFlip.flip(wantedScoringPos.pose, color).getRotation().getRadians());
-				Logger.recordOutput("DEBUG/autoAlign/kRot", k);
-				return Math.abs(k) < 0.02? 0 : k;
+                var k =
+                        rotController.calculate(
+                                getOdoRot().getRadians(),
+                                AllianceFlip.flip(wantedScoringPos.pose, color)
+                                        .getRotation()
+                                        .getRadians());
+                Logger.recordOutput("DEBUG/autoAlign/kRot", k);
+                return Math.abs(k) < 0.02 ? 0 : k;
             case TEST:
                 return rotController.calculate(getPose().getRotation().getRadians());
             case INTAKE:

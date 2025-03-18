@@ -16,7 +16,6 @@ public class CoralerCommands {
         return Commands.run(() -> coraler.setDutyCycle(-0.5), coraler);
     }
 
-
     public Command stow() {
         return Commands.run(() -> coraler.setDutyCycle(0.2), coraler);
     }
