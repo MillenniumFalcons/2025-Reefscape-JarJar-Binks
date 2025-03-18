@@ -139,15 +139,6 @@ public class Elevator extends TalonFXSubsystem {
         return getPosition();
     }
 
-    @Override
-    public void readPeriodicInputs() {
-        super.readPeriodicInputs();
-        Logger.recordOutput("SYSID/position", master.getPosition().getValueAsDouble());
-        Logger.recordOutput("SYSID/velocity", master.getVelocity().getValueAsDouble());
-        Logger.recordOutput("SYSID/voltage", master.getMotorVoltage().getValueAsDouble());
-        // Logger.recordOutput("elevDemand/elevademad",
-        // this.master.getClosedLoopReference().getValueAsDouble());
-    }
 
     @Override
     public String getName() {

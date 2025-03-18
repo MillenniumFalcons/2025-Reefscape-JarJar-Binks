@@ -306,13 +306,13 @@ public class SwerveDriveConstants {
     //                 kDriveMotorInvertedRightSide,
     //                 kTurnMotorInvertedBoolean);
 
-    private static void printError(StatusCode error) {
-        if (error.value == 0) {
-            return;
-        }
+    // private static void printError(StatusCode error) {
+    //     if (error.value == 0) {
+    //         return;
+    //     }
 
-        System.out.println(error);
-    }
+    //     System.out.println(error);
+    // }
 
     static double driveMOI =
             Units.Pound.of(120).in(Units.Kilogram)

@@ -14,6 +14,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -27,6 +30,9 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
     public final String name;
     public final Transform3d robotToCamera;
+
+	public boolean useMt2 = false;
+	public boolean convergeToMT1 = false;
 
     private final int kAprilTagPipelineIndex = 0;
 
@@ -68,7 +74,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         //         robotToCamera.getRotation().getY(),
         //         robotToCamera.getRotation().getZ());
         LimelightHelpers.setPipelineIndex(name, kAprilTagPipelineIndex);
-        setIMUMode(4);
+        LimelightHelpers.SetIMUAssistAlpha(name, 3);
 
         this.baseStdDevs = baseStdDevs;
     }
@@ -99,9 +105,29 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
                 0);
     }
 
+	private boolean isMultitag(){
+		var sampleMaybe = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+
+		if (sampleMaybe.isEmpty()) {
+			return false;
+		}
+
+		var sample = sampleMaybe.get();
+		return sample.tagCount > 1;
+	}
+
+	public Command setConvergeToMT1(){
+		return Commands.runOnce(() -> convergeToMT1 = true);
+	}
+	public Command setConvergeToGyro(){
+		return Commands.runOnce(() -> convergeToMT1 = false);
+	}
+
     @Override
     public void periodic() {
         setOrientation();
+
+		useMt2 = VisionController.hasReset && !isMultitag();
         if (DriverStation.isEnabled()) {
             LimelightHelpers.cancelThrottle(name);
             // setIMUMode(1);
@@ -111,8 +137,13 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
             // setIMUMode(2);
         }
 		
-		setIMUMode(VisionController.hasReset? 4 : 3);
+		setIMUMode((!VisionController.hasReset || convergeToMT1)? 3 : 4);
+
+		
+		
 		Logger.recordOutput("DEBUG/autoAlign/hasreset", VisionController.hasReset);
+		Logger.recordOutput("DEBUG/autoAlign/useMT2", useMt2);
+		Logger.recordOutput("DEBUG/autoAlign/is not multitag", !isMultitag());
 
         getDX().ifPresentOrElse(
                         pose -> Logger.recordOutput("name", pose),
@@ -155,7 +186,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     }
 
     public Optional<Pose2d> getDX() {
-        var estimate = VisionController.hasReset? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name) : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+        var estimate = useMt2? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name) : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
 
         if (estimate.isEmpty()) return Optional.empty();
 
@@ -173,8 +204,8 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     @Override
     public Optional<VisionMeasurement> QueueToInputs() {
         setOrientation();
-        var botPose = 
-		LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+        var botPose = VisionController.hasReset?
+		LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name) : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         if (botPose.isEmpty()) {
             return Optional.empty();
         }
@@ -185,7 +216,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
         var bestTag = getBestTag(result.rawFiducials);
 
-        if (bestTag.distToCamera > 4) {
+        if (bestTag.distToCamera > 3.5) {
             return Optional.empty();
         }
 
@@ -198,8 +229,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
         var stdDevs =
                 baseStdDevs
-                        .times(result.avgTagDist / Math.pow(result.tagCount, 3))
-                        .times(result.isMegaTag2 ? 1 / 8 : 1);
+                        .times(result.avgTagDist / Math.pow(result.tagCount, 3));
 
         var ambiguityScore = 1 / (result.tagCount * 100 + (1 - bestTag.ambiguity));
 
@@ -225,12 +255,12 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
     @Override
     public double getTx() {
-        return LimelightHelpers.getTX(name);
+        return LimelightHelpers.getTXNC(name);
     }
 
     @Override
     public double getTy() {
-        return LimelightHelpers.getTY(name);
+        return LimelightHelpers.getTYNC(name);
     }
 
     @Override

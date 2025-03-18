@@ -496,7 +496,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
     }
 
     public void setRobotPose(Pose2d pose) {
-        if (RobotBase.isSimulation()) {
+        if (Utils.isSimulation()) {
             simDrive.mapleSimDrive.setSimulationWorldPose(pose);
             Timer.delay(0.05);
         }

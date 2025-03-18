@@ -111,7 +111,7 @@ public class AutoCommands implements AllianceObserver {
         return customPathFollower(
                 traj,
                 choreoSwerveController(
-                        AutoConstants.AutoXController, AutoConstants.yController, rotController),
+                        AutoConstants.autoXController, AutoConstants.autoYController, rotController),
                 (speeds) -> {
                     swerve.drive(
                             speeds.vxMetersPerSecond,
@@ -125,7 +125,7 @@ public class AutoCommands implements AllianceObserver {
         return customPathFollower(
                 traj,
                 choreoSwerveController(
-                        AutoConstants.AutoXController, AutoConstants.yController, rotController),
+                        AutoConstants.autoXController, AutoConstants.autoYController, rotController),
                 (speeds) -> {
                     swerve.drive(
                             speeds.vxMetersPerSecond * 0.5,

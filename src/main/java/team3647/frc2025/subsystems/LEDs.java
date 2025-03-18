@@ -36,7 +36,7 @@ public class LEDs extends VirtualSubsystem {
 		super();
         this.m_candle = candle;
         m_candle.configBrightnessScalar(1);
-        m_candle.configLEDType(LEDStripType.GRB);
+        m_candle.configLEDType(LEDStripType.RGB);
 
         this.triggers = triggers;
 

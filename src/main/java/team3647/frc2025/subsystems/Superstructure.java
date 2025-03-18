@@ -613,11 +613,7 @@ public class Superstructure {
 			this::shouldClear);
 	}
 
-	@Deprecated
-	public Command stowWristAuto() {
-		return wristCommands.setAngle(
-				() -> InverseKinematics.getWristOutofTheWayMaxAngle(getCurrentState(), WristConstants.kStowAngle));
-	}
+
 
 	public Command killAll() {
 		return Commands.parallel(

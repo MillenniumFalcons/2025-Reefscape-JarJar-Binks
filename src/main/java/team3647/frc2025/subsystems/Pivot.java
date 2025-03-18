@@ -115,7 +115,7 @@ public class Pivot extends TalonFXSubsystem {
     public void readPeriodicInputs() {
         // TODO Auto-generated method stub
         super.readPeriodicInputs();
-		Logger.recordOutput("DEBUG/pivot/demand", this.master.getClosedLoopReference().getValueAsDouble() * positionConversion);
+		// Logger.recordOutput("DEBUG/pivot/demand", this.master.getClosedLoopReference().getValueAsDouble() * positionConversion);
 		
     }
 

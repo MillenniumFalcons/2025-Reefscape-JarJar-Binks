@@ -19,7 +19,8 @@ public class LEDConstants {
 
     static {
         m_candle.configVBatOutput(VBatOutputMode.On);
-		m_candle.configLEDType(LEDStripType.BRG);
+		m_candle.configLEDType(LEDStripType.RGB);
+		m_candle.configV5Enabled(true);
     }
 
     // LED Counts

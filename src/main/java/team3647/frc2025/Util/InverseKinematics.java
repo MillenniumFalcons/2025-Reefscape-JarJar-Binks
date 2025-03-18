@@ -40,8 +40,8 @@ public class InverseKinematics {
     public static Translation2d startingWristTopPos =
             new Translation2d(Inches.of(4.594), Inches.of(20.489));
 
-	private static Rectangle2d rect = 
-				new Rectangle2d(new Pose2d(Inches.of(10), Inches.of(12), Rotation2d.kZero), Inches.of(10), Inches.of(13));
+	public static Rectangle2d rect = 
+				new Rectangle2d(new Pose2d(Inches.of(18.43), Inches.of(13.49), Rotation2d.kZero), Inches.of(20), Inches.of(14));
 	
 	private static SuperstructureState minState = 
 		SuperstructureState.TroughScore

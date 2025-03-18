@@ -49,6 +49,7 @@ public class VisionController extends VirtualSubsystem {
                 list.add(getInputs);
 
                 count = 0;
+				
             } else {
                 count++;
                 if (count > 4) {

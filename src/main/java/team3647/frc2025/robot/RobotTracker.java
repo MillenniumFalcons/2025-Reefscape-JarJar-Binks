@@ -2,6 +2,7 @@ package team3647.frc2025.robot;
 
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Value;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -11,12 +12,15 @@ import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.Superstructure;
+import edu.wpi.first.math.geometry.Translation2d;
 import team3647.lib.team6328.VirtualSubsystem;
 
 public class RobotTracker extends VirtualSubsystem {
 	private final Superstructure superstructure;
 	private final AutoDrive autoDrive;
 	private SuperstructureState currentState = SuperstructureState.kInvalidState;
+
+	Translation2d fk = new Translation2d();
 
 	public RobotTracker(Superstructure superstructure, AutoDrive autoDrive) {
 		super();
@@ -38,6 +42,14 @@ public class RobotTracker extends VirtualSubsystem {
 		// debug
 		// superstructure.getStateScoreAuto();
 		currentState = superstructure.getCurrentState();
+
+		fk = InverseKinematics.forwardKinematics(currentState);
+
+		Logger.recordOutput("DEBUG/autowrist/ssX", fk.getMeasureX().in(Inches));
+		Logger.recordOutput("DEBUG/autowrist/ssY", fk.getMeasureY().in(Inches));
+		Logger.recordOutput("DEBUG/autowrist/ssXThresholdLow", InverseKinematics.rect.getCenter().getMeasureX().minus(InverseKinematics.rect.getMeasureXWidth().div(Value.of(2))).in(Inches));
+		Logger.recordOutput("DEBUG/autowrist/ssXThresholdHigh", InverseKinematics.rect.getCenter().getMeasureX().plus(InverseKinematics.rect.getMeasureXWidth().div(Value.of(2))).in(Inches));
+		
 		// Logger.recordOutput("zeropose", Pose2d.kZero);
 
 		// Logger.recordOutput("IK/lookaheadgood?",
@@ -48,7 +60,7 @@ public class RobotTracker extends VirtualSubsystem {
 		// Logger.recordOutput("IK/wristTopPos/translation", InverseKinematics.wristTopPos(superstructure.getCurrentState()));
 		// Logger.recordOutput("thingy", InverseKinematics.getWristOutofTheWayMaxAngle(superstructure.getCurrentState(), WristConstants.kStowAngle));
 
-		Logger.recordOutput("DEBUG/pivot/minangle", InverseKinematics.getMinAngle(currentState));
+		// Logger.recordOutput("xpivot/minangle", InverseKinematics.getMinAngle(currentState));
 		
 
 	}

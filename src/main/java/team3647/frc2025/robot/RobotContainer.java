@@ -89,22 +89,26 @@ public class RobotContainer {
 
 		//algae stuff
 
-		mainController.rightBumper.onTrue(superstructure.autoTakeOffByLevel()
+		mainController.rightBumper.whileTrue(superstructure.autoTakeOffByLevel()
 			.until(() -> superstructure.coralerAlgaeCurrent())
 			.andThen(
 				superstructure.coralerCommands.setOpenLoop(0.2).alongWith(superstructure.setHasAlgae())
 			));
 
+		mainController.rightBumper.onFalse(superstructure.goToStateParalellNoWrist(() -> SuperstructureState.LowScore));
+		
+
+		
+
 		// mainController.rightBumper.and(algaeReadyToScore).onFalse(superstructure.paralellStow());
 
 		algaeReadyToScore.whileTrue(superstructure.coralerCommands.setOpenLoop(0.2));
 		
-		//not done yet also random keybind still needa make pivot go up and then shoot it out
-		algaeReadyToScore.and(mainController.buttonA).whileTrue(
+		algaeReadyToScore.and(mainController.leftTrigger).whileTrue(
 			superstructure.scoreAlgaeBarge()
 		);
 
-		mainController.buttonA.and(algaeReadyToScore).onFalse(superstructure.stowAlgaeBarge());
+		mainController.leftTrigger.negate().and(algaeReadyToScore).onTrue(superstructure.stowAlgaeBarge().alongWith(superstructure.setNoAlgae()));
 		
 		//real stuff
 
@@ -118,7 +122,7 @@ public class RobotContainer {
 		coralerCurrent.and(mainController.rightBumper.negate())
 		.onTrue(superstructure.stow());
 
-		mainController.leftBumper.onFalse(superstructure.stowWristAuto().alongWith(
+		mainController.leftBumper.onFalse(superstructure.wristCommands.stow().alongWith(
 			superstructure.coralerCommands.kill(),
 			superstructure.rollersCommands.kill()));
 
@@ -134,11 +138,11 @@ public class RobotContainer {
 						.paralellStow()
 						.alongWith(
 								superstructure.poopCoral().withTimeout(0.5),
-								superstructure.setNoPeice().withTimeout(0.01)))
-								.onFalse(Commands.sequence(
-					superstructure.wristCommands.setAngle(Degree.of(30)),
-					Commands.waitSeconds(0.5),
-					superstructure.wristCommands.setAngle(Degree.of(80))));
+								superstructure.setNoPeice().withTimeout(0.01)));
+					// 			.onFalse(Commands.sequence(
+					// superstructure.wristCommands.setAngle(Degree.of(30)),
+					// Commands.waitSeconds(0.5),
+					// superstructure.wristCommands.setAngle(Degree.of(80))));
 		
 		mainController.buttonX.whileTrue(
 			superstructure.rollersCommands.setOpenLoop(-0.3, 0.3)
@@ -185,6 +189,7 @@ public class RobotContainer {
 
 		coController.leftJoyStickPress.onTrue(Commands.runOnce(() -> swerve.resetPose(new Pose2d(1,1,Rotation2d.k180deg))));
 
+
 		// coController
 		// .buttonA
 		// .and(coController.buttonB.negate())
@@ -222,6 +227,9 @@ public class RobotContainer {
 		coController.rightMidButton.onTrue(autoDrive.enableAutoDrive());
 
 		coController.leftMidButton.onTrue(autoDrive.disableAutoDrive());
+
+		coController.rightJoyStickPress.whileTrue(front.setConvergeToMT1());
+		coController.rightJoyStickPress.onFalse(front.setConvergeToGyro());
 	}
 
 	private void configureSmartDashboardLogging() {
@@ -246,8 +254,8 @@ public class RobotContainer {
 						autoDrive::getAutoDriveEnabled,
 						autoDrive::hasScoringTarget,
 						coController.leftJoyStickPress));
-		elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
-		pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
+		// elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
+		// pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
 		coraler.setDefaultCommand(superstructure.coralerCommands.kill());
 		wrist.setDefaultCommand(superstructure.wristCommands.stow());
 		climb.setDefaultCommand(climbCommands.kill());
@@ -346,7 +354,7 @@ public class RobotContainer {
 			swerve::getOdoPose,
 			FieldConstants.redSources,
 			FieldConstants.blueSources,
-			AutoConstants.teleopXController,
+			AutoConstants.xController,
 			AutoConstants.yController,
 			AutoConstants.rotController,
 			FieldConstants.redReefSides,
