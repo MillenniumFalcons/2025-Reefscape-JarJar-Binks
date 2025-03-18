@@ -1676,16 +1676,16 @@ public class LimelightHelpers {
     }
 
     /**
-     * Throttles the Limelight to help with thermals by only processing every third frame
+     * Throttles the Limelight to help with thermals by skipping 3 frames before processing 1
      *
      * @param limelightName Name of the Limelight camera
      */
     public static void setThrottle(String limelightName) {
-        LimelightHelpers.setLimelightNTDouble(limelightName, "throttle_set", 2);
+        SetThrottle(limelightName, 3);
     }
 
     public static void cancelThrottle(String limelightName) {
-        LimelightHelpers.setLimelightNTDouble(limelightName, "throttle_set", 0);
+        SetThrottle(limelightName, 0);
     }
 
     /**
@@ -1718,5 +1718,28 @@ public class LimelightHelpers {
         }
 
         return results;
+    }
+
+    /**
+     * Configures the throttle value. Set to 100-200 while disabled to reduce thermal
+     * output/temperature.
+     *
+     * @param limelightName Name/identifier of the Limelight
+     * @param throttle Defaults to 0. Your Limelgiht will process one frame after skipping
+     *     <throttle> frames.
+     */
+    public static void SetThrottle(String limelightName, int throttle) {
+        setLimelightNTDouble(limelightName, "throttle_set", throttle);
+    }
+
+    /**
+     * Configures the complementary filter alpha value for IMU Assist Modes (Modes 3 and 4)
+     *
+     * @param limelightName Name/identifier of the Limelight
+     * @param alpha Defaults to .001. Higher values will cause the internal IMU to converge onto the
+     *     assist source more rapidly.
+     */
+    public static void SetIMUAssistAlpha(String limelightName, double alpha) {
+        setLimelightNTDouble(limelightName, "imuassistalpha_set", alpha);
     }
 }

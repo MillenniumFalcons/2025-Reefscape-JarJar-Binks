@@ -19,7 +19,7 @@ public class Pivot extends TalonFXSubsystem {
 
     private final Supplier<Distance> elevatorHeight;
 
-    double kG;
+    double kG, angle = 0;
 
     public Pivot(
             TalonFX master,
@@ -47,7 +47,7 @@ public class Pivot extends TalonFXSubsystem {
 
     public void setAngle(Angle angle) {
         // Current ff = Amps.of(kG * Math.cos(angle.in(Radian)));
-
+        this.angle = angle.in(Radian);
         super.setPositionExpoVoltage(
                 MathUtil.clamp(
                         angle.in(Radian), getMinAngle().in(Radian), getMaxAngle().in(Radian)),
@@ -110,6 +110,9 @@ public class Pivot extends TalonFXSubsystem {
     public void readPeriodicInputs() {
         // TODO Auto-generated method stub
         super.readPeriodicInputs();
+        // Logger.recordOutput("DEBUG/pivot/demand",
+        // this.master.getClosedLoopReference().getValueAsDouble() * positionConversion);
+
     }
 
     @Override

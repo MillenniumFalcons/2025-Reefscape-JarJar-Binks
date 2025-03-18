@@ -1,5 +1,7 @@
 package team3647.frc2025.subsystems;
 
+import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pound;
 import static edu.wpi.first.units.Units.Second;
@@ -35,7 +37,6 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -436,7 +437,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
         readPeriodicInputs();
         writePeriodicOutputs();
 
-        Logger.recordOutput("HEADING", this.getHeading());
+        // Logger.recordOutput("HEADING", this.getHeading());
     }
 
     public void setisAccel() {
@@ -451,11 +452,11 @@ public class SwerveDrive extends TunerSwerveDrivetrain
     public Orientation getPigeonOrientation() {
         return new Orientation(
                 periodicIO.pose.getRotation().getMeasure(),
-                getPigeon2().getPitch().getValue(),
-                getPigeon2().getRoll().getValue(),
-                getPigeon2().getAngularVelocityZWorld().getValue(),
-                getPigeon2().getAngularVelocityXWorld().getValue(),
-                getPigeon2().getAngularVelocityYWorld().getValue());
+                Degree.zero(),
+                Degree.zero(),
+                DegreesPerSecond.zero(),
+                DegreesPerSecond.zero(),
+                DegreesPerSecond.zero());
     }
 
     public boolean getIsAccel() {
@@ -494,7 +495,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
     }
 
     public void setRobotPose(Pose2d pose) {
-        if (RobotBase.isSimulation()) {
+        if (Utils.isSimulation()) {
             simDrive.mapleSimDrive.setSimulationWorldPose(pose);
             Timer.delay(0.05);
         }

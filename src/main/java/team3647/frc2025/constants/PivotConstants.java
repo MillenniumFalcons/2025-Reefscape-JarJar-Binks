@@ -11,7 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
-    public static final Angle kMinAngle = Radian.of(-1.584);
+    public static final Angle kMinAngle = Radian.of(-1.591);
     public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561).minus(Degree.of(10));
     public static final Angle kLevel2Angle = Radian.of(-0.279).plus(Degree.of(25));
     public static final Angle kLevel3Angle = Radian.of(0.4650).plus(Degree.of(25));
@@ -25,8 +25,9 @@ public class PivotConstants {
 
     public static final Angle klowLevelsStow = Radian.of(-0.045);
 
-    public static final Angle kAlgaeAngleHigh = Radian.of(0.1988);
-    public static final Angle kAlgaeAngleLow = Radian.of(0.290);
+    // idk what the low one is so change this
+    //     public static final Angle kAlgaeAngleHigh = Radian.of(0.1988);
+    public static final Angle kAlgaeAngleHigh = Radian.of(0.290);
 
     public static final Angle kClearAngle = Radian.of(-0.4);
     // lowclearangle = max angle when the pivot is blocked by the intake going up
@@ -55,14 +56,14 @@ public class PivotConstants {
     public static final TalonFXConfiguration kMasterConfig = new TalonFXConfiguration();
 
     static {
-        kMasterConfig.Slot0.withKP(2);
+        kMasterConfig.Slot0.withKP(2.5);
         kMasterConfig.Slot0.withKI(0);
         kMasterConfig.Slot0.withKD(0.1);
         kMasterConfig.Slot0.withGravityType(GravityTypeValue.Arm_Cosine);
         kMasterConfig.Slot0.withKS(0);
         kMasterConfig.Slot0.withKV(0);
         kMasterConfig.Slot0.withKA(0);
-        kMasterConfig.Slot0.withKG(0.288);
+        kMasterConfig.Slot0.withKG(0.45);
 
         kMasterConfig.MotorOutput.withInverted(InvertedValue.Clockwise_Positive);
         kMasterConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

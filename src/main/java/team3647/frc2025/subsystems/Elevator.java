@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
-import org.littletonrobotics.junction.Logger;
 import team3647.lib.ModifiedSignalLogger;
 import team3647.lib.TalonFXSubsystem;
 
@@ -137,16 +136,6 @@ public class Elevator extends TalonFXSubsystem {
 
     public double getHeightM() {
         return getPosition();
-    }
-
-    @Override
-    public void readPeriodicInputs() {
-        super.readPeriodicInputs();
-        Logger.recordOutput("SYSID/position", master.getPosition().getValueAsDouble());
-        Logger.recordOutput("SYSID/velocity", master.getVelocity().getValueAsDouble());
-        Logger.recordOutput("SYSID/voltage", master.getMotorVoltage().getValueAsDouble());
-        // Logger.recordOutput("elevDemand/elevademad",
-        // this.master.getClosedLoopReference().getValueAsDouble());
     }
 
     @Override

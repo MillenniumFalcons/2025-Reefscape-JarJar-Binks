@@ -3,6 +3,7 @@ package team3647.frc2025.Util;
 import static edu.wpi.first.units.Units.Meter;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 
@@ -29,5 +30,9 @@ public class PoseUtils {
                 && point.getX() < highX
                 && point.getY() > lowY
                 && point.getY() < highY;
+    }
+
+    public static boolean inRect(Translation2d point, Rectangle2d rect) {
+        return rect.contains(point);
     }
 }

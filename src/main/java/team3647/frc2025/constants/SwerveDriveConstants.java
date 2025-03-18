@@ -2,7 +2,6 @@ package team3647.frc2025.constants;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -306,13 +305,13 @@ public class SwerveDriveConstants {
     //                 kDriveMotorInvertedRightSide,
     //                 kTurnMotorInvertedBoolean);
 
-    private static void printError(StatusCode error) {
-        if (error.value == 0) {
-            return;
-        }
+    // private static void printError(StatusCode error) {
+    //     if (error.value == 0) {
+    //         return;
+    //     }
 
-        System.out.println(error);
-    }
+    //     System.out.println(error);
+    // }
 
     static double driveMOI =
             Units.Pound.of(120).in(Units.Kilogram)

@@ -17,12 +17,16 @@ public class LEDs extends VirtualSubsystem {
     /** Creates a new LEDSubsystem. */
     private Map<String, Animation> colors =
             Map.of(
+                    "blue",
+                    LEDConstants.SOLID_BLUE,
+                    "red",
+                    LEDConstants.SOLID_RED,
                     "aligned",
-                    LEDConstants.FLASH_YELLOW,
+                    LEDConstants.FLASH_GREEN,
                     "intaking",
-                    LEDConstants.SOLID_YELLOW,
+                    LEDConstants.FLASH_YELLOW,
                     "hasPiece",
-                    LEDConstants.SOLID_ORANGE,
+                    LEDConstants.SOLID_YELLOW,
                     "climbing",
                     LEDConstants.SOLID_PURPLE);
 
@@ -35,9 +39,10 @@ public class LEDs extends VirtualSubsystem {
     private CANdle m_candle;
 
     public LEDs(CANdle candle, LEDTriggers triggers) {
+        super();
         this.m_candle = candle;
         m_candle.configBrightnessScalar(1);
-        m_candle.configLEDType(LEDStripType.GRB);
+        m_candle.configLEDType(LEDStripType.RGB);
 
         this.triggers = triggers;
 

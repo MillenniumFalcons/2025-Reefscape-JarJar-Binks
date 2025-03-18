@@ -5,7 +5,6 @@
 package team3647.frc2025.robot;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -19,8 +18,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import team3647.frc2025.Util.InverseKinematics;
-import team3647.frc2025.constants.LEDConstants;
 import team3647.lib.ModifiedSignalLogger;
 import team3647.lib.team6328.VirtualSubsystem;
 
@@ -81,28 +78,9 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        Logger.recordOutput(
-                "Superstructure/pivotoffset", m_robotContainer.superstructure.getPivotOffset());
-        Logger.recordOutput(
-                "Superstructure/elevOffset", m_robotContainer.superstructure.getElevOffset());
-        Logger.recordOutput(
-                "Superstructure/Level", m_robotContainer.superstructure.getWantedLevel());
-
-        Logger.recordOutput("Robot/mode", m_robotContainer.autoDrive.getWantedMode());
-
-        Logger.recordOutput(
-                "Superstructure/shouldClear", m_robotContainer.superstructure.shouldClear());
-        InverseKinematics.getMinAngle(m_robotContainer.superstructure.getCurrentState());
-
-        Logger.recordOutput("Superstructure/has piece", m_robotContainer.superstructure.hasPeice());
-        Logger.recordOutput(
-                "monkey",
-                m_robotContainer.superstructure.hasPeice()
-                        && m_robotContainer.pivot.getAngle().gte(Units.Degrees.of(-0.35)));
 
         m_robotContainer.updateRobotPoseForSmartdashboard();
         VirtualSubsystem.periodicAll();
-        LEDConstants.m_candle.animate(LEDConstants.RAINBOW);
     }
 
     @Override

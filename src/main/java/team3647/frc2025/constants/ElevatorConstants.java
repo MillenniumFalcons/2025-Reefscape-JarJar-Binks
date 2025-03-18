@@ -17,20 +17,22 @@ public class ElevatorConstants {
 
     public static final Distance kStartingHeight = Meters.of(0.85);
     public static final Distance kStowHeight = kStartingHeight.plus(Centimeter.of(5));
+    public static final Distance kLowScoreHeight = kStartingHeight.plus(Meters.of(0.03));
 
     public static final Distance kHandoffHeight = kStowHeight.plus(Inches.of(3));
 
     public static final Distance kMaxHeight = Meters.of(84.27 * kNativeToMeters);
 
     // all heights measured as center dist from the pivot pivoting bar
-    public static final Distance kLevel1Height = kStartingHeight;
-    public static final Distance kLevel2Height = kStartingHeight;
-    public static final Distance kLevel3Height = kStartingHeight;
+
     public static final Distance kLevel4Height = Meters.of(1.529);
 
     // high needs tuning, low doesn't; tune for same angle at both heights
-    public static final Distance kHighAlgaeHeight = Meters.of(1.368);
-    public static final Distance kLowAlgaeHeight = kStartingHeight;
+
+    // change this one to low algae cuz the old low algae worked for high
+    //     public static final Distance kHighAlgaeHeight = Meters.of(1.368);
+
+    public static final Distance kHighAlgaeHeight = kStartingHeight.plus(Meters.of(0.2));
 
     public static final Distance kIntakeHeight = kStartingHeight;
 

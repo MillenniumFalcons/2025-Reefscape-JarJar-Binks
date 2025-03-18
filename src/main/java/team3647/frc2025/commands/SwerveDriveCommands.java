@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.AutoDrive.DriveMode;
 import team3647.frc2025.subsystems.SwerveDrive;
 import team3647.lib.team9442.AllianceObserver;
@@ -48,7 +47,7 @@ public class SwerveDriveCommands implements AllianceObserver {
                     var velocities = autoDriveVelocities.get();
                     var toRun = hasTargets.getAsBoolean();
                     var slow = slowMode.getAsBoolean() ? 0.4 : 1;
-                    Logger.recordOutput("hastarget@cmds", toRun);
+                    // Logger.recordOutput("hastarget@cmds", toRun);
 
                     int invert = 1;
                     if (DriverStation.getAlliance().isPresent()) {
@@ -75,21 +74,17 @@ public class SwerveDriveCommands implements AllianceObserver {
                                 motionXComponent, motionYComponent, motionTurnComponent);
 
                     } else if (isAutoDrive && (getMode.get().equals(DriveMode.SCORE))) {
-                        if (toRun) {
-                            // DriverStation.reportError("FIREEEEEEEEE", false);
-                            // motionXComponent = velocities.dx + motionXComponent * 0.3;
-                            motionYComponent = velocities.dy + motionYComponent * 0.3;
-                        }
-
-                        motionTurnComponent = velocities.dtheta + motionTurnComponent * 0.8;
+                        motionXComponent = velocities.dx + motionXComponent * 0.3;
+                        motionYComponent = velocities.dy + motionYComponent * 0.3;
+                        motionTurnComponent = velocities.dtheta + motionTurnComponent * 0.3;
 
                         swerve.driveFieldOriented(
                                 motionXComponent, motionYComponent, motionTurnComponent);
                         return;
                     } else if (isAutoDrive && getMode.get().equals(DriveMode.INTAKE)) {
                         motionXComponent = velocities.dx;
+                        // Logger.recordOutput("DEBUG/Coraldetection/velocities.dx", velocities.dx);
                         motionYComponent = velocities.dy;
-                        motionTurnComponent = velocities.dtheta;
 
                         swerve.drive(motionXComponent, motionYComponent, motionTurnComponent);
                     }

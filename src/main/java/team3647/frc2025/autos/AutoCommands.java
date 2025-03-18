@@ -79,7 +79,7 @@ public class AutoCommands implements AllianceObserver {
                         .wristCommands
                         .setAngle(WristConstants.kSourceIntakeAngle)
                         .alongWith(superstructure.rollersCommands.setOpenLoop(-0.3))
-                        .until(superstructure.intakeCurrent()),
+                        .until(superstructure::intakeCurrent),
                 superstructure
                         .stowFromIntake()
                         .alongWith(autoDrive.setWantedScoringPos(ScoringPos.F2)),
@@ -111,7 +111,9 @@ public class AutoCommands implements AllianceObserver {
         return customPathFollower(
                 traj,
                 choreoSwerveController(
-                        AutoConstants.AutoXController, AutoConstants.yController, rotController),
+                        AutoConstants.autoXController,
+                        AutoConstants.autoYController,
+                        rotController),
                 (speeds) -> {
                     swerve.drive(
                             speeds.vxMetersPerSecond,
@@ -125,7 +127,9 @@ public class AutoCommands implements AllianceObserver {
         return customPathFollower(
                 traj,
                 choreoSwerveController(
-                        AutoConstants.AutoXController, AutoConstants.yController, rotController),
+                        AutoConstants.autoXController,
+                        AutoConstants.autoYController,
+                        rotController),
                 (speeds) -> {
                     swerve.drive(
                             speeds.vxMetersPerSecond * 0.5,
