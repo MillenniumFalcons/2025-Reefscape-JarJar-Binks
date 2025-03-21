@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -75,7 +76,7 @@ public class RobotContainer {
         pivot.setEncoderAngle(PivotConstants.kStartingAngle);
         wrist.setEncoderAngle(WristConstants.kStartingAngle);
 
-        swerve.resetPose(new Pose2d(0, 0, Rotation2d.k180deg));
+        swerve.resetPose(new Pose2d(1.88, 4.09, Rotation2d.k180deg));
 
         CommandScheduler.getInstance()
                 .registerSubsystem(
@@ -102,30 +103,33 @@ public class RobotContainer {
                                         .alongWith(superstructure.setHasAlgae())));
 
         mainController.rightBumper.onFalse(
-                superstructure.goToStateParalellNoWrist(() -> SuperstructureState.LowScore));
+                superstructure.goToStateParalellNoWrist(() -> SuperstructureState.AlgaeStow));
+
+		
 
         // mainController.rightBumper.and(algaeReadyToScore).onFalse(superstructure.paralellStow());
 
         algaeReadyToScore.whileTrue(superstructure.coralerCommands.setOpenLoop(0.2));
 
-        algaeReadyToScore
+       algaeReadyToScore
                 .and(mainController.leftTrigger)
                 .whileTrue(superstructure.scoreAlgaeBarge());
 
-        mainController
-                .leftTrigger
-                .negate()
-                .and(algaeReadyToScore)
-                .onTrue(superstructure.stowAlgaeBarge().alongWith(superstructure.setNoAlgae()));
+        algaeReadyToScore
+				.and(mainController.leftTrigger)
+                .onFalse(superstructure.stowAlgaeBarge().alongWith(superstructure.setNoAlgae()));
 
         // real stuff
 
         mainController.leftBumper.whileTrue(superstructure.intake());
         intakeUp.onTrue(superstructure.transfer()).onTrue(autoDrive.setDriveMode(DriveMode.NONE));
         mainController.buttonB.whileTrue(superstructure.transfer());
+		mainController.buttonA.and(mainController.buttonX).whileTrue(autoDrive.setDriveMode(DriveMode.SCORE));
+		mainController.buttonA.and(mainController.buttonX).onFalse(autoDrive.clearDriveMode());
 
         seagullCurrent
                 .and(() -> !superstructure.intakeCurrent())
+				.and(mainController.rightBumper.negate())
                 .onTrue(superstructure.handoff().alongWith(superstructure.setPeice()));
         coralerCurrent.and(mainController.rightBumper.negate()).onTrue(superstructure.stow());
 
@@ -139,12 +143,12 @@ public class RobotContainer {
 
         mainController
                 .rightTrigger
-                .whileTrue(superstructure.autoScoreByLevel())
-                .whileTrue(
-                        Commands.sequence(
-                                superstructure.wristCommands.setAngle(Degree.of(30)),
-                                Commands.waitSeconds(0.5),
-                                superstructure.wristCommands.setAngle(Degree.of(80))));
+                .whileTrue(superstructure.autoScoreByLevel());
+                // .whileTrue(
+                //         Commands.sequence(
+                //                 superstructure.wristCommands.setAngle(Degree.of(40)),
+                //                 Commands.waitSeconds(0.15),
+                //                 superstructure.wristCommands.setAngle(Degree.of(80))));
         mainController.rightTrigger.onFalse(
                 superstructure
                         .paralellStow()
@@ -181,13 +185,13 @@ public class RobotContainer {
         coController.leftBumper.onTrue(autoDrive.setWantedBranch(Branch.ONE));
         coController.rightBumper.onTrue(autoDrive.setWantedBranch(Branch.TWO));
 
-        mainController.leftTrigger.onTrue(autoDrive.setDriveMode(DriveMode.SCORE));
-        mainController.leftTrigger.onFalse(autoDrive.setDriveMode(DriveMode.NONE));
+        // mainController.leftTrigger.and(algaeReadyToScore.negate()).onTrue(autoDrive.setDriveMode(DriveMode.SCORE));
+        // mainController.leftTrigger.onFalse(autoDrive.setDriveMode(DriveMode.NONE));
 
-        mainController.leftBumper.onTrue(autoDrive.setDriveMode(DriveMode.INTAKE));
+        mainController.leftBumper.whileTrue(autoDrive.setDriveMode(DriveMode.INTAKE));
         mainController.leftBumper.onFalse(autoDrive.setDriveMode(DriveMode.NONE));
 
-        autoDrive.isAlignedToReef().onTrue(autoDrive.clearDriveMode());
+        autoDrive.isAlignedToReef().debounce(0.1).onTrue(autoDrive.clearDriveMode());
 
         mainController
                 .dPadUp
@@ -201,6 +205,8 @@ public class RobotContainer {
 
         coController.leftJoyStickPress.onTrue(
                 Commands.runOnce(() -> swerve.resetPose(new Pose2d(1, 1, Rotation2d.k180deg))));
+		coController.leftTrigger.whileTrue(superstructure.setWantedLevel(Level.ALGAELOW));
+		coController.leftTrigger.onFalse(superstructure.setWantedLevel(Level.HIGH));
 
         // coController
         // .buttonA
@@ -266,8 +272,8 @@ public class RobotContainer {
                         autoDrive::getAutoDriveEnabled,
                         autoDrive::hasScoringTarget,
                         coController.leftJoyStickPress));
-        // elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
-        // pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
+        elevator.setDefaultCommand(superstructure.elevatorCommands.holdPositionAtCall());
+        pivot.setDefaultCommand(superstructure.pivotCommands.holdPositionAtCall());
         coraler.setDefaultCommand(superstructure.coralerCommands.kill());
         wrist.setDefaultCommand(superstructure.wristCommands.stow());
         climb.setDefaultCommand(climbCommands.kill());
@@ -381,7 +387,7 @@ public class RobotContainer {
                     FieldConstants.blueSources,
                     AutoConstants.xController,
                     AutoConstants.yController,
-                    AutoConstants.rotController,
+                    AutoConstants.profiledRotController,
                     FieldConstants.redReefSides,
                     FieldConstants.blueReefSides,
                     detector,
@@ -398,7 +404,7 @@ public class RobotContainer {
 
     public final AutoConstants autoConstants = new AutoConstants();
 
-    public final AutoCommands autoCommands = new AutoCommands(swerve, superstructure, autoDrive);
+    public final AutoCommands autoCommands = new AutoCommands(swerve, superstructure, autoDrive::getVelocities, detector::hasTarget);
 
     public final AutoChooser autoChooser = new AutoChooser(autoCommands, swerve::setRobotPose);
 
@@ -460,11 +466,13 @@ public class RobotContainer {
     Trigger intakeUp =
             new Trigger(() -> superstructure.intakeCurrent() && wrist.getAngleDegs() < 20)
                     .debounce(0.5)
-                    .or(mainController.buttonB);
+                    .or(mainController.buttonB)
+					.and(() -> !DriverStation.isAutonomous());
     Trigger seagullCurrent =
             new Trigger(() -> superstructure.seagullCurrent())
                     .debounce(0.5)
-                    .or(coController.buttonY);
+                    .or(coController.buttonY)
+					.and(() -> !DriverStation.isAutonomous());
 
     Trigger coralerCurrent =
             superstructure
@@ -472,14 +480,17 @@ public class RobotContainer {
                     .current()
                     .debounce(0.4)
                     .and(mainController.leftBumper)
-                    .or(coController.buttonA);
+					.and(() -> pivot.getAngleRads() < -0.5)
+                    .or(coController.buttonA)
+					.and(() -> !DriverStation.isAutonomous());
 
     Trigger algaePrepped =
             new Trigger(
                     () ->
                             pivot.angleReached(PivotConstants.kStowAngleUp, Degree.of(40))
                                     && (superstructure.getWantedLevel() == Level.ALGAEHIGH
-                                            || superstructure.getWantedLevel() == Level.ALGAELOW));
+                                            || superstructure.getWantedLevel() == Level.ALGAELOW))
+											.and(() -> !DriverStation.isAutonomous());
 
     Trigger algaeReadyToScore = new Trigger(() -> superstructure.getAlgae());
 }

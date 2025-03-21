@@ -1,13 +1,19 @@
 package team3647.frc2025.Util;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+
+import com.ctre.phoenix.motorcontrol.StickyFaults;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
+import team3647.frc2025.subsystems.Elevator;
+import team3647.frc2025.subsystems.Pivot;
+import team3647.frc2025.subsystems.Wrist;
 
 public class SuperstructureState {
     public Angle pivotAngle;
@@ -36,13 +42,32 @@ public class SuperstructureState {
                     PivotConstants.kLevel4Angle,
                     ElevatorConstants.kLevel4Height,
                     WristConstants.kStowAngle);
+	
 
     // gg more algae stuff
     public static SuperstructureState HighAlgae =
             new SuperstructureState(
                     PivotConstants.kAlgaeAngleHigh,
-                    ElevatorConstants.kHighAlgaeHeight,
+                    ElevatorConstants.kHighAlgaeHeight.plus(Inches.of(10)),
                     WristConstants.kStowAngle);
+	public static SuperstructureState LowAlgae = 
+			new SuperstructureState(
+				PivotConstants.kAlgaeAngleLow, 
+				ElevatorConstants.kStowHeight, 
+				WristConstants.kStowAngle);
+
+	public static SuperstructureState AlgaeStow = 
+			new SuperstructureState(
+				PivotConstants.kMaxAngle, 
+				LowScore.elevatorHeight, 
+				WristConstants.kStowAngle);
+
+	public static SuperstructureState AlgaeBarge = 
+			new SuperstructureState(
+				PivotConstants.kMaxAngle.minus(Degree.of(10)), 
+				ElevatorConstants.kMaxHeight, 
+				WristConstants.kStowAngle);
+
     // end algae stuff
 
     public static SuperstructureState Stow =

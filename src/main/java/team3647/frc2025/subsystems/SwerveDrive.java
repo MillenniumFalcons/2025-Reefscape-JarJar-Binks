@@ -639,7 +639,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
         // data.pose.getRotation().getDegrees(),
         // data.timestamp
         // });
-        addVisionMeasurement(data.pose, data.timestamp, data.stdDevs);
+        addVisionMeasurement(data.pose, Utils.fpgaToCurrentTime(data.timestamp), data.stdDevs);
         // if(RobotBase.isSimulation()){
         // simpleSim.addVisionEstimation(data.pose, data.timestamp, data.stdDevs);
 

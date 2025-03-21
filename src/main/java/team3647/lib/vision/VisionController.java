@@ -55,8 +55,8 @@ public class VisionController extends VirtualSubsystem {
                 if (count > 4) {
 
                     resetPose.accept(getInputs.pose);
-                    hasReset = true;
                     Logger.recordOutput("Robot/Reset", getInputs.pose);
+					hasReset = true;
                     break;
                 }
             }

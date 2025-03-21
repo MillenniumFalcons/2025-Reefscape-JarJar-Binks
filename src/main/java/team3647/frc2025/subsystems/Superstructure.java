@@ -63,8 +63,8 @@ public class Superstructure {
     private Trigger overridePiece;
 
     private double currentLimit = 47;
-    private double SeagullCurrentLimit = 15;
-    private double algaeCurrentLimit = 50;
+    private double SeagullCurrentLimit = 8;
+    private double algaeCurrentLimit = 47;
 
     private double wristOffset = 0;
 
@@ -336,7 +336,10 @@ public class Superstructure {
 
     // unimplemented lmao
     public Command autoTakeOffByLevel() {
-        return takeOffAlgaeHigh();
+        return Commands.either(
+			takeOffAlgaeLow(), 
+			takeOffAlgaeHigh(), 
+			() -> getWantedLevel() == Level.ALGAELOW);
     }
 
     public Command takeOffAlgaeHigh() {
@@ -346,13 +349,27 @@ public class Superstructure {
                 coralerCommands.intake());
     }
 
+	public Command takeOffAlgaeLow(){
+		return Commands.parallel(
+                elevatorCommands.setHeight(ElevatorConstants.kStowHeight),
+                pivotCommands.setAngle(PivotConstants.kAlgaeAngleLow),
+                coralerCommands.intake());
+	}
+
     public Command scoreAlgaeBarge() {
-        return goToStateParalellNoWrist(
-                () ->
-                        new SuperstructureState(
-                                PivotConstants.kMaxAngle,
-                                ElevatorConstants.kMaxHeight,
-                                WristConstants.idrc));
+        return Commands.parallel(
+			elevatorCommands.setHeight(ElevatorConstants.kMaxHeight),
+			
+			Commands.sequence(
+				Commands.waitSeconds(0.3),
+				pivotCommands.setAngle(PivotConstants.kStowAngle)
+			),
+			Commands.sequence(
+				Commands.waitSeconds(0.35),
+				coralerCommands.setOpenLoop(-1.0).withTimeout(0.5)
+			)
+
+		);
     }
 
     public Command stowAlgaeBarge() {
@@ -393,7 +410,7 @@ public class Superstructure {
     public Command transfer() {
         return Commands.parallel(
                 goToStateParalell(() -> SuperstructureState.Transfer),
-                rollersCommands.setOpenLoop(0.6, -0.3));
+                rollersCommands.setOpenLoop(0.6, -0.1));
     }
 
     public Command handoff() {
@@ -593,6 +610,7 @@ public class Superstructure {
         return Commands.either(
                 Commands.sequence(
                         goToStatePerpendicular(() -> SuperstructureState.ToStow),
+						Commands.waitSeconds(0.01),
                         goToStateParalell(() -> SuperstructureState.Stow)),
                 goToStatePerpendicular(() -> SuperstructureState.Stow, () -> 0.3),
                 this::shouldClear);

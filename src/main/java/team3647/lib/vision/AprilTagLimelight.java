@@ -9,12 +9,16 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import java.lang.StackWalker.Option;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -49,6 +53,9 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
     private final Vector<N3> baseStdDevs;
 
+	Optional<PoseEstimate> mt2Maybe = Optional.of(kEmpty);
+	Optional<PoseEstimate> mt1Mabye = Optional.of(kEmpty);
+
     AprilTagFieldLayout aprilTagFieldLayout =
             AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
@@ -62,6 +69,8 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         this.robotToCamera = robotToCamera;
         this.orientation = orientationSupplier;
         setIMUMode(3);
+		mt2Maybe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+		mt1Mabye = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         // LimelightHelpers.setCameraPose_RobotSpace(
         //         name,
         //         robotToCamera.getX(),
@@ -71,7 +80,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         //         robotToCamera.getRotation().getY(),
         //         robotToCamera.getRotation().getZ());
         LimelightHelpers.setPipelineIndex(name, kAprilTagPipelineIndex);
-        LimelightHelpers.SetIMUAssistAlpha(name, 3);
+        LimelightHelpers.SetIMUAssistAlpha(name, 10);
 
         this.baseStdDevs = baseStdDevs;
     }
@@ -97,15 +106,28 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     }
 
     private boolean isMultitag() {
-        var sampleMaybe = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
 
-        if (sampleMaybe.isEmpty()) {
-            return false;
-        }
-
-        var sample = sampleMaybe.get();
+        var sample = mt1Mabye.orElse(kEmpty);
         return sample.tagCount > 1;
     }
+
+	public boolean rotToMT1Rads(){
+
+		if (mt2Maybe.isEmpty() || mt1Mabye.isEmpty()) {
+			return false;
+		}
+
+		var mt1 = mt1Mabye.get();
+		var mt2 = mt2Maybe.get();
+		return Math.abs(mt2.pose.getRotation().minus(mt1.pose.getRotation()).getDegrees()) >= 10;
+	}
+
+	public boolean botPoseZGood(){
+		return Math.abs(LimelightHelpers.getBotPose3d_wpiBlue(name)
+		.orElse(new Pose3d(0,0,99, Rotation3d.kZero)).getZ()) < 0.2;
+
+
+	}
 
     public Command setConvergeToMT1() {
         return Commands.runOnce(() -> convergeToMT1 = true);
@@ -114,14 +136,17 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     public Command setConvergeToGyro() {
         return Commands.runOnce(() -> convergeToMT1 = false);
     }
+	
 
     @Override
     public void periodic() {
         setOrientation();
+		mt2Maybe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+		mt1Mabye = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
 
-        useMt2 = VisionController.hasReset && !isMultitag();
+        useMt2 = VisionController.hasReset || !isMultitag() && !rotToMT1Rads() ;
         if (DriverStation.isEnabled()) {
-            LimelightHelpers.cancelThrottle(name);
+            LimelightHelpers.cancelThrottle(name);	
             // setIMUMode(1);
         }
         if (DriverStation.isDisabled()) {
@@ -129,15 +154,18 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
             // setIMUMode(2);
         }
 
-        setIMUMode((!VisionController.hasReset || convergeToMT1) ? 3 : 4);
-
+        // setIMUMode(!VisionController.hasReset || convergeToMT1? 3 : 4);
+		setIMUMode(4);
+		
+		
+		
+		Logger.recordOutput("DEBUG/autoAlign/imumode", !VisionController.hasReset? 3 : 4);
         Logger.recordOutput("DEBUG/autoAlign/hasreset", VisionController.hasReset);
         Logger.recordOutput("DEBUG/autoAlign/useMT2", useMt2);
         Logger.recordOutput("DEBUG/autoAlign/is not multitag", !isMultitag());
 
-        getDX().ifPresentOrElse(
-                        pose -> Logger.recordOutput("name", pose),
-                        () -> Logger.recordOutput("name", Pose2d.kZero));
+		SmartDashboard.putBoolean("hasTarget", hasTarget());
+
     }
 
     public RawFiducial getBestTagDist(RawFiducial[] fiducials) {
@@ -173,32 +201,19 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         return best;
     }
 
-    public Optional<Pose2d> getDX() {
-        var estimate =
-                useMt2
-                        ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name)
-                        : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+   
 
-        if (estimate.isEmpty()) return Optional.empty();
-
-        return Optional.of(estimate.get().pose);
-    }
-
-    public double getDY() {
-        var estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
-        if (estimate.isEmpty()) return 0;
-
-        var bestTagID = getBestTag(estimate.get().rawFiducials).id;
-        return aprilTagFieldLayout.getTagPose(bestTagID).get().getY() - estimate.get().pose.getY();
-    }
+ 
 
     @Override
     public Optional<VisionMeasurement> QueueToInputs() {
         setOrientation();
+		mt2Maybe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+		mt1Mabye = LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
         var botPose =
-                VisionController.hasReset
-                        ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name)
-                        : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+                useMt2
+                        ? mt2Maybe
+                        : mt2Maybe;
         if (botPose.isEmpty()) {
             return Optional.empty();
         }

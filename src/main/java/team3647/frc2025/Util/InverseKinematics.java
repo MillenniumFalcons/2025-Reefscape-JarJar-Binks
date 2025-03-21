@@ -157,7 +157,7 @@ public class InverseKinematics {
     public static SuperstructureState lookAheadEstimateUp(SuperstructureState currenState) {
         return currenState
                 .withElevatorHeight(currenState.elevatorHeight.plus(Inches.of(5)))
-                .withPivotAngle(currenState.pivotAngle.plus(Degree.of(5)));
+                .withPivotAngle(currenState.pivotAngle.plus(Degree.of(15)));
     }
 
     public static SuperstructureState lookAheadEstimateDown(SuperstructureState currenState) {
@@ -183,6 +183,6 @@ public class InverseKinematics {
 
         var inRect = PoseUtils.inRect(trans, rect);
 
-        return inRect ? Degree.of(30) : wristStowAngle;
+        return inRect ? Degree.of(45) : wristStowAngle;
     }
 }

@@ -16,7 +16,7 @@ public class WristConstants {
     public static final Angle kIntakeAngle = Units.Degree.of(2);
     public static final Angle kStowAngle = Units.Degree.of(85);
 
-    public static final Angle kStartingAngle = Degree.of(122.058); // Units.Degree.of(125.38)
+    public static final Angle kStartingAngle = Degree.of(116); // Units.Degree.of(125.38)
 
     ;
 

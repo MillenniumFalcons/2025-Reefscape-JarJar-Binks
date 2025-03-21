@@ -40,12 +40,11 @@ public class SwerveDriveCommands implements AllianceObserver {
             BooleanSupplier autoDriveEnabled,
             BooleanSupplier hasTargets,
             BooleanSupplier slowMode) {
-        var corrector = new PIDController(1, 0, 0);
+     
         return Commands.run(
                 () -> {
                     var isAutoDrive = autoDriveEnabled.getAsBoolean();
                     var velocities = autoDriveVelocities.get();
-                    var toRun = hasTargets.getAsBoolean();
                     var slow = slowMode.getAsBoolean() ? 0.4 : 1;
                     // Logger.recordOutput("hastarget@cmds", toRun);
 
