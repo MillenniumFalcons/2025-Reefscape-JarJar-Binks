@@ -5,9 +5,13 @@ import static edu.wpi.first.units.Units.Degree;
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -16,26 +20,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import java.util.List;
 // import java.lang.invoke.ClassSpecializer.SpeciesData;
 import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import org.opencv.video.SparsePyrLKOpticalFlow;
-
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.PathPlannerLogging;
-
-import team3647.frc2025.Util.AutoDrive;
+import team3647.frc2025.Util.AllianceFlip;
 import team3647.frc2025.Util.PoseUtils;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.FieldConstants;
-import team3647.frc2025.constants.FieldConstants.ScoringPos;
-import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.Superstructure;
 import team3647.frc2025.subsystems.SwerveDrive;
@@ -50,6 +45,21 @@ public class AutoCommands implements AllianceObserver {
     private final Trajectory<SwerveSample> f2_to_src;
     private final Trajectory<SwerveSample> src_to_e2;
     private final Trajectory<SwerveSample> s2_to_d2;
+
+    private final Rectangle2d BlueLSource =
+            new Rectangle2d(
+                    new Translation2d(0, FieldConstants.kFieldLengthM),
+                    new Translation2d(2.5893, 5.4657));
+    private final Rectangle2d BlueRSource =
+            new Rectangle2d(Translation2d.kZero, new Translation2d(2.5893, 1.192));
+    private final Rectangle2d RedLSource =
+            new Rectangle2d(
+                    AllianceFlip.flip(new Translation2d(0, FieldConstants.kFieldLengthM)),
+                    AllianceFlip.flip(new Translation2d(2.5893, 5.4657)));
+    private final Rectangle2d RedRSource =
+            new Rectangle2d(
+                    AllianceFlip.flip(Translation2d.kZero),
+                    AllianceFlip.flip(new Translation2d(2.5893, 1.192)));
 
     private final PIDController rotController = new PIDController(5, 0, 0);
 
@@ -74,40 +84,43 @@ public class AutoCommands implements AllianceObserver {
         return scorePreload();
     }
 
-	public Command getSuperstructureTwoS3_e2f1(){
-		return Commands.sequence(
-			scorePreload(),
-			Commands.repeatingSequence(
-				superstructure.intake().until(superstructure::intakeCurrent)
-			)
-		);
-	}
+    public Command getSuperstructureTwoS3_e2f1() {
+        return Commands.sequence(
+                scorePreload(),
+                Commands.repeatingSequence(
+                        superstructure.intake().until(superstructure::intakeCurrent)));
+    }
 
-	// public Command masterSuperstructureSequence(){
-	// 	return Commands.sequence(
-	// 		scorePreload(),
-	// 		Commands.repeatingSequence(
-	// 			superstructure.intake().until(intakeCurrent),
-	// 			superstructure.transfer().until(seagullCurrent),
-	// 			superstructure.handoff().until(coralerCurrent),
+    // public Command masterSuperstructureSequence(){
+    // 	return Commands.sequence(
+    // 		scorePreload(),
+    // 		Commands.repeatingSequence(
+    // 			superstructure.intake().until(intakeCurrent),
+    // 			superstructure.transfer().until(seagullCurrent),
+    // 			superstructure.handoff().until(coralerCurrent),
 
-	// 		)
-	// 	);
-	// }
+    // 		)
+    // 	);
+    // }
 
     public Command scorePreload() {
         return Commands.sequence(
-			Commands.parallel(
-				superstructure.goToStatePerpendicular(() -> SuperstructureState.HighScore, () -> 0),
-				Commands.sequence(
-                                superstructure.wristCommands.setAngle(Degree.of(45)),
-                                Commands.waitSeconds(0.15),
-                                superstructure.wristCommands.setAngle(Degree.of(80)))
-			),
-			Commands.waitSeconds(3),
-			superstructure.stow().alongWith(superstructure.poopCoral())
-
-		);
+                Commands.parallel(
+                                superstructure.goToStatePerpendicular(
+                                        () -> SuperstructureState.HighScore, () -> 0),
+                                Commands.sequence(
+                                                superstructure.wristCommands.setAngle(
+                                                        Degree.of(45)),
+                                                superstructure.wristCommands.setAngle(
+                                                        WristConstants.kStowAngle))
+                                        .alongWith(
+                                                superstructure
+                                                        .coralerCommands
+                                                        .setOpenLoop(0.1)
+                                                        .withTimeout(1)))
+                        .withTimeout(10),
+                Commands.waitSeconds(3),
+                superstructure.stow().alongWith(superstructure.poopCoral()));
     }
 
     public Command getOneS2_d2() {
@@ -134,9 +147,13 @@ public class AutoCommands implements AllianceObserver {
                 swerve::getOdoPose);
     }
 
-    public Command followChoreoPathWithOverrideNoverrideFast(Trajectory<SwerveSample> traj, Alliance color) {
+    public Command followChoreoPathWithOverrideNoverrideFast(
+            Trajectory<SwerveSample> traj, Alliance color) {
         boolean mirror = color == Alliance.Red;
-        // PathPlannerLogging.logActivePath(PathPlannerPath.fromChoreoTrajectory(path));
+        try {
+            PathPlannerLogging.logActivePath(PathPlannerPath.fromChoreoTrajectory(traj.name()));
+        } catch (Exception e) {
+        }
         // Logger.recordOutput("Autos/current path", path);
         return customPathFollower(
                         traj,
@@ -149,16 +166,15 @@ public class AutoCommands implements AllianceObserver {
                             var motionXComponent = speeds.vxMetersPerSecond;
                             var motionYComponent = speeds.vyMetersPerSecond;
 
-                            var posexthresholdlow =
-                                    color == Alliance.Blue ? 5 : FieldConstants.kFieldLengthM - 8.75;
-                            var posexThresholdHigh =
-                                    color == Alliance.Blue ? 8.75 : FieldConstants.kFieldLengthM - 5;
-
                             var isInPose =
-                                    swerve.getOdoPose().getX() > posexthresholdlow
-                                            && swerve.getOdoPose().getX() < posexThresholdHigh;
+                                    PoseUtils.inRect(swerve.getOdoPose(), BlueLSource)
+                                            || PoseUtils.inRect(swerve.getOdoPose(), BlueRSource)
+                                            || PoseUtils.inRect(swerve.getOdoPose(), RedLSource)
+                                            || PoseUtils.inRect(swerve.getOdoPose(), RedRSource);
 
-                            if (!this.coralerCurrent.getAsBoolean() && hasTarget.getAsBoolean() && isInPose) {
+                            if (!this.coralerCurrent.getAsBoolean()
+                                    && hasTarget.getAsBoolean()
+                                    && isInPose) {
                                 motionXComponent = autoDriveVelocities.get().dx;
                                 motionYComponent = autoDriveVelocities.get().dy;
                                 // motionRotComponent = autoDriveVelocities.get().dtheta;
@@ -166,7 +182,7 @@ public class AutoCommands implements AllianceObserver {
 
                             swerve.drive(motionXComponent, motionYComponent, motionRotComponent);
                         },
-						swerve::getOdoPose)
+                        swerve::getOdoPose)
                 .andThen(Commands.runOnce(() -> swerve.drive(0, 0, 0), swerve));
     }
 
@@ -274,11 +290,11 @@ public class AutoCommands implements AllianceObserver {
     Superstructure superstructure;
     Supplier<Twist2d> autoDriveVelocities;
 
-	Trigger intakeCurrent;
-	Trigger coralerCurrent;
-	Trigger seagullCurrent;
+    Trigger intakeCurrent;
+    Trigger coralerCurrent;
+    Trigger seagullCurrent;
 
-	private final BooleanSupplier hasTarget;
+    private final BooleanSupplier hasTarget;
 
     public final AutoMode blueOne_s2d2;
 
@@ -291,13 +307,17 @@ public class AutoCommands implements AllianceObserver {
     public List<AutoMode> redAutosList;
     public List<AutoMode> blueAutosList;
 
-    public AutoCommands(SwerveDrive swerve, Superstructure superstructure,  Supplier<Twist2d> autoDriveVelocities, BooleanSupplier hasTarget) {
+    public AutoCommands(
+            SwerveDrive swerve,
+            Superstructure superstructure,
+            Supplier<Twist2d> autoDriveVelocities,
+            BooleanSupplier hasTarget) {
         this.superstructure = superstructure;
         color = Alliance.Red;
 
         this.swerve = swerve;
         this.autoDriveVelocities = autoDriveVelocities;
-		this.hasTarget = hasTarget;
+        this.hasTarget = hasTarget;
 
         // init paths
         this.s3_to_e1 = getTraj("s3 to e1");
@@ -328,21 +348,23 @@ public class AutoCommands implements AllianceObserver {
                 new AutoMode(
                         getOneS2_d2(), getInitial(s2_to_d2, Alliance.Red), "red one Piece mid");
 
-
         blueAutosList =
                 List.of(
-                        new AutoMode(Commands.none(), Pose2d.kZero.rotateBy(Rotation2d.k180deg), "nothingBlue"),
+                        new AutoMode(
+                                Commands.none(),
+                                Pose2d.kZero.rotateBy(Rotation2d.k180deg),
+                                "nothingBlue"),
                         blueOne_s2d2,
                         blueDT_One_s2d2);
         redAutosList =
                 List.of(
-                        new AutoMode(Commands.none(), Pose2d.kZero.rotateBy(Rotation2d.k180deg), "nothingRed"),
+                        new AutoMode(Commands.none(), Pose2d.kZero, "nothingRed"),
                         redOne_s2d2,
                         redDT_One_s2d2);
 
-		this.coralerCurrent = new Trigger(superstructure.coralerCommands.current()).debounce(0.4);
-		this.intakeCurrent = new Trigger(superstructure::intakeCurrent).debounce(0.5);
-		this.seagullCurrent = new Trigger(superstructure::seagullCurrent).debounce(0.5);
+        this.coralerCurrent = new Trigger(superstructure.coralerCommands.current()).debounce(0.4);
+        this.intakeCurrent = new Trigger(superstructure::intakeCurrent).debounce(0.5);
+        this.seagullCurrent = new Trigger(superstructure::seagullCurrent).debounce(0.5);
     }
 
     public interface ChoreoController extends BiFunction<Pose2d, SwerveSample, ChassisSpeeds> {}

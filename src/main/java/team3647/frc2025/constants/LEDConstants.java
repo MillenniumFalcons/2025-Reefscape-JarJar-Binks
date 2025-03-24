@@ -44,50 +44,59 @@ public class LEDConstants {
 
     // Solid Color
 
-    public static final Animation SOLID_YELLOW = new StrobeAnimation(246/2, 190/2, 0, 128/2, 1, LEDCOUNT);
+    public static final Animation SOLID_YELLOW =
+            new StrobeAnimation(246 / 2, 190 / 2, 0, 128 / 2, 1, LEDCOUNT);
 
-    public static final Animation SOLID_ORANGE = new StrobeAnimation(255/2, 140/2, 0, 128/2, 1, LEDCOUNT);
+    public static final Animation SOLID_ORANGE =
+            new StrobeAnimation(255 / 2, 140 / 2, 0, 128 / 2, 1, LEDCOUNT);
 
     public static final Animation SOLID_PURPLE =
-            new StrobeAnimation(162/2, 25/2, 255/2, 128/2, 1, LEDCOUNT);
+            new StrobeAnimation(162 / 2, 25 / 2, 255 / 2, 128 / 2, 1, LEDCOUNT);
 
-    public static final Animation SOLID_PINK = new StrobeAnimation(255/2, 0, 255/2, 128/2, 1, LEDCOUNT);
+    public static final Animation SOLID_PINK =
+            new StrobeAnimation(255 / 2, 0, 255 / 2, 128 / 2, 1, LEDCOUNT);
 
     public static final Animation SOLID_WHITE =
-            new StrobeAnimation(255/2, 255/2, 255/2, 128/2, 1, LEDCOUNT);
+            new StrobeAnimation(255 / 2, 255 / 2, 255 / 2, 128 / 2, 1, LEDCOUNT);
 
-    public static final Animation SOLID_BLUE = new StrobeAnimation(0, 0, 255/2, 128/2, 1, LEDCOUNT);
+    public static final Animation SOLID_BLUE =
+            new StrobeAnimation(0, 0, 255 / 2, 128 / 2, 1, LEDCOUNT);
 
-    public static final Animation SOLID_RED = new StrobeAnimation(255/2, 0, 0, 128/2, 1, LEDCOUNT);
+    public static final Animation SOLID_RED =
+            new StrobeAnimation(255 / 2, 0, 0, 128 / 2, 1, LEDCOUNT);
 
-    public static final Animation SOLID_GREEN = new StrobeAnimation(0, 255/2, 0, 128/2, 1, LEDCOUNT);
+    public static final Animation SOLID_GREEN =
+            new StrobeAnimation(0, 255 / 2, 0, 128 / 2, 1, LEDCOUNT);
 
-    public static final Animation SOLID_BROWN = new StrobeAnimation(181/2, 101/2, 30/2, 128/2, 1, LEDCOUNT);
+    public static final Animation SOLID_BROWN =
+            new StrobeAnimation(181 / 2, 101 / 2, 30 / 2, 128 / 2, 1, LEDCOUNT);
 
     // Breathing/Flashing Animations
 
     public static final Animation BREATHE_RED =
-            new SingleFadeAnimation(255/2, 0, 0, 0, 0.8, LEDCOUNT);
+            new SingleFadeAnimation(255 / 2, 0, 0, 0, 0.8, LEDCOUNT);
 
     public static final Animation BREATHE_GREEN =
-            new SingleFadeAnimation(0, 255/2, 0, 0, 0.65, LEDCOUNT);
+            new SingleFadeAnimation(0, 255 / 2, 0, 0, 0.65, LEDCOUNT);
 
     public static final Animation BREATHE_YELLOW =
-            new StrobeAnimation(246/2, 190/2, 0, 128/2, 0.3, LEDCOUNT);
+            new StrobeAnimation(246 / 2, 190 / 2, 0, 128 / 2, 0.3, LEDCOUNT);
 
     public static final Animation BREATHE_PINK =
-            new StrobeAnimation(255/2, 0, 255/2, 128/2, 0.5, LEDCOUNT);
+            new StrobeAnimation(255 / 2, 0, 255 / 2, 128 / 2, 0.5, LEDCOUNT);
 
-    public static final Animation FLASH_PURPLE = new StrobeAnimation(49/2, 0, 71/2, 128/2, 0.3, LEDCOUNT);
+    public static final Animation FLASH_PURPLE =
+            new StrobeAnimation(49 / 2, 0, 71 / 2, 128 / 2, 0.3, LEDCOUNT);
 
     public static final Animation FLASH_ORANGE =
-            new StrobeAnimation(255/2, 50/2, 0, 128/2, 0.5, LEDCOUNT);
+            new StrobeAnimation(255 / 2, 50 / 2, 0, 128 / 2, 0.5, LEDCOUNT);
 
     public static final Animation FLASH_YELLOW =
-            new StrobeAnimation(246/2, 190/2, 0, 128/2, 0.5, LEDCOUNT);
+            new StrobeAnimation(246 / 2, 190 / 2, 0, 128 / 2, 0.5, LEDCOUNT);
 
-    public static final Animation FLASH_GREEN = new StrobeAnimation(0, 255/2, 0, 0, 0.5, LEDCOUNT);
+    public static final Animation FLASH_GREEN =
+            new StrobeAnimation(0, 255 / 2, 0, 0, 0.5, LEDCOUNT);
 
     public static final Animation FLASH_BROWN =
-            new StrobeAnimation(181/2, 101/2, 30, 128/2, 0.3, LEDCOUNT);
+            new StrobeAnimation(181 / 2, 101 / 2, 30, 128 / 2, 0.3, LEDCOUNT);
 }

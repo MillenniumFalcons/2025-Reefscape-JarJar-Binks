@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.littletonrobotics.junction.Logger;
 import team3647.lib.team6328.VirtualSubsystem;
+import team3647.lib.team9442.AutoChooser;
 
 public class VisionController extends VirtualSubsystem {
     private final AprilTagCamera[] cameras;
@@ -52,14 +53,16 @@ public class VisionController extends VirtualSubsystem {
 
             } else {
                 count++;
-                if (count > 4) {
+                if (count > 4 && AutoChooser.selected) {
 
                     resetPose.accept(getInputs.pose);
+                    hasReset = true;
                     Logger.recordOutput("Robot/Reset", getInputs.pose);
-					hasReset = true;
+
                     break;
                 }
             }
+            Logger.recordOutput("selected?", AutoChooser.selected);
 
             // Logger.recordOutput("Robot/" + camera.getName(), getInputs.pose);
         }

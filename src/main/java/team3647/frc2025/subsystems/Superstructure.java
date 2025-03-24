@@ -62,8 +62,8 @@ public class Superstructure {
 
     private Trigger overridePiece;
 
-    private double currentLimit = 47;
-    private double SeagullCurrentLimit = 8;
+    private double currentLimit = 57;
+    private double SeagullCurrentLimit = 30;
     private double algaeCurrentLimit = 47;
 
     private double wristOffset = 0;
@@ -116,7 +116,7 @@ public class Superstructure {
 
         this.overridePiece = pieceOverride;
 
-        this.wantedLevel = Level.NONE;
+        this.wantedLevel = Level.HIGH;
         this.isAligned =
                 () -> {
                     DriverStation.reportError(
@@ -337,9 +337,7 @@ public class Superstructure {
     // unimplemented lmao
     public Command autoTakeOffByLevel() {
         return Commands.either(
-			takeOffAlgaeLow(), 
-			takeOffAlgaeHigh(), 
-			() -> getWantedLevel() == Level.ALGAELOW);
+                takeOffAlgaeLow(), takeOffAlgaeHigh(), () -> getWantedLevel() == Level.ALGAELOW);
     }
 
     public Command takeOffAlgaeHigh() {
@@ -349,27 +347,22 @@ public class Superstructure {
                 coralerCommands.intake());
     }
 
-	public Command takeOffAlgaeLow(){
-		return Commands.parallel(
+    public Command takeOffAlgaeLow() {
+        return Commands.parallel(
                 elevatorCommands.setHeight(ElevatorConstants.kStowHeight),
                 pivotCommands.setAngle(PivotConstants.kAlgaeAngleLow),
                 coralerCommands.intake());
-	}
+    }
 
     public Command scoreAlgaeBarge() {
         return Commands.parallel(
-			elevatorCommands.setHeight(ElevatorConstants.kMaxHeight),
-			
-			Commands.sequence(
-				Commands.waitSeconds(0.3),
-				pivotCommands.setAngle(PivotConstants.kStowAngle)
-			),
-			Commands.sequence(
-				Commands.waitSeconds(0.35),
-				coralerCommands.setOpenLoop(-1.0).withTimeout(0.5)
-			)
-
-		);
+                elevatorCommands.setHeight(ElevatorConstants.kMaxHeight),
+                Commands.sequence(
+                        Commands.waitSeconds(0.3),
+                        pivotCommands.setAngle(PivotConstants.kStowAngle)),
+                Commands.sequence(
+                        Commands.waitSeconds(0.39),
+                        coralerCommands.setOpenLoop(-1.0).withTimeout(0.5)));
     }
 
     public Command stowAlgaeBarge() {
@@ -610,7 +603,7 @@ public class Superstructure {
         return Commands.either(
                 Commands.sequence(
                         goToStatePerpendicular(() -> SuperstructureState.ToStow),
-						Commands.waitSeconds(0.01),
+                        Commands.waitSeconds(0.01),
                         goToStateParalell(() -> SuperstructureState.Stow)),
                 goToStatePerpendicular(() -> SuperstructureState.Stow, () -> 0.3),
                 this::shouldClear);
@@ -619,6 +612,7 @@ public class Superstructure {
     public Command sequencialStow() {
         return Commands.sequence(
                 goToStateNoWrist(() -> SuperstructureState.ToStow),
+                Commands.waitSeconds(0.5),
                 goToStateParalellNoWrist(() -> SuperstructureState.Stow));
     }
 

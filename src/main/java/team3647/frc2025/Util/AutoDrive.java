@@ -8,16 +8,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.nio.file.WatchEvent.Kind;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -30,7 +27,6 @@ import team3647.lib.team6328.VirtualSubsystem;
 import team3647.lib.team9442.AllianceObserver;
 import team3647.lib.vision.AprilTagCamera;
 import team3647.lib.vision.NeuralDetector;
-import team3647.lib.vision.VisionMeasurement;
 
 public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
@@ -46,7 +42,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     public final ProfiledPIDController yController;
     public final ProfiledPIDController rotController;
 
-	private final PIDController intakeXController, intakeYController;
+    private final PIDController intakeXController, intakeYController;
 
     private Alliance color = Alliance.Red;
 
@@ -63,8 +59,8 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     private final List<Pose2d> redSidePoses, blueSidePoses;
     private List<Pose2d> sidePoses;
 
-	private final Constraints intakeConstraints = new Constraints(2, 3);
-	private final Constraints scoringConstraints = new Constraints(3, 5);
+    private final Constraints intakeConstraints = new Constraints(2, 3);
+    private final Constraints scoringConstraints = new Constraints(3, 5);
 
     public boolean enabled = true;
     public boolean isYAligned = false;
@@ -99,14 +95,12 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
         this.sourcePoses = color == Alliance.Red ? redSourcePoses : blueSourcePoses;
         this.rotController.enableContinuousInput(-Math.PI, Math.PI);
-		this.xController.setTolerance(0.01);
+        this.xController.setTolerance(0.01);
         this.yController.setTolerance(0.01);
         this.rotController.setTolerance(0.01);
 
-
-		this.intakeXController = new PIDController(4, 0, 0);
-		this.intakeYController = new PIDController(4, 0, 0);
-		
+        this.intakeXController = new PIDController(4, 0, 0);
+        this.intakeYController = new PIDController(4, 0, 0);
 
         this.poseToSideMap =
                 Map.of(
@@ -134,12 +128,11 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     }
 
     public Pose2d getPose() {
-        if (frontLL.QueueToInputs().isPresent()) {
-            return frontLL.QueueToInputs()
-                    .orElse(new VisionMeasurement(odoPoseFunction.get(), -1))
-                    .pose;
-            // return frontLL.QueueToInputs().get().pose;
-        }
+        // var inputs = frontLL.QueueToInputs();
+        // if (inputs.isPresent()) {
+        //    return inputs.get().pose;
+        //     // return frontLL.QueueToInputs().get().pose;
+        // }
         // DriverStation.reportError(
         //         "@getposeautodrive " + frontLL.QueueToInputs().isPresent(), false);
         return odoPoseFunction.get();
@@ -167,30 +160,31 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
     // TODO: ground intake implementatoin
     public double getX() {
-        switch (getWantedMode()) {	
+        switch (getWantedMode()) {
             case SCORE:
-			// xController.setConstraints(scoringConstraints);
+                // xController.setConstraints(scoringConstraints);
                 var k =
                         xController.calculate(
-                                getPose().getX(), 
+                                getPose().getX(),
                                 AllianceFlip.flip(wantedScoringPos.pose, color).getX());
 
                 Logger.recordOutput("DEBUG/autoAlign/kx", k);
 
                 return k;
             case INTAKE:
-			
-			// xController.setConstraints(intakeConstraints);
-                var kIntake = detector.getTY() >= 0
-                        ? intakeXController.calculate(Math.toRadians(0), Math.toRadians(detector.getTY()))
-                        : 0;
-		;
-				return kIntake;
+
+                // xController.setConstraints(intakeConstraints);
+                var kIntake =
+                        detector.getTY() >= 0
+                                ? intakeXController.calculate(
+                                        Math.toRadians(0), Math.toRadians(detector.getTY()))
+                                : 0;
+                ;
+                return kIntake;
 
             default:
                 return xController.calculate(
-                        getPose().getX(), 
-						AllianceFlip.flip(wantedScoringPos.pose, color).getX());
+                        getPose().getX(), AllianceFlip.flip(wantedScoringPos.pose, color).getX());
         }
     }
 
@@ -201,36 +195,37 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                         getPose().getY(), getPose().nearest(sourcePoses).getY());
             case SCORE:
 
-			// yController.setConstraints(scoringConstraints);
+                // yController.setConstraints(scoringConstraints);
                 var k =
                         yController.calculate(
-                                getPose().getY(), 
-                               AllianceFlip.flip(wantedScoringPos.pose, color).getY());
+                                getPose().getY(),
+                                AllianceFlip.flip(wantedScoringPos.pose, color).getY());
 
                 Logger.recordOutput("DEBUG/autoAlign/ky", k);
                 return Math.abs(k) < 0.04 ? 0 : k;
 
             case INTAKE:
-				
-		
-                var kintake =  detector.getTY() >= 0
-                        ? intakeYController.calculate(Math.toRadians(detector.getTX()), 0)
-                        : 0;
-				
-				return kintake;
+                var kintake =
+                        detector.getTY() >= 0
+                                ? intakeYController.calculate(Math.toRadians(detector.getTX()), 0)
+                                : 0;
+
+                return kintake;
 
             default:
                 return yController.calculate(
-                        getPose().getY(), 
-						AllianceFlip.flip(wantedScoringPos.pose, color).getY());
+                        getPose().getY(), AllianceFlip.flip(wantedScoringPos.pose, color).getY());
         }
     }
 
-	public void resetControllers(){
-		xController.reset(getPose().getX());
-		yController.reset(getPose().getY());
-		rotController.reset(getPose().getRotation().getRadians());
-	}
+    public Command resetControllers() {
+        return Commands.runOnce(
+                () -> {
+                    xController.reset(getPose().getX());
+                    yController.reset(getPose().getY());
+                    rotController.reset(getPose().getRotation().getRadians());
+                });
+    }
 
     public double getRot() {
         switch (wantedMode) {
@@ -246,22 +241,14 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                                         .getRotation()
                                         .getRadians());
 
-
-			
-
                 Logger.recordOutput("DEBUG/autoAlign/kRot", k);
 
-
-
                 return Math.abs(k) < 0.03 ? 0 : k;
-
-
 
             case TEST:
                 return rotController.calculate(getPose().getRotation().getRadians(), 0);
 
             default:
-
                 return rotController.calculate(
                         getPose()
                                 .getRotation()
@@ -342,19 +329,27 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     @Override
     public void periodic() {
         wantedSide = poseToSideMap.get(getPose().nearest(sidePoses));
-        Logger.recordOutput("wanjted side pose", wantedScoringPos.pose);
-		SmartDashboard.putData("xController", xController);
-		SmartDashboard.putData("yController", yController);
-		SmartDashboard.putData("rotController", rotController);
+        Logger.recordOutput("wanjted side pose", AllianceFlip.flip(wantedScoringPos.pose, color));
+        SmartDashboard.putData("xController", xController);
+        SmartDashboard.putData("yController", yController);
+        SmartDashboard.putData("rotController", rotController);
 
-		SmartDashboard.putNumber("DEBUG/autoAlign/x error", xController.getPositionError());
-		SmartDashboard.putNumber("DEBUG/autoAlign/y error", yController.getPositionError());
-		SmartDashboard.putNumber("DEBUG/autoAlign/rot error", rotController.getPositionError());
-		SmartDashboard.putNumber("DEBUG/autoAlign/x setpoint", xController.getSetpoint().position);
-		SmartDashboard.putNumber("DEBUG/autoAlign/y setpoint", yController.getSetpoint().position);
-		SmartDashboard.putNumber("DEBUG/autoAlign/rot setpoint", rotController.getSetpoint().position);
-		SmartDashboard.putNumber("DEBUG/autoAlign/kX",                         xController.calculate(
-			getPose().getX(), 3.54));
+        Logger.recordOutput("xController", xController.getGoal().position);
+        Logger.recordOutput("xController", yController.getGoal().position);
+        Logger.recordOutput("xController", rotController.getGoal().position);
+
+        // SmartDashboard.putNumber("DEBUG/autoAlign/x error", xController.getPositionError());
+        // SmartDashboard.putNumber("DEBUG/autoAlign/y error", yController.getPositionError());
+        // SmartDashboard.putNumber("DEBUG/autoAlign/rot error", rotController.getPositionError());
+        // SmartDashboard.putNumber("DEBUG/autoAlign/x setpoint",
+        // xController.getSetpoint().position);
+        // SmartDashboard.putNumber("DEBUG/autoAlign/y setpoint",
+        // yController.getSetpoint().position);
+        // SmartDashboard.putNumber("DEBUG/autoAlign/rot setpoint",
+        // rotController.getSetpoint().position);
+        // SmartDashboard.putNumber("DEBUG/autoAlign/kX",
+        // xController.calculate(
+        // 	getPose().getX(), 3.54));
         // Logger.recordOutput("getpose", getPose());
 
         // forscoring: 0.324 m away from the face

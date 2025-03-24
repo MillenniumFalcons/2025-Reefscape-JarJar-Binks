@@ -20,9 +20,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
-import edu.wpi.first.wpilibj.DriverStation;
 import java.io.IOException;
-import java.lang.StackWalker.Option;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -615,12 +613,13 @@ public class LimelightHelpers {
             // System.err.println("Bad LL 3D Pose Data!");
             return Optional.empty();
         }
-        return Optional.of(new Pose3d(
-			new Translation3d(inData[0], inData[1], inData[2]),
-			new Rotation3d(
-					Units.degreesToRadians(inData[3]),
-					Units.degreesToRadians(inData[4]),
-					Units.degreesToRadians(inData[5]))));
+        return Optional.of(
+                new Pose3d(
+                        new Translation3d(inData[0], inData[1], inData[2]),
+                        new Rotation3d(
+                                Units.degreesToRadians(inData[3]),
+                                Units.degreesToRadians(inData[4]),
+                                Units.degreesToRadians(inData[5]))));
     }
 
     /**
@@ -1221,7 +1220,7 @@ public class LimelightHelpers {
      * @return Pose3d object representing the robot's position and orientation in Blue Alliance
      *     field space
      */
-    public static Optional<Pose3d>  getBotPose3d_wpiBlue(String limelightName) {
+    public static Optional<Pose3d> getBotPose3d_wpiBlue(String limelightName) {
         double[] poseArray = getLimelightNTDoubleArray(limelightName, "botpose_wpiblue");
         return toPose3D(poseArray);
     }

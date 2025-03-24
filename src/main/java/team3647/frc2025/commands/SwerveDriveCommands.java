@@ -2,7 +2,6 @@ package team3647.frc2025.commands;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -40,7 +39,7 @@ public class SwerveDriveCommands implements AllianceObserver {
             BooleanSupplier autoDriveEnabled,
             BooleanSupplier hasTargets,
             BooleanSupplier slowMode) {
-     
+
         return Commands.run(
                 () -> {
                     var isAutoDrive = autoDriveEnabled.getAsBoolean();
