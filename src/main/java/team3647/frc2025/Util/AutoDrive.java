@@ -38,9 +38,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
     private Side wantedSide = Side.A;
 
-    public final ProfiledPIDController xController;
-    public final ProfiledPIDController yController;
-    public final ProfiledPIDController rotController;
+    public final PIDController xController;
+    public final PIDController yController;
+    public final PIDController rotController;
 
     private final PIDController intakeXController, intakeYController;
 
@@ -71,9 +71,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
             Supplier<Pose2d> odoPoseFunction,
             List<Pose2d> redSourcePoses,
             List<Pose2d> blueSourcePoses,
-            ProfiledPIDController xController,
-            ProfiledPIDController yController,
-            ProfiledPIDController rotController,
+            PIDController xController,
+            PIDController yController,
+            PIDController rotController,
             List<Pose2d> redSidePoses,
             List<Pose2d> blueSidePoses,
             NeuralDetector detector,
@@ -95,9 +95,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
         this.sourcePoses = color == Alliance.Red ? redSourcePoses : blueSourcePoses;
         this.rotController.enableContinuousInput(-Math.PI, Math.PI);
-        this.xController.setTolerance(0.01);
-        this.yController.setTolerance(0.01);
-        this.rotController.setTolerance(0.01);
+        // this.xController.setTolerance(0.01);
+        // this.yController.setTolerance(0.01);
+        // this.rotController.setTolerance(0.01);
 
         this.intakeXController = new PIDController(4, 0, 0);
         this.intakeYController = new PIDController(4, 0, 0);
@@ -218,14 +218,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         }
     }
 
-    public Command resetControllers() {
-        return Commands.runOnce(
-                () -> {
-                    xController.reset(getPose().getX());
-                    yController.reset(getPose().getY());
-                    rotController.reset(getPose().getRotation().getRadians());
-                });
-    }
+
 
     public double getRot() {
         switch (wantedMode) {
@@ -333,10 +326,6 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         SmartDashboard.putData("xController", xController);
         SmartDashboard.putData("yController", yController);
         SmartDashboard.putData("rotController", rotController);
-
-        Logger.recordOutput("xController", xController.getGoal().position);
-        Logger.recordOutput("xController", yController.getGoal().position);
-        Logger.recordOutput("xController", rotController.getGoal().position);
 
         // SmartDashboard.putNumber("DEBUG/autoAlign/x error", xController.getPositionError());
         // SmartDashboard.putNumber("DEBUG/autoAlign/y error", yController.getPositionError());

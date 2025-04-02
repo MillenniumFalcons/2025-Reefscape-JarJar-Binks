@@ -123,8 +123,7 @@ public class RobotContainer {
         mainController
                 .buttonA
                 .and(mainController.dPadLeft)
-                .whileTrue(autoDrive.setDriveMode(DriveMode.SCORE))
-                .onTrue(autoDrive.resetControllers());
+                .whileTrue(autoDrive.setDriveMode(DriveMode.SCORE));
         mainController.buttonA.and(mainController.dPadLeft).onFalse(autoDrive.clearDriveMode());
 
         seagullCurrent
@@ -387,7 +386,7 @@ public class RobotContainer {
                     FieldConstants.blueSources,
                     AutoConstants.xController,
                     AutoConstants.yController,
-                    AutoConstants.profiledRotController,
+                    AutoConstants.rotController,
                     FieldConstants.redReefSides,
                     FieldConstants.blueReefSides,
                     detector,
