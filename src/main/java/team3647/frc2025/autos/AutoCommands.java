@@ -147,13 +147,13 @@ public class AutoCommands implements AllianceObserver {
                 swerve::getOdoPose);
     }
 
-    public Command followChoreoPathWithOverrideNoverrideFast(
-            Trajectory<SwerveSample> traj, Alliance color) {
-        boolean mirror = color == Alliance.Red;
+    public Command followChoreoPathWithOverrideFast(
+            Trajectory<SwerveSample> traj) {
         try {
             PathPlannerLogging.logActivePath(PathPlannerPath.fromChoreoTrajectory(traj.name()));
         } catch (Exception e) {
         }
+		
         // Logger.recordOutput("Autos/current path", path);
         return customPathFollower(
                         traj,
@@ -172,7 +172,7 @@ public class AutoCommands implements AllianceObserver {
                                             || PoseUtils.inRect(swerve.getOdoPose(), RedLSource)
                                             || PoseUtils.inRect(swerve.getOdoPose(), RedRSource);
 
-                            if (!this.coralerCurrent.getAsBoolean()
+                            if (!this.intakeCurrent.getAsBoolean()
                                     && hasTarget.getAsBoolean()
                                     && isInPose) {
                                 motionXComponent = autoDriveVelocities.get().dx;
