@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import team3647.frc2025.commands.PivotCommands;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
@@ -37,6 +38,12 @@ public class SuperstructureState {
                     PivotConstants.kLevel4Angle,
                     ElevatorConstants.kLevel4Height,
                     WristConstants.kStowAngle);
+
+	public static SuperstructureState L4Stow = 
+			new SuperstructureState(
+				PivotConstants.klowLevelsStow, 
+				ElevatorConstants.kLevel4Height, 
+				WristConstants.kStowAngle);
 
     // gg more algae stuff
     public static SuperstructureState HighAlgae =

@@ -124,6 +124,7 @@ public class RobotContainer {
                 .buttonA
                 .and(mainController.dPadLeft)
                 .whileTrue(autoDrive.setDriveMode(DriveMode.SCORE));
+
         mainController.buttonA.and(mainController.dPadLeft).onFalse(autoDrive.clearDriveMode());
 
         seagullCurrent
@@ -142,25 +143,15 @@ public class RobotContainer {
 
         mainController
                 .rightTrigger
-                .whileTrue(Commands.waitSeconds(0.05).andThen(superstructure.autoScoreByLevel()))
+                .whileTrue(Commands.waitUntil(superstructure.wristCommands.angleBelow(50)).andThen(superstructure.autoScoreByLevel()))
                 .whileTrue(
                         Commands.sequence(
-                                        superstructure.wristCommands.setAngle(Degree.of(40)),
+                                        superstructure.wristCommands.setAngle(Degree.of(46)),
                                         Commands.waitSeconds(0.3),
                                         superstructure.wristCommands.setAngle(
-                                                WristConstants.kStowAngle))
-                                .alongWith(
-                                        superstructure.coralerCommands.setOpenLoop(0.1),
-                                        superstructure
-                                                .rollersCommands
-                                                .setOpenLoop(0.1, 0)
-                                                .withTimeout(1)));
+                                                WristConstants.kStowAngle)));
         mainController.rightTrigger.onFalse(
-                superstructure
-                        .paralellStow()
-                        .alongWith(
-                                superstructure.poopCoral().withTimeout(0.5),
-                                superstructure.setNoPeice().withTimeout(0.01)));
+                superstructure.autoStowByLevel());
         // 			.onFalse(Commands.sequence(
         // superstructure.wristCommands.setAngle(Degree.of(30)),
         // Commands.waitSeconds(0.5),
