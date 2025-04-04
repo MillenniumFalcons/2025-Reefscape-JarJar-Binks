@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.ElevatorConstants;
@@ -47,14 +48,14 @@ public class InverseKinematics {
 
     private static SuperstructureState minState =
             SuperstructureState.TroughScore.withPivotAngle(
-                    SuperstructureState.TroughScore.pivotAngle.minus(Degree.of(3)));
+                    SuperstructureState.TroughScore.pivotAngleRads - Math.toRadians(3));
 
     // the highest tip of the wirst, make it a variable function
     public static Translation2d wristTopPos(SuperstructureState currentState) {
         // real top pos at stow angle
         return startingWristTopPos.rotateBy(
                 Rotation2d.fromDegrees(
-                        (kWristStartingAngleDeg - currentState.wristAngle.in(Degree))));
+                        (kWristStartingAngleDeg - currentState.wristAngleDegs)));
     }
 
     @Deprecated
@@ -73,16 +74,16 @@ public class InverseKinematics {
                 getIK(new Translation2d(trans.getX(), clearheightTotal))
                         .withWristAngle(Degree.of(20));
 
-        Logger.recordOutput("IKSTATE/wrist", state.wristAngle.in(Degree));
-        Logger.recordOutput("IKSTATE/pivot", state.pivotAngle.in(Degree));
-        Logger.recordOutput("IKSTATE/elev", state.elevatorHeight.in(Meter));
+        Logger.recordOutput("IKSTATE/wrist", state.wristAngleDegs);
+        Logger.recordOutput("IKSTATE/pivot", Math.toDegrees(state.pivotAngleRads));
+        Logger.recordOutput("IKSTATE/elev", state.elevatorHeightM);
 
         return state;
     }
 
     public static boolean shouldClear(SuperstructureState currentState) {
-        return currentState.pivotAngle.gte(Radian.of(-0.7))
-                && currentState.elevatorHeight.lte(ElevatorConstants.kClearHeight);
+        return currentState.pivotAngleRads >= -0.7
+                && currentState.elevatorHeightM <= ElevatorConstants.kClearHeight.in(Meters);
     }
 
     private static Translation2d minPos(SuperstructureState currentState) {
@@ -122,10 +123,10 @@ public class InverseKinematics {
     }
 
     public static Translation2d forwardKinematics(SuperstructureState state) {
-        var x = armLength.in(Meters) * Math.cos(state.pivotAngle.in(Radian));
+        var x = armLength.in(Meters) * Math.cos(state.pivotAngleRads);
         var y =
-                state.elevatorHeight.in(Meters)
-                        + (armLength.in(Meters) * Math.sin(state.pivotAngle.in(Radian)));
+                state.elevatorHeightM
+                        + (armLength.in(Meters) * Math.sin(state.pivotAngleRads));
 
         return new Translation2d(x, y);
     }
@@ -138,11 +139,11 @@ public class InverseKinematics {
         }
         var minPos = minPos(currentState);
 
-        var phi = minState.pivotAngle;
-        var dx = armLength.in(Meters) * Math.sin(phi.in(Radian));
+        var phi = minState.pivotAngleRads;
+        var dx = armLength.in(Meters) * Math.sin(phi);
 
-        var elev = currentState.elevatorHeight;
-        var dy = elev.in(Meters) - minPos.getY();
+        var elev = currentState.elevatorHeightM;
+        var dy = elev - minPos.getY();
 
         // Logger.recordOutput("dy", dy);
         // Logger.recordOutput("dx", dx);
@@ -156,15 +157,11 @@ public class InverseKinematics {
 
     public static SuperstructureState lookAheadEstimateUp(SuperstructureState currenState) {
         return currenState
-                .withElevatorHeight(currenState.elevatorHeight.plus(Inches.of(5)))
-                .withPivotAngle(currenState.pivotAngle.plus(Degree.of(10)));
+                .withElevatorHeight(Meters.of(currenState.elevatorHeightM).plus(Inches.of(5)))
+                .withPivotAngle(Radian.of(currenState.pivotAngleRads).plus(Degree.of(10)));
     }
 
-    public static SuperstructureState lookAheadEstimateDown(SuperstructureState currenState) {
-        return currenState
-                .withElevatorHeight(currenState.elevatorHeight.minus(Inches.of(8)))
-                .withPivotAngle(currenState.pivotAngle.minus(Degree.of(8)));
-    }
+ 
 
     public static boolean shouldWristOutOftheway(SuperstructureState currentState) {
         var newState = lookAheadEstimateUp(currentState);
@@ -177,12 +174,19 @@ public class InverseKinematics {
     }
 
     public static Angle getWristOutofTheWayMaxAngle(
-            SuperstructureState currentState, Angle wristStowAngle) {
-        var newState = lookAheadEstimateUp(currentState);
-        var trans = forwardKinematics(newState);
+            SuperstructureState lookAheadState, Angle wristStowAngle) {
+        
+        var trans = forwardKinematics(lookAheadState);
 
         var inRect = PoseUtils.inRect(trans, rect);
 
         return inRect ? Degree.of(20) : wristStowAngle;
     }
+
+	public static SuperstructureState lookAhead(SuperstructureState currenState, double elevVelocity, double pivotVelocity){
+		var finalElevHeight = currenState.elevatorHeightM + (elevVelocity * 0.04);
+		var finalPivotAngle = currenState.elevatorHeightM + (pivotVelocity * 0.04);
+
+		return new SuperstructureState(finalElevHeight, finalPivotAngle, currenState.wristAngleDegs);
+	}
 }

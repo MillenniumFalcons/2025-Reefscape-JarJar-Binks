@@ -179,17 +179,17 @@ public class Superstructure {
                 Commands.parallel(
                         // Commands.run(() -> Logger.recordOutput("monkeyballs",
                         // state.get().elevatorHeight)),
-                        elevatorCommands.setHeight(() -> state.get().elevatorHeight),
+                        elevatorCommands.setHeight(() -> state.get().elevatorHeightM),
                         pivotCommands.setAngle(
                                 () ->
                                         MathUtil.clamp(
-                                                state.get().pivotAngle.in(Radian),
+                                                state.get().pivotAngleRads,
                                                 getPivotMinAngle(),
                                                 pivot.getMaxAngle().in(Radian))),
                         Commands.either(
                                 Commands.none(),
-                                wristCommands.setAngle(state.get().wristAngle),
-                                () -> state.get().wristAngle.equals(WristConstants.idrc))
+                                wristCommands.setAngle(state.get().wristAngleDegs),
+                                () -> state.get().wristAngleDegs == (WristConstants.idrc.in(Degree)))
                         // Commands.run(() ->
                         // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
 
@@ -204,11 +204,11 @@ public class Superstructure {
                 Commands.parallel(
                         // Commands.run(() -> Logger.recordOutput("monkeyballs",
                         // state.get().elevatorHeight)),
-                        elevatorCommands.setHeight(() -> state.get().elevatorHeight),
+                        elevatorCommands.setHeight(() -> state.get().elevatorHeightM),
                         pivotCommands.setAngle(
                                 () ->
                                         MathUtil.clamp(
-                                                state.get().pivotAngle.in(Radian),
+                                                state.get().pivotAngleRads,
                                                 pivot.getMinAngle().in(Radian),
                                                 pivot.getMaxAngle().in(Radian)))
                         // Commands.run(() ->
@@ -234,17 +234,17 @@ public class Superstructure {
                         Commands.waitSeconds(0.1)
                                 .andThen(
                                         elevatorCommands.setHeight(
-                                                () -> state.get().elevatorHeight)),
+                                                () -> state.get().elevatorHeightM)),
                         pivotCommands.setAngle(
                                 () ->
                                         MathUtil.clamp(
-                                                state.get().pivotAngle.in(Radian),
+                                                state.get().pivotAngleRads,
                                                 getPivotMinAngle(),
                                                 pivot.getMaxAngle().in(Radian))),
                         Commands.either(
                                 Commands.none(),
-                                wristCommands.setAngle(state.get().wristAngle),
-                                () -> state.get().wristAngle.equals(WristConstants.idrc))
+                                wristCommands.setAngle(state.get().wristAngleDegs),
+                                () -> state.get().wristAngleDegs == (WristConstants.idrc.in(Degree)))
                         // Commands.run(() ->
                         // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
 
@@ -261,8 +261,8 @@ public class Superstructure {
                         Commands.waitSeconds(0.1)
                                 .andThen(
                                         elevatorCommands.setHeight(
-                                                () -> state.get().elevatorHeight)),
-                        (pivotCommands.setAngle(() -> state.get().pivotAngle))
+                                                () -> state.get().elevatorHeightM)),
+                        (pivotCommands.setAngle(() -> state.get().pivotAngleRads))
                         // Commands.either(
                         // 		Commands.none(),
                         // 		wristCommands.setAngle(state.get().wristAngle),
@@ -298,8 +298,8 @@ public class Superstructure {
                         Commands.waitSeconds(delay.getAsDouble())
                                 .andThen(
                                         elevatorCommands.setHeight(
-                                                () -> state.get().elevatorHeight)),
-                        (pivotCommands.setAngle(() -> state.get().pivotAngle))
+                                                () -> state.get().elevatorHeightM)),
+                        (pivotCommands.setAngle(() -> state.get().pivotAngleRads))
                         // Commands.either(
                         // 		Commands.none(),
                         // 		wristCommands.setAngle(state.get().wristAngle),
