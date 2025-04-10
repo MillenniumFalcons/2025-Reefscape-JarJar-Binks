@@ -331,8 +331,6 @@ public class RobotContainer {
                     WristConstants.kMaxAngle,
                     elevator::getHeight,
                     pivot::getAngle,
-					elevator::getVelocity,
-					pivot::getVelocity,
                     GlobalConstants.kDt);
 
     Rollers rollers =

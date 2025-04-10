@@ -44,11 +44,6 @@ public class WristCommands {
                 .until(() -> wrist.angleReached(angle.in(Degree), 2));
     }
 
-	public Command setAngle(double angleDegs) {
-        return Commands.run(() -> wrist.setAngle(angleDegs), wrist)
-                .until(() -> wrist.angleReached(angleDegs, 2));
-    }
-
     public Command setAngle(Supplier<Angle> angle) {
         return Commands.run(() -> wrist.setAngle(angle.get()), wrist)
                 .until(() -> wrist.angleReached(angle.get().in(Degree), 2));

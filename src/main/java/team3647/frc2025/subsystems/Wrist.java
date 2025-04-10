@@ -7,8 +7,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
-
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.Util.SuperstructureState;
@@ -21,8 +19,6 @@ public class Wrist extends TalonFXSubsystem {
     private final Supplier<Angle> getPivotAngle;
     private final Supplier<Distance> getElevHeight;
 
-	private final DoubleSupplier getPivotVelocity, getElevVelocity;
-
     public Wrist(
             TalonFX master,
             double velocityConversion,
@@ -32,8 +28,6 @@ public class Wrist extends TalonFXSubsystem {
             Angle maxAngle,
             Supplier<Distance> elevHeight,
             Supplier<Angle> pivotAngle,
-			DoubleSupplier elevVelocity,
-			DoubleSupplier pivotVelocity,
             double kDt) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
 
@@ -42,9 +36,6 @@ public class Wrist extends TalonFXSubsystem {
 
         this.getElevHeight = elevHeight;
         this.getPivotAngle = pivotAngle;
-
-		this.getElevVelocity = elevVelocity;
-		this.getPivotVelocity = pivotVelocity;
     }
 
     public void setAngle(Angle angle) {
@@ -55,14 +46,6 @@ public class Wrist extends TalonFXSubsystem {
                 0);
     }
 
-	public void setAngle(double angleDegs) {
-
-        setPositionExpoVoltage(
-                MathUtil.clamp(
-                        angleDegs, minAngle.in(Degree), getMaxAngle().in(Degree)),
-                0);
-    }
-
     public void setEncoderAngle(Angle angle) {
 
         setEncoder(angle.in(Degree));
@@ -70,7 +53,7 @@ public class Wrist extends TalonFXSubsystem {
 
     public Angle getMaxAngle() {
         return InverseKinematics.getWristOutofTheWayMaxAngle(
-                InverseKinematics.lookAhead(new SuperstructureState(getPivotAngle.get(), getElevHeight.get(), getAngle()), getElevVelocity.getAsDouble(), getPivotVelocity.getAsDouble()),
+                new SuperstructureState(getPivotAngle.get(), getElevHeight.get(), getAngle()),
                 maxAngle);
     }
 

@@ -3,7 +3,6 @@ package team3647.frc2025.Util;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radian;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -13,9 +12,9 @@ import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
 
 public class SuperstructureState {
-    public double pivotAngleRads;
-    public double elevatorHeightM;
-    public double wristAngleDegs;
+    public Angle pivotAngle;
+    public Distance elevatorHeight;
+    public Angle wristAngle;
 
     public static SuperstructureState kInvalidState =
             new SuperstructureState(Degree.of(-100), Meters.of(-1), Degree.of(-100));
@@ -60,7 +59,7 @@ public class SuperstructureState {
 
     public static SuperstructureState AlgaeStow =
             new SuperstructureState(
-                    PivotConstants.kMaxAngle.in(Radian), LowScore.elevatorHeightM, WristConstants.kStowAngle.in(Degree));
+                    PivotConstants.kMaxAngle, LowScore.elevatorHeight, WristConstants.kStowAngle);
 
     public static SuperstructureState AlgaeBarge =
             new SuperstructureState(
@@ -107,30 +106,21 @@ public class SuperstructureState {
                     WristConstants.kStowWithPiece);
 
     public SuperstructureState(Angle pivotAngle, Distance elevatorHeight, Angle wristAngle) {
-        this.pivotAngleRads = pivotAngle.in(Radian);
-        this.elevatorHeightM = elevatorHeight.in(Meters);
-        this.wristAngleDegs = wristAngle.in(Degree);
+        this.pivotAngle = pivotAngle;
+        this.elevatorHeight = elevatorHeight;
+        this.wristAngle = wristAngle;
     }
-
-	public SuperstructureState(double pivotAngleRads, double elevatorHightM, double wrsitAngleDegs){
-		this.pivotAngleRads = pivotAngleRads;
-		this.elevatorHeightM = elevatorHightM;
-		this.wristAngleDegs = wrsitAngleDegs;
-	}
 
     public SuperstructureState withPivotAngle(Angle pivotAngle) {
-        return new SuperstructureState(pivotAngle.in(Radian), this.elevatorHeightM, this.wristAngleDegs);
-    }
-	public SuperstructureState withPivotAngle(double pivotAngle) {
-        return new SuperstructureState(pivotAngle, this.elevatorHeightM, this.wristAngleDegs);
+        return new SuperstructureState(pivotAngle, this.elevatorHeight, this.wristAngle);
     }
 
     public SuperstructureState withElevatorHeight(Distance elevatorHeight) {
-        return new SuperstructureState(this.pivotAngleRads, elevatorHeight.in(Meters), this.wristAngleDegs);
+        return new SuperstructureState(this.pivotAngle, elevatorHeight, this.wristAngle);
     }
 
     public SuperstructureState withWristAngle(Angle wristAngle) {
-        return new SuperstructureState(this.pivotAngleRads, this.elevatorHeightM, wristAngle.in(Degree));
+        return new SuperstructureState(this.pivotAngle, this.elevatorHeight, wristAngle);
     }
 
     @Override
@@ -139,7 +129,7 @@ public class SuperstructureState {
             return false;
         }
 
-        return this.elevatorHeightM == ((SuperstructureState) obj).elevatorHeightM
-                && this.pivotAngleRads == ((SuperstructureState) obj).pivotAngleRads;
+        return this.elevatorHeight.equals(((SuperstructureState) obj).elevatorHeight)
+                && this.pivotAngle.equals(((SuperstructureState) obj).pivotAngle);
     }
 }
