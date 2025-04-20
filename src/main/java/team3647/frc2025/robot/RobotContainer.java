@@ -39,6 +39,9 @@ import team3647.frc2025.constants.VisionConstants;
 import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.Climb;
 import team3647.frc2025.subsystems.Coraler;
+import team3647.frc2025.subsystems.Drivetrain.SwerveDrive;
+import team3647.frc2025.subsystems.Drivetrain.SwerveDriveReal;
+import team3647.frc2025.subsystems.Drivetrain.SwerveDriveSim;
 import team3647.frc2025.subsystems.Elevator;
 import team3647.frc2025.subsystems.LEDs;
 import team3647.frc2025.subsystems.Pivot;
@@ -47,7 +50,6 @@ import team3647.frc2025.subsystems.Seagull;
 import team3647.frc2025.subsystems.Superstructure;
 import team3647.frc2025.subsystems.Superstructure.Branch;
 import team3647.frc2025.subsystems.Superstructure.Level;
-import team3647.frc2025.subsystems.SwerveDrive;
 import team3647.frc2025.subsystems.Wrist;
 import team3647.lib.GroupPrinter;
 import team3647.lib.inputs.Joysticks;
@@ -279,17 +281,7 @@ public class RobotContainer {
 
     @SuppressWarnings("unchecked")
     public final SwerveDrive swerve =
-            new SwerveDrive(
-                    TunerConstants.DrivetrainConstants,
-                    SwerveDriveConstants.kDrivePossibleMaxSpeedMPS,
-                    SwerveDriveConstants.kRotPossibleMaxSpeedRadPerSec,
-                    GlobalConstants.kDt,
-                    SwerveDriveConstants.ppRobotConfig,
-                    SwerveDriveConstants.kTeleopKinematicLimits,
-                    TunerConstants.FrontLeft,
-                    TunerConstants.FrontRight,
-                    TunerConstants.BackLeft,
-                    TunerConstants.BackRight);
+            new SwerveDriveSim(SwerveDriveConstants.driveTrainSimulationConfig, GlobalConstants.kDt);
 
     public final Coraler coraler =
             new Coraler(

@@ -1,5 +1,6 @@
 package team3647.frc2025.constants;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.configs.*;
@@ -13,6 +14,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import team3647.lib.team254.geometry.Translation2d;
 import team3647.lib.team254.swerve.SwerveDriveKinematics;
 import team3647.lib.team254.swerve.SwerveKinematicLimits;
@@ -30,35 +32,56 @@ public class SwerveDriveConstants {
     public static final double kDrivePossibleMaxSpeedMPS = 5.6;
     public static final double kRotPossibleMaxSpeedRadPerSec = 11.2;
 
+    // Create and configure a drivetrain simulation configuration
+    public static final DriveTrainSimulationConfig driveTrainSimulationConfig =
+            DriveTrainSimulationConfig.Default()
+                    // Specify gyro type (for realistic gyro drifting and error simulation)
+                    .withGyro(COTS.ofPigeon2())
+                    // Specify swerve module (for realistic swerve dynamics)
+                    .withSwerveModule(
+                            COTS.ofMark4i(
+                                    DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
+                                    DCMotor.getFalcon500(1), // Steer motor is a Falcon 500
+                                    COTS.WHEELS
+                                            .DEFAULT_NEOPRENE_TREAD
+                                            .cof, // Use the COF for Colson Wheels
+                                    3)) // L3 Gear ratio
+                    // Configures the track length and track width (spacing between swerve modules)
+                    .withTrackLengthTrackWidth(Inches.of(22), Inches.of(22))
+                    // Configures the bumper size (dimensions of the robot bumper)
+                    .withBumperSize(Inches.of(33), Inches.of(33));
+
     // public static final TalonFX kFrontLeftDrive =
-    //         new TalonFX(GlobalConstants.SwerveDriveIds.kFrontLeftDriveId, "rio");
+    // new TalonFX(GlobalConstants.SwerveDriveIds.kFrontLeftDriveId, "rio");
     // public static final TalonFX kFrontLeftTurn =
-    //         new TalonFX(GlobalConstants.SwerveDriveIds.kFrontLeftTurnId, "rio");
+    // new TalonFX(GlobalConstants.SwerveDriveIds.kFrontLeftTurnId, "rio");
     // public static final CANcoder kFrontLeftAbsEncoder =
-    //         new CANcoder(GlobalConstants.SwerveDriveIds.kFrontLeftAbsEncoderPort, "rio");
+    // new CANcoder(GlobalConstants.SwerveDriveIds.kFrontLeftAbsEncoderPort, "rio");
 
     // public static final TalonFX kFrontRightDrive =
-    //         new TalonFX(GlobalConstants.SwerveDriveIds.kFrontRightDriveId, "rio");
+    // new TalonFX(GlobalConstants.SwerveDriveIds.kFrontRightDriveId, "rio");
     // public static final TalonFX kFrontRightTurn =
-    //         new TalonFX(GlobalConstants.SwerveDriveIds.kFrontRightTurnId, "rio");
+    // new TalonFX(GlobalConstants.SwerveDriveIds.kFrontRightTurnId, "rio");
     // public static final CANcoder kFrontRightAbsEncoder =
-    //         new CANcoder(GlobalConstants.SwerveDriveIds.kFrontRightAbsEncoderPort, "rio");
+    // new CANcoder(GlobalConstants.SwerveDriveIds.kFrontRightAbsEncoderPort,
+    // "rio");
 
     // public static final TalonFX kBackLeftDrive =
-    //         new TalonFX(GlobalConstants.SwerveDriveIds.kBackLeftDriveId, "rio");
+    // new TalonFX(GlobalConstants.SwerveDriveIds.kBackLeftDriveId, "rio");
     // public static final TalonFX kBackLeftTurn =
-    //         new TalonFX(GlobalConstants.SwerveDriveIds.kBackLeftTurnId, "rio");
+    // new TalonFX(GlobalConstants.SwerveDriveIds.kBackLeftTurnId, "rio");
     // public static final CANcoder kBackLeftAbsEncoder =
-    //         new CANcoder(GlobalConstants.SwerveDriveIds.kBackLeftAbsEncoderPort, "rio");
+    // new CANcoder(GlobalConstants.SwerveDriveIds.kBackLeftAbsEncoderPort, "rio");
 
     // public static final TalonFX kBackRightDrive =
-    //         new TalonFX(GlobalConstants.SwerveDriveIds.kBackRightDriveId, "rio");
+    // new TalonFX(GlobalConstants.SwerveDriveIds.kBackRightDriveId, "rio");
     // public static final TalonFX kBackRightTurn =
-    //         new TalonFX(GlobalConstants.SwerveDriveIds.kBackRightTurnId, "rio");
+    // new TalonFX(GlobalConstants.SwerveDriveIds.kBackRightTurnId, "rio");
     // public static final CANcoder kBackRightAbsEncoder =
-    //         new CANcoder(GlobalConstants.SwerveDriveIds.kBackRightAbsEncoderPort, "rio");
+    // new CANcoder(GlobalConstants.SwerveDriveIds.kBackRightAbsEncoderPort, "rio");
 
-    // public static final Pigeon2 kGyro = new Pigeon2(GlobalConstants.SwerveDriveIds.gyroPin);
+    // public static final Pigeon2 kGyro = new
+    // Pigeon2(GlobalConstants.SwerveDriveIds.gyroPin);
 
     // config swerve module reversed here, module class doens't reverse for you
 
@@ -87,7 +110,8 @@ public class SwerveDriveConstants {
 
     public static final SwerveKinematicLimits kTeleopKinematicLimits = new SwerveKinematicLimits();
 
-    // public static final double defaultAccel = TunerConstants.kSpeedAt12VoltsMps / 0.1;
+    // public static final double defaultAccel = TunerConstants.kSpeedAt12VoltsMps /
+    // 0.1;
     public static final double shootingAccel = 13;
 
     static {
@@ -157,7 +181,8 @@ public class SwerveDriveConstants {
     public static final double kTeleopDriveMaxAngularAccelUnitsPerSec =
             kRotPossibleMaxSpeedRadPerSec / 3;
 
-    // public static final Pigeon2Configurator kGyroConfig = kGyro.getConfigurator();
+    // public static final Pigeon2Configurator kGyroConfig =
+    // kGyro.getConfigurator();
 
     // master FF for drive for all modules
     public static final double kS = 0.22; // (0.56744 / 12); // 0.56744; // Volts
@@ -241,76 +266,76 @@ public class SwerveDriveConstants {
     // PID constants for roll and yaw
 
     // private static final SwerveModuleConstantsFactory ConstantCreator =
-    //         new SwerveModuleConstantsFactory()
-    //                 .withDriveMotorGearRatio(kDriveMotorGearRatio)
-    //                 .withSteerMotorGearRatio(kTurnMotorGearRatio)
-    //                 .withWheelRadius(kWheelRadiusInches)
-    //                 .withSlipCurrent(300)
-    //                 .withSteerMotorGains(kTurnGains)
-    //                 .withDriveMotorGains(kDriveGains)
-    //                 .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-    //                 .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-    //                 .withSpeedAt12Volts(
-    //                         LinearVelocity.ofRelativeUnits(
-    //                                 kDrivePossibleMaxSpeedMPS,
-    //                                 edu.wpi.first.units.Units.MetersPerSecond))
-    //                 .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
-    //                 .withCouplingGearRatio(kCouplingGearRatio);
+    // new SwerveModuleConstantsFactory()
+    // .withDriveMotorGearRatio(kDriveMotorGearRatio)
+    // .withSteerMotorGearRatio(kTurnMotorGearRatio)
+    // .withWheelRadius(kWheelRadiusInches)
+    // .withSlipCurrent(300)
+    // .withSteerMotorGains(kTurnGains)
+    // .withDriveMotorGains(kDriveGains)
+    // .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+    // .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+    // .withSpeedAt12Volts(
+    // LinearVelocity.ofRelativeUnits(
+    // kDrivePossibleMaxSpeedMPS,
+    // edu.wpi.first.units.Units.MetersPerSecond))
+    // .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
+    // .withCouplingGearRatio(kCouplingGearRatio);
 
     // is stored as reference?
 
     // public static final SwerveDrivetrainConstants kDrivetrainConstants =
-    //         new SwerveDrivetrainConstants()
-    //                 .withPigeon2Id(kGyro.getDeviceID())
-    //                 .withCANBusName("rio");
+    // new SwerveDrivetrainConstants()
+    // .withPigeon2Id(kGyro.getDeviceID())
+    // .withCANBusName("rio");
 
     // public static final SwerveModuleConstants kFrontLeftConstants =
-    //         ConstantCreator.createModuleConstants(
-    //                 kFrontLeftTurn.getDeviceID(),
-    //                 kFrontLeftDrive.getDeviceID(),
-    //                 kFrontLeftAbsEncoder.getDeviceID(),
-    //                 kFrontLeftEncoderOffset,
-    //                 Units.Inches.of(kWheelBase / 2.0).in(Units.Meters),
-    //                 Units.Inches.of(kTrackWidth / 2.0).in(Units.Meters),
-    //                 kDriveMotorInvertedLeftSide,
-    //                 kTurnMotorInvertedBoolean);
+    // ConstantCreator.createModuleConstants(
+    // kFrontLeftTurn.getDeviceID(),
+    // kFrontLeftDrive.getDeviceID(),
+    // kFrontLeftAbsEncoder.getDeviceID(),
+    // kFrontLeftEncoderOffset,
+    // Units.Inches.of(kWheelBase / 2.0).in(Units.Meters),
+    // Units.Inches.of(kTrackWidth / 2.0).in(Units.Meters),
+    // kDriveMotorInvertedLeftSide,
+    // kTurnMotorInvertedBoolean);
     // public static final SwerveModuleConstants kFrontRightConstants =
-    //         ConstantCreator.createModuleConstants(
-    //                 kFrontRightTurn.getDeviceID(),
-    //                 kFrontRightDrive.getDeviceID(),
-    //                 kFrontRightAbsEncoder.getDeviceID(),
-    //                 kFrontRightEncoderOffset,
-    //                 Units.Inches.of(kWheelBase / 2.0).in(Units.Meters),
-    //                 Units.Inches.of(-kTrackWidth / 2.0).in(Units.Meters),
-    //                 kDriveMotorInvertedRightSide,
-    //                 kTurnMotorInvertedBoolean);
+    // ConstantCreator.createModuleConstants(
+    // kFrontRightTurn.getDeviceID(),
+    // kFrontRightDrive.getDeviceID(),
+    // kFrontRightAbsEncoder.getDeviceID(),
+    // kFrontRightEncoderOffset,
+    // Units.Inches.of(kWheelBase / 2.0).in(Units.Meters),
+    // Units.Inches.of(-kTrackWidth / 2.0).in(Units.Meters),
+    // kDriveMotorInvertedRightSide,
+    // kTurnMotorInvertedBoolean);
     // public static final SwerveModuleConstants kBackLeftConstants =
-    //         ConstantCreator.createModuleConstants(
-    //                 kBackLeftTurn.getDeviceID(),
-    //                 kBackLeftDrive.getDeviceID(),
-    //                 kBackLeftAbsEncoder.getDeviceID(),
-    //                 kBackLeftEncoderOffset,
-    //                 Units.Inches.of(-kWheelBase / 2.0).in(Units.Meters),
-    //                 Units.Inches.of(kTrackWidth / 2.0).in(Units.Meters),
-    //                 kDriveMotorInvertedLeftSide,
-    //                 kTurnMotorInvertedBoolean);
+    // ConstantCreator.createModuleConstants(
+    // kBackLeftTurn.getDeviceID(),
+    // kBackLeftDrive.getDeviceID(),
+    // kBackLeftAbsEncoder.getDeviceID(),
+    // kBackLeftEncoderOffset,
+    // Units.Inches.of(-kWheelBase / 2.0).in(Units.Meters),
+    // Units.Inches.of(kTrackWidth / 2.0).in(Units.Meters),
+    // kDriveMotorInvertedLeftSide,
+    // kTurnMotorInvertedBoolean);
     // public static final SwerveModuleConstants kBackRightConstants =
-    //         ConstantCreator.createModuleConstants(
-    //                 kBackRightTurn.getDeviceID(),
-    //                 kBackRightDrive.getDeviceID(),
-    //                 kBackRightAbsEncoder.getDeviceID(),
-    //                 kBackRightEncoderOffset,
-    //                 Units.Inches.of(-kWheelBase / 2.0).in(Units.Meters),
-    //                 Units.Inches.of(-kTrackWidth / 2.0).in(Units.Meters),
-    //                 kDriveMotorInvertedRightSide,
-    //                 kTurnMotorInvertedBoolean);
+    // ConstantCreator.createModuleConstants(
+    // kBackRightTurn.getDeviceID(),
+    // kBackRightDrive.getDeviceID(),
+    // kBackRightAbsEncoder.getDeviceID(),
+    // kBackRightEncoderOffset,
+    // Units.Inches.of(-kWheelBase / 2.0).in(Units.Meters),
+    // Units.Inches.of(-kTrackWidth / 2.0).in(Units.Meters),
+    // kDriveMotorInvertedRightSide,
+    // kTurnMotorInvertedBoolean);
 
     // private static void printError(StatusCode error) {
-    //     if (error.value == 0) {
-    //         return;
-    //     }
+    // if (error.value == 0) {
+    // return;
+    // }
 
-    //     System.out.println(error);
+    // System.out.println(error);
     // }
 
     static double driveMOI =
@@ -320,36 +345,36 @@ public class SwerveDriveConstants {
                     * Units.Inch.of(19).in(Units.Meter);
 
     // public static final DriveTrainSimulationConfig simConfig =
-    //         DriveTrainSimulationConfig.Default()
-    //                 .withTrackLengthTrackWidth(Units.Inch.of(27), Units.Inches.of(27))
-    //                 .withGyro(COTS.ofPigeon2())
-    //                 .withRobotMass(Units.Pound.of(125))
-    //                 .withSwerveModule(
-    //                         new SwerveModuleSimulationConfig(
-    //                                 DCMotor.getFalcon500(1),
-    //                                 DCMotor.getFalcon500(1),
-    //                                 TunerConstants.FrontLeft.DriveMotorGearRatio,
-    //                                 TunerConstants.FrontLeft.SteerMotorGearRatio,
-    //                                 Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
-    //                                 Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
-    //                                 Inches.of(2),
+    // DriveTrainSimulationConfig.Default()
+    // .withTrackLengthTrackWidth(Units.Inch.of(27), Units.Inches.of(27))
+    // .withGyro(COTS.ofPigeon2())
+    // .withRobotMass(Units.Pound.of(125))
+    // .withSwerveModule(
+    // new SwerveModuleSimulationConfig(
+    // DCMotor.getFalcon500(1),
+    // DCMotor.getFalcon500(1),
+    // TunerConstants.FrontLeft.DriveMotorGearRatio,
+    // TunerConstants.FrontLeft.SteerMotorGearRatio,
+    // Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
+    // Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
+    // Inches.of(2),
     //
     // KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
-    //                                 COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof))
-    //                 .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
+    // COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof))
+    // .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
 
     // public static final DriveTrainSimulationConfig kBetterSimConfig =
-    //         DriveTrainSimulationConfig.Default()
-    //                 .withTrackLengthTrackWidth(Units.Inch.of(19), Units.Inches.of(19))
-    //                 .withGyro(COTS.ofPigeon2())
-    //                 .withRobotMass(Units.Pound.of(120))
-    //                 .withSwerveModule(
-    //                         COTS.ofMark4i(
-    //                                 DCMotor.getKrakenX60Foc(1),
-    //                                 DCMotor.getFalcon500Foc(1),
-    //                                 COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof,
-    //                                 4))
-    //                 .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
+    // DriveTrainSimulationConfig.Default()
+    // .withTrackLengthTrackWidth(Units.Inch.of(19), Units.Inches.of(19))
+    // .withGyro(COTS.ofPigeon2())
+    // .withRobotMass(Units.Pound.of(120))
+    // .withSwerveModule(
+    // COTS.ofMark4i(
+    // DCMotor.getKrakenX60Foc(1),
+    // DCMotor.getFalcon500Foc(1),
+    // COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof,
+    // 4))
+    // .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
 
     static {
     }

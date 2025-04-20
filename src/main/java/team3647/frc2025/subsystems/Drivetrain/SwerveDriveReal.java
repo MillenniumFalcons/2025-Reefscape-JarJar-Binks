@@ -1,15 +1,10 @@
-package team3647.frc2025.subsystems;
+package team3647.frc2025.subsystems.Drivetrain;
 
-import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Pound;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
@@ -31,7 +26,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -46,26 +40,20 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import java.util.function.DoubleSupplier;
-import org.ironmaple.simulation.drivesims.COTS;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import team3647.frc2025.Util.sim.MapleSimSwerveDrivetrain;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
-import team3647.frc2025.constants.TunerConstants;
 import team3647.frc2025.constants.TunerConstants.TunerSwerveDrivetrain;
 import team3647.lib.ModifiedSignalLogger;
-import team3647.lib.PeriodicSubsystem;
 import team3647.lib.SwerveFOCRequest;
 import team3647.lib.team254.swerve.SwerveKinematicLimits;
 import team3647.lib.team254.swerve.SwerveSetpoint;
 import team3647.lib.team254.swerve.SwerveSetpointGenerator;
-import team3647.lib.team9442.AllianceObserver;
 import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
-public class SwerveDrive extends TunerSwerveDrivetrain
-        implements AllianceObserver, PeriodicSubsystem {
+public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDrive {
 
     public final SwerveSetpointGenerator setpointGenerator;
 
@@ -106,9 +94,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
 
     private static final double kSimLoopPeriod = 0.002;
 
-    MapleSimSwerveDrivetrain simDrive;
-
-    public static class PeriodicIO {
+    private class PeriodicIO {
         // inputs
 
         public SwerveSetpoint setpoint =
@@ -172,7 +158,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
                                         .MotionMagicExpo);
     }
 
-    public SwerveDrive(
+    public SwerveDriveReal(
             SwerveDrivetrainConstants swerveDriveConstants,
             double maxSpeedMpS,
             double maxRotRadPerSec,
@@ -349,33 +335,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
                 this // Reference to this subsystem to set requirements
                 );
 
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
         wantedRoutine = this.m_driveSysIdRoutine;
-    }
-
-    private void startSimThread() {
-        simDrive =
-                new MapleSimSwerveDrivetrain(
-                        Seconds.of(kSimLoopPeriod),
-                        // TODO: modify the following constants according to your robot
-                        Pound.of(125), // robot weight
-                        Inches.of(30), // bumper length
-                        Inches.of(30), // bumper width
-                        DCMotor.getKrakenX60(1), // drive motor type
-                        DCMotor.getFalcon500(1), // steer motor type
-                        COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof, // wheel COF
-                        getModuleLocations(),
-                        getPigeon2(),
-                        getModules(),
-                        TunerConstants.FrontLeft,
-                        TunerConstants.FrontRight,
-                        TunerConstants.BackLeft,
-                        TunerConstants.BackRight);
-        /* Run simulation at a faster rate so PID gains behave more reasonably */
-        m_simNotifier = new Notifier(simDrive::update);
-        m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
     public void zeroPitch() {
@@ -450,13 +410,7 @@ public class SwerveDrive extends TunerSwerveDrivetrain
     }
 
     public Orientation getPigeonOrientation() {
-        return new Orientation(
-                periodicIO.pose.getRotation().getMeasure(),
-                Degree.zero(),
-                Degree.zero(),
-                DegreesPerSecond.zero(),
-                DegreesPerSecond.zero(),
-                DegreesPerSecond.zero());
+        return new Orientation(periodicIO.pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
     }
 
     public boolean getIsAccel() {
@@ -495,10 +449,6 @@ public class SwerveDrive extends TunerSwerveDrivetrain
     }
 
     public void setRobotPose(Pose2d pose) {
-        if (Utils.isSimulation()) {
-            simDrive.mapleSimDrive.setSimulationWorldPose(pose);
-            Timer.delay(0.05);
-        }
 
         resetPose(pose);
         periodicIO = new PeriodicIO();

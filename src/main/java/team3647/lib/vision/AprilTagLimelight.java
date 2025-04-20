@@ -1,6 +1,5 @@
 package team3647.lib.vision;
 
-import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Millisecond;
 import static edu.wpi.first.units.Units.Second;
 
@@ -93,7 +92,14 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
 
     public void setOrientation() {
         var angle = orientation.get();
-        LimelightHelpers.SetRobotOrientation(name, angle.yaw.in(Degree), 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation(
+                name,
+                angle.yaw(),
+                angle.pitchRate(),
+                angle.pitch(),
+                angle.pitchRate(),
+                angle.roll(),
+                angle.rollRate());
     }
 
     private boolean isMultitag() {

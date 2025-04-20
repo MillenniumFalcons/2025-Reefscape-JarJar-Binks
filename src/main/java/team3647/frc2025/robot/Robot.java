@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import static edu.wpi.first.units.Units.Millisecond;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -59,6 +62,7 @@ public class Robot extends LoggedRobot {
         }
 
         AutoLogOutputManager.addPackage("team3647.lib");
+        AutoLogOutputManager.addPackage("team3647.frc2025.subsystems.Drivetrain");
 
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata
         // values may
@@ -140,11 +144,13 @@ public class Robot extends LoggedRobot {
     public void testExit() {}
 
     @Override
-    public void simulationInit() {}
+    public void simulationInit() {
+        // SimulatedArena.overrideSimulationTimings(Millisecond.of(20), 1);
+    }
 
     @Override
     public void simulationPeriodic() {
-
+        Logger.recordOutput("SimulatedArena.getSimulationDt", SimulatedArena.getSimulationDt());
         SimulatedArena.getInstance().simulationPeriodic();
     }
 }

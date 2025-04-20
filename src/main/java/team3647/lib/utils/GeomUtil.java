@@ -1,8 +1,12 @@
-package team3647.lib;
+package team3647.lib.utils;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N3;
 
 public class GeomUtil {
     public static double distance(Pose2d pose1, Pose2d pose2) {
@@ -29,5 +33,10 @@ public class GeomUtil {
     public static double distanceSquared(Translation2d transform) {
         var distancSquared = Math.pow(transform.getX(), 2) + Math.pow(transform.getY(), 2);
         return distancSquared;
+    }
+
+    public static Vector<N3> asVector(ChassisSpeeds speeds) {
+        return VecBuilder.fill(
+                speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
     }
 }
