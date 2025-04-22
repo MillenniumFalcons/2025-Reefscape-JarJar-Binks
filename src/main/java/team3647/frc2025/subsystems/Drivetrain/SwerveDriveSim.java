@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -25,49 +26,11 @@ import team3647.lib.vision.VisionMeasurement;
 public class SwerveDriveSim implements SwerveDrive {
     private final SelfControlledSwerveDriveSimulation simSwerve;
 
-    @AutoLog
-    static class PeriodicIO {
-
-        // config/driving stuff
-        public ChassisSpeeds outputSpeeds = new ChassisSpeeds();
-        public boolean fieldRelative = false;
-        public Translation2d centerOfRotation = new Translation2d();
-
-        // pose stuff
-        public Pose2d odoPose = new Pose2d();
-        public Pose2d simPose = new Pose2d();
-        public Pose2d visionPose = new Pose2d();
-        public ChassisSpeeds measuredSpeeds = new ChassisSpeeds();
-        public ChassisSpeeds actualSpeeds = new ChassisSpeeds();
-
-        double timestamp = 0;
-
-        // states stuff
- 
-
-        public SwerveModuleState[] states =
-        new SwerveModuleState[] {
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState()
-        };
-
-        public SwerveModuleState[] targets =
-                new SwerveModuleState[] {
-                    new SwerveModuleState(),
-                    new SwerveModuleState(),
-                    new SwerveModuleState(),
-                    new SwerveModuleState()
-                };
-
-        public Alliance color = Alliance.Blue;
-    }
-
     private PeriodicIOAutoLogged periodicIO = new PeriodicIOAutoLogged();
     private final double kDt;
 
     public SwerveDriveSim(DriveTrainSimulationConfig config, double kDt) {
+        if(RobotBase.isReal()) throw new IllegalStateException("TRYING TO RUN SIM DT ON REAL RIO");
         this.simSwerve =
                 new SelfControlledSwerveDriveSimulation(
                         new SwerveDriveSimulation(
@@ -88,12 +51,10 @@ public class SwerveDriveSim implements SwerveDrive {
 
     @Override
     public void driveFieldOriented(double x, double y, double rotation) {
-        periodicIO.outputSpeeds.vxMetersPerSecond = x;
-        periodicIO.outputSpeeds.vyMetersPerSecond = y;
-        periodicIO.outputSpeeds.omegaRadiansPerSecond = rotation;
+        periodicIO.outputSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotation, periodicIO.simPose.getRotation());
 
 
-        periodicIO.fieldRelative = true;
+        periodicIO.fieldRelative = false;
     }
 
     public boolean shouldAddData(VisionMeasurement measurement) {
@@ -119,7 +80,7 @@ public class SwerveDriveSim implements SwerveDrive {
     public void writePeriodicOutputs() {
         simSwerve.periodic();
         simSwerve.runChassisSpeeds(
-                periodicIO.outputSpeeds,    
+                periodicIO.outputSpeeds.times(1),    
                 periodicIO.centerOfRotation,
                 periodicIO.fieldRelative,
                 true);
@@ -137,7 +98,7 @@ public class SwerveDriveSim implements SwerveDrive {
 
         
 
-        periodicIO.odoPose = simSwerve.getOdometryEstimatedPose();
+        periodicIO.pose = simSwerve.getOdometryEstimatedPose();
         periodicIO.simPose = simSwerve.getActualPoseInSimulationWorld();
         periodicIO.measuredSpeeds = simSwerve.getMeasuredSpeedsFieldRelative(true);
         periodicIO.actualSpeeds = simSwerve.getActualSpeedsFieldRelative();
@@ -169,7 +130,12 @@ public class SwerveDriveSim implements SwerveDrive {
 
     @Override
     public Pose2d getOdoPose() {
-        return periodicIO.odoPose;
+        return periodicIO.pose;
+    }
+
+    @Override
+    public Pose2d getRealPose() {
+        return periodicIO.simPose;
     }
 
     public Pose2d getSimPose() {
@@ -178,7 +144,7 @@ public class SwerveDriveSim implements SwerveDrive {
 
     @Override
     public Orientation getPigeonOrientation() {
-        return new Orientation(periodicIO.odoPose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        return new Orientation(periodicIO.pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
     }
 
     @Override

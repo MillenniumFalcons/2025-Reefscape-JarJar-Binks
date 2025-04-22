@@ -7,10 +7,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+
 import org.littletonrobotics.junction.Logger;
+
+import team3647.frc2025.constants.VisionConstants;
 import team3647.lib.team6328.VirtualSubsystem;
 
-public class VisionController extends VirtualSubsystem {
+public class VisionController extends VirtualSubsystem{
     private final AprilTagCamera[] cameras;
     private final Consumer<VisionMeasurement> botPoseAcceptor;
     private final Consumer<Pose2d> resetPose;
@@ -72,6 +76,7 @@ public class VisionController extends VirtualSubsystem {
 
             Logger.recordOutput("Robot/Vision", list.get(0).pose);
             Logger.recordOutput("Robot/Camera", list.get(0).name);
+          
             // Logger.recordOutput("stddev", list.get(0).stdDevs.get(0, 0));
         } else {
             Logger.recordOutput("Robot/Vision", new Pose2d(1, 1, new Rotation2d()));

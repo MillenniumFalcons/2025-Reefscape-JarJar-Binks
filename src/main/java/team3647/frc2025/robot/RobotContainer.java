@@ -58,6 +58,7 @@ import team3647.lib.team9442.AutoChooser;
 import team3647.lib.vision.AprilTagLimelight;
 import team3647.lib.vision.AprilTagPhotonVision;
 import team3647.lib.vision.NeuralDetectorLimelight;
+import team3647.lib.vision.SimVision;
 import team3647.lib.vision.VisionController;
 
 public class RobotContainer {
@@ -365,6 +366,7 @@ public class RobotContainer {
                     VisionConstants.FrontLL,
                     swerve::getPigeonOrientation,
                     VisionConstants.baseStdDevs);
+                
 
     public final AutoDrive autoDrive =
             new AutoDrive(
@@ -417,7 +419,8 @@ public class RobotContainer {
                     VisionConstants.backLeftCamName,
                     VisionConstants.BackLeft,
                     VisionConstants.baseStdDevs,
-                    (pose) -> true);
+                    (pose) -> true,
+                    VisionConstants.k2025AprilTags);
 
     AprilTagLimelight xBar =
             new AprilTagLimelight(
@@ -425,6 +428,15 @@ public class RobotContainer {
                     VisionConstants.LLCrossMount,
                     swerve::getPigeonOrientation,
                     VisionConstants.baseStdDevs);
+		
+	//sim purposes
+    AprilTagPhotonVision frontPhotonCam = 
+			new AprilTagPhotonVision(
+				VisionConstants.frontLLName, 
+				VisionConstants.FrontLL, 
+				VisionConstants.baseStdDevs, 
+				pose -> false,
+				VisionConstants.k2025AprilTags);
 
     // AprilTagPhotonVision frontRight =
     // new AprilTagPhotonVision("frontRight", VisionConstants.kRobotToFrontRight ,
@@ -441,6 +453,16 @@ public class RobotContainer {
                     xBar,
                     front);
     public final RobotTracker tracker = new RobotTracker(superstructure, autoDrive);
+
+    public final SimVision simVision = 
+                new SimVision(
+                        VisionConstants.k2025AprilTags,
+						swerve::getRealPose,
+                        frontLeft,
+                        frontRight,
+                        backRight,
+						frontPhotonCam
+                );
 
     Trigger score =
             new Trigger(

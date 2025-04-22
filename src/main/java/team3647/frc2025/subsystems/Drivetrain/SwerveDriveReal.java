@@ -66,7 +66,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
     private final double maxSpeedMpS;
     private final double maxRotRadPerSec;
 
-    private PeriodicIO periodicIO = new PeriodicIO();
+    private PeriodicIOAutoLogged periodicIO = new PeriodicIOAutoLogged();
 
     private final Pose2d zeroPose2d = new Pose2d();
 
@@ -94,69 +94,22 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     private static final double kSimLoopPeriod = 0.002;
 
-    private class PeriodicIO {
-        // inputs
+    // real-specific output stuff
+    public SwerveRequest masterRequest = new SwerveRequest.Idle();
+    public SysIdSwerveRotation spinSysidRequest = new SysIdSwerveRotation();
+    public SysIdSwerveTranslation driveVoltageRequest = new SysIdSwerveTranslation();
+    public SysIdSwerveSteerGains steerVoltageRequest = new SysIdSwerveSteerGains();
+    public SwerveFOCRequest driveFOCRequest = new SwerveFOCRequest(true);
+    public SwerveFOCRequest steerFOCRequest = new SwerveFOCRequest(false);
+    public FieldCentric fieldCentric = new FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    public RobotCentric robotCentric = new RobotCentric()
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+            .withSteerRequestType(
+                    com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType.MotionMagicExpo);
 
-        public SwerveSetpoint setpoint =
-                new SwerveSetpoint(
-                        new team3647.lib.team254.swerve.ChassisSpeeds(),
-                        new team3647.lib.team254.swerve.SwerveModuleState[4]);
-
-        public boolean good = false;
-
-        public double cachedVel = 0;
-        public boolean isAccel = false;
-
-        public double characterizationVoltage = 0;
-        public boolean isOpenloop = true;
-        public double heading = 0;
-        public double roll = 0;
-        public double pitch = 0;
-        public double rawHeading = 0;
-        public Rotation2d gyroRotation = new Rotation2d();
-
-        public Alliance color = Alliance.Blue;
-
-        public SwerveModuleState frontLeftState = new SwerveModuleState();
-        public SwerveModuleState frontRightState = new SwerveModuleState();
-        public SwerveModuleState backLeftState = new SwerveModuleState();
-        public SwerveModuleState backRightState = new SwerveModuleState();
-
-        public SwerveModuleState[] states =
-                new SwerveModuleState[] {
-                    frontLeftState, frontRightState, backLeftState, backRightState
-                };
-
-        public SwerveModuleState[] targets =
-                new SwerveModuleState[] {
-                    new SwerveModuleState(),
-                    new SwerveModuleState(),
-                    new SwerveModuleState(),
-                    new SwerveModuleState()
-                };
-
-        public double timestamp = 0;
-
-        public Pose2d visionPose = new Pose2d();
-
-        public Pose2d pose = new Pose2d();
-        public ChassisSpeeds speeds = new ChassisSpeeds();
-
-        public SwerveRequest masterRequest = new SwerveRequest.Idle();
-        public SysIdSwerveRotation spinSysidRequest = new SysIdSwerveRotation();
-        public SysIdSwerveTranslation driveVoltageRequest = new SysIdSwerveTranslation();
-        public SysIdSwerveSteerGains steerVoltageRequest = new SysIdSwerveSteerGains();
-        public SwerveFOCRequest driveFOCRequest = new SwerveFOCRequest(true);
-        public SwerveFOCRequest steerFOCRequest = new SwerveFOCRequest(false);
-        public FieldCentric fieldCentric =
-                new FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-        public RobotCentric robotCentric =
-                new RobotCentric()
-                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-                        .withSteerRequestType(
-                                com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType
-                                        .MotionMagicExpo);
-    }
+    public SwerveSetpoint setpoint = new SwerveSetpoint(
+            new team3647.lib.team254.swerve.ChassisSpeeds(),
+            new team3647.lib.team254.swerve.SwerveModuleState[4]);
 
     public SwerveDriveReal(
             SwerveDrivetrainConstants swerveDriveConstants,
@@ -165,9 +118,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
             double kDt,
             RobotConfig ppRobotConfig,
             SwerveKinematicLimits limits,
-            SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-                            ...
-                    swerveModuleConstants) {
+            SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>... swerveModuleConstants) {
         super(swerveDriveConstants, swerveModuleConstants);
         registerTelemetry(this::setStuff);
 
@@ -183,127 +134,114 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         this.limits.kMaxDriveAcceleration = 5 / 0.1; // defaultAccel;
         this.limits.kMaxSteeringVelocity = Units.Degree.of(1500).in(Units.Radians);
 
-        this.kTurnMotorRoutineVoltage =
-                new SysIdRoutine(
-                        new SysIdRoutine.Config(
-                                null, // Use default ramp rate (1 V/s)
-                                Volts.of(7), // Use dynamic voltage of 7 V
-                                null, // Use default timeout (10 s)
-                                // Log state with SignalLogger class
-                                state ->
-                                        SignalLogger.writeString(
-                                                "SysIdSteer_State", state.toString())),
-                        new SysIdRoutine.Mechanism(
-                                volts ->
-                                        setControl(periodicIO.steerVoltageRequest.withVolts(volts)),
-                                null,
-                                this,
-                                "steer motor voltage"));
+        this.kTurnMotorRoutineVoltage = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        null, // Use default ramp rate (1 V/s)
+                        Volts.of(7), // Use dynamic voltage of 7 V
+                        null, // Use default timeout (10 s)
+                        // Log state with SignalLogger class
+                        state -> SignalLogger.writeString(
+                                "SysIdSteer_State", state.toString())),
+                new SysIdRoutine.Mechanism(
+                        volts -> setControl(this.steerVoltageRequest.withVolts(volts)),
+                        null,
+                        this,
+                        "steer motor voltage"));
 
-        this.m_driveSysIdRoutine =
-                new SysIdRoutine(
-                        new SysIdRoutine.Config(
-                                Units.Volts.of(10).per(Units.Second),
-                                Units.Volts.of(30),
-                                Units.Seconds.of(4),
-                                ModifiedSignalLogger.logState()),
-                        new SysIdRoutine.Mechanism(
-                                (Voltage volts) ->
-                                        setControl(
-                                                periodicIO.driveFOCRequest.withVoltage(
-                                                        volts.in(Units.Volts))),
-                                null,
-                                this,
-                                "Drive motor foc"));
+        this.m_driveSysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        Units.Volts.of(10).per(Units.Second),
+                        Units.Volts.of(30),
+                        Units.Seconds.of(4),
+                        ModifiedSignalLogger.logState()),
+                new SysIdRoutine.Mechanism(
+                        (Voltage volts) -> setControl(
+                                this.driveFOCRequest.withVoltage(
+                                        volts.in(Units.Volts))),
+                        null,
+                        this,
+                        "Drive motor foc"));
 
-        this.m_steerSysIdRoutine =
-                new SysIdRoutine(
-                        new SysIdRoutine.Config(
-                                Units.Volts.of(3).per(Units.Second),
-                                Units.Volts.of(10),
-                                Units.Seconds.of(4),
-                                ModifiedSignalLogger.logState()),
-                        new SysIdRoutine.Mechanism(
-                                (Voltage volts) ->
-                                        setControl(
-                                                periodicIO.steerFOCRequest.withVoltage(
-                                                        volts.in(Units.Volts))),
-                                null,
-                                this,
-                                "steer motor FOC"));
+        this.m_steerSysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        Units.Volts.of(3).per(Units.Second),
+                        Units.Volts.of(10),
+                        Units.Seconds.of(4),
+                        ModifiedSignalLogger.logState()),
+                new SysIdRoutine.Mechanism(
+                        (Voltage volts) -> setControl(
+                                this.steerFOCRequest.withVoltage(
+                                        volts.in(Units.Volts))),
+                        null,
+                        this,
+                        "steer motor FOC"));
 
-        this.kSpinSysIdRoutine =
-                new SysIdRoutine(
-                        new SysIdRoutine.Config(
-                                Units.Volts.of(1).per(Second),
-                                Units.Volts.of(3),
-                                Second.of(10),
-                                ModifiedSignalLogger.logState()),
-                        new Mechanism(
-                                (Voltage volts) ->
-                                        setControl(
-                                                periodicIO.spinSysidRequest.withRotationalRate(
-                                                        volts.in(Units.Volts))),
-                                null,
-                                this,
-                                "Robot MOI Characterization"));
+        this.kSpinSysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        Units.Volts.of(1).per(Second),
+                        Units.Volts.of(3),
+                        Second.of(10),
+                        ModifiedSignalLogger.logState()),
+                new Mechanism(
+                        (Voltage volts) -> setControl(
+                                this.spinSysidRequest.withRotationalRate(
+                                        volts.in(Units.Volts))),
+                        null,
+                        this,
+                        "Robot MOI Characterization"));
 
         // "voltage" is velocity and "Velocity" is also velocity and "position" is
         // position in the
         // sysid app
         // ^ will lead to shit ff gains but hopefully good pid gains
-        this.xControllerTuning =
-                new SysIdRoutine(
-                        new Config(
-                                Volts.of(0.4).per(Seconds),
-                                Volts.of(0.6),
-                                Seconds.of(10),
-                                ModifiedSignalLogger.logState()),
-                        new Mechanism(
-                                (xVel) -> driveFieldOriented(xVel.in(Volts), 0, 0),
-                                null,
-                                this,
-                                getName() + " X Controller"));
+        this.xControllerTuning = new SysIdRoutine(
+                new Config(
+                        Volts.of(0.4).per(Seconds),
+                        Volts.of(0.6),
+                        Seconds.of(10),
+                        ModifiedSignalLogger.logState()),
+                new Mechanism(
+                        (xVel) -> driveFieldOriented(xVel.in(Volts), 0, 0),
+                        null,
+                        this,
+                        getName() + " X Controller"));
         // "voltage" is velocity and "Velocity" is also velocity and "position" is
         // position for the
         // sysid app
         // ^ will lead to shit ff gains but hopefully good pid gains
-        this.yControllerTuning =
-                new SysIdRoutine(
-                        new Config(
-                                Volts.of(0.2).per(Seconds),
-                                Volts.of(0.6),
-                                Seconds.of(5),
-                                ModifiedSignalLogger.logState()),
-                        new Mechanism(
-                                (yVel) -> drive(0, yVel.in(Volts), 0),
-                                null,
-                                this,
-                                getName() + " Y Controller"));
+        this.yControllerTuning = new SysIdRoutine(
+                new Config(
+                        Volts.of(0.2).per(Seconds),
+                        Volts.of(0.6),
+                        Seconds.of(5),
+                        ModifiedSignalLogger.logState()),
+                new Mechanism(
+                        (yVel) -> drive(0, yVel.in(Volts), 0),
+                        null,
+                        this,
+                        getName() + " Y Controller"));
 
-        this.rotControllerTuning =
-                new SysIdRoutine(
-                        new Config(
-                                Volts.of(0.4).per(Seconds),
-                                Volts.of(0.8),
-                                Seconds.of(10),
-                                ModifiedSignalLogger.logState()),
-                        new Mechanism(
-                                (rotVel) -> drive(0, 0, rotVel.in(Volts)),
-                                null,
-                                this,
-                                getName() + " Rot Controller"));
+        this.rotControllerTuning = new SysIdRoutine(
+                new Config(
+                        Volts.of(0.4).per(Seconds),
+                        Volts.of(0.8),
+                        Seconds.of(10),
+                        ModifiedSignalLogger.logState()),
+                new Mechanism(
+                        (rotVel) -> drive(0, 0, rotVel.in(Volts)),
+                        null,
+                        this,
+                        getName() + " Rot Controller"));
 
         AutoBuilder.configure(
                 this::getOdoPose, // Robot pose supplier
                 this::resetPose, // Method to reset odometry (will be called if your auto has a
                 // starting pose)
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (ChassisSpeeds speeds) ->
-                        this.drive(
-                                speeds.vxMetersPerSecond,
-                                speeds.vyMetersPerSecond,
-                                speeds.omegaRadiansPerSecond), // Method that will drive the robot
+                (ChassisSpeeds speeds) -> this.drive(
+                        speeds.vxMetersPerSecond,
+                        speeds.vyMetersPerSecond,
+                        speeds.omegaRadiansPerSecond), // Method that will drive the robot
                 // given ROBOT RELATIVE
                 // ChassisSpeeds. Also optionally outputs individual module
                 // feedforwards
@@ -318,7 +256,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
                                 AutoConstants.rotController.getP(),
                                 AutoConstants.rotController.getI(),
                                 AutoConstants.rotController.getD()) // Rotation PID constants
-                        ),
+                ),
                 ppRobotConfig,
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red
@@ -333,7 +271,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
                     return false;
                 },
                 this // Reference to this subsystem to set requirements
-                );
+        );
 
         wantedRoutine = this.m_driveSysIdRoutine;
     }
@@ -348,16 +286,12 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         periodicIO.heading = this.getPigeon2().getYaw().getValueAsDouble();
         periodicIO.pitch = this.getPigeon2().getPitch().getValueAsDouble() - this.pitchZero;
         periodicIO.rawHeading = this.getPigeon2().getYaw().getValueAsDouble();
-        periodicIO.frontLeftState = this.getModules()[0].getCurrentState();
-        periodicIO.frontRightState = this.getModules()[1].getCurrentState();
-        periodicIO.backLeftState = this.getModules()[2].getCurrentState();
-        periodicIO.backRightState = this.getModules()[3].getCurrentState();
+        periodicIO.states[0] = this.getModules()[0].getCurrentState();
+        periodicIO.states[1] = this.getModules()[1].getCurrentState();
+        periodicIO.states[2] = this.getModules()[2].getCurrentState();
+        periodicIO.states[3] = this.getModules()[3].getCurrentState();
         periodicIO.gyroRotation = Rotation2d.fromDegrees(periodicIO.heading);
         periodicIO.timestamp = Timer.getFPGATimestamp();
-        periodicIO.frontLeftState = periodicIO.states[0];
-        periodicIO.frontRightState = periodicIO.states[1];
-        periodicIO.backLeftState = periodicIO.states[2];
-        periodicIO.backRightState = periodicIO.states[3];
 
         // SmartDashboard.putBoolean("good", periodicIO.good);
 
@@ -368,7 +302,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
     @Override
     public void writePeriodicOutputs() {
         setisAccel();
-        this.setControl(periodicIO.masterRequest);
+        this.setControl(this.masterRequest);
         // simpleSim.periodic();
         Logger.recordOutput("Robot/targets", periodicIO.targets);
         Logger.recordOutput("Robot/states", periodicIO.states);
@@ -423,11 +357,10 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     public void reset() {
         for (int i = 0; i < 4; ++i) {
-            periodicIO.setpoint.mModuleStates[i] =
-                    new team3647.lib.team254.swerve.SwerveModuleState(
-                            0.0,
-                            team3647.lib.team254.geometry.Rotation2d.fromRadians(
-                                    this.getModulePositions()[i].angle.getRadians()));
+            this.setpoint.mModuleStates[i] = new team3647.lib.team254.swerve.SwerveModuleState(
+                    0.0,
+                    team3647.lib.team254.geometry.Rotation2d.fromRadians(
+                            this.getModulePositions()[i].angle.getRadians()));
         }
         periodicIO.good = true;
     }
@@ -451,7 +384,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
     public void setRobotPose(Pose2d pose) {
 
         resetPose(pose);
-        periodicIO = new PeriodicIO();
+        periodicIO = new PeriodicIOAutoLogged();
     }
 
     public void resetEncoders() {
@@ -521,7 +454,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         // state.Pose.getX(), state.Pose.getY(), state.Pose.getRotation().getDegrees()
         // });
         periodicIO.pose = state.Pose;
-        periodicIO.speeds = state.Speeds;
+        periodicIO.measuredSpeeds = state.Speeds;
         periodicIO.states = state.ModuleStates;
         periodicIO.targets = state.ModuleTargets;
 
@@ -548,15 +481,15 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     public SwerveModulePosition[] getModulePositions() {
         return new SwerveModulePosition[] {
-            this.getModules()[0].getPosition(true),
-            this.getModules()[1].getPosition(true),
-            this.getModules()[2].getPosition(true),
-            this.getModules()[3].getPosition(true)
+                this.getModules()[0].getPosition(true),
+                this.getModules()[1].getPosition(true),
+                this.getModules()[2].getPosition(true),
+                this.getModules()[3].getPosition(true)
         };
     }
 
     public ChassisSpeeds getChassisSpeeds() {
-        return periodicIO.speeds;
+        return periodicIO.measuredSpeeds;
     }
 
     public double getAccel() {
@@ -572,8 +505,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     public boolean shouldAddData(VisionMeasurement measurement) {
         double distance = measurement.pose.minus(getOdoPose()).getTranslation().getNorm();
-        double angle =
-                measurement.pose.getRotation().minus(getOdoPose().getRotation()).getDegrees();
+        double angle = measurement.pose.getRotation().minus(getOdoPose().getRotation()).getDegrees();
         return (distance < MathUtil.clamp(getVel(), 0.25, 1.5) && Math.abs(angle) < 15)
                 || DriverStation.isAutonomous();
     }
@@ -611,7 +543,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
     }
 
     public void stopModules() {
-        periodicIO.masterRequest = new SwerveRequest.Idle();
+        this.masterRequest = new SwerveRequest.Idle();
     }
 
     public void drive(double x, double y, double rotation) {
@@ -621,39 +553,40 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
             return;
         }
         SwerveSetpoint setpoint = generateRobotOriented(x, y, rotation);
-        periodicIO
-                .robotCentric
+        this.robotCentric
                 .withVelocityX(setpoint.mChassisSpeeds.vxMetersPerSecond)
                 .withVelocityY(setpoint.mChassisSpeeds.vyMetersPerSecond)
                 .withRotationalRate(setpoint.mChassisSpeeds.omegaRadiansPerSecond);
-        periodicIO.masterRequest = periodicIO.robotCentric;
+        this.masterRequest = this.robotCentric;
     }
 
     public SwerveSetpoint generate(double x, double y, double omega) {
-        Logger.recordOutput("prevspt", periodicIO.setpoint.mChassisSpeeds.vyMetersPerSecond);
-        var robotRel =
-                team3647.lib.team254.swerve.ChassisSpeeds.fromFieldRelativeSpeeds(
-                        x,
-                        y,
-                        omega,
-                        team3647.lib.team254.geometry.Rotation2d.fromDegrees(
-                                this.getOdoPose().getRotation().getDegrees()));
+        Logger.recordOutput("prevspt", this.setpoint.mChassisSpeeds.vyMetersPerSecond);
+        var robotRel = team3647.lib.team254.swerve.ChassisSpeeds.fromFieldRelativeSpeeds(
+                x,
+                y,
+                omega,
+                team3647.lib.team254.geometry.Rotation2d.fromDegrees(
+                        this.getOdoPose().getRotation().getDegrees()));
 
-        periodicIO.setpoint =
-                setpointGenerator.generateSetpoint(limits, periodicIO.setpoint, robotRel, kDt);
+        this.setpoint = setpointGenerator.generateSetpoint(limits, this.setpoint, robotRel, kDt);
 
-        return periodicIO.setpoint;
+        return this.setpoint;
+    }
+
+    @Override
+    public Pose2d getRealPose() {
+        return periodicIO.simPose;
     }
 
     public SwerveSetpoint generateRobotOriented(double x, double y, double omega) {
         var robotRel = new team3647.lib.team254.swerve.ChassisSpeeds(x, y, omega);
-        periodicIO.setpoint =
-                setpointGenerator.generateSetpoint(limits, periodicIO.setpoint, robotRel, kDt);
-        return periodicIO.setpoint;
+        this.setpoint = setpointGenerator.generateSetpoint(limits, this.setpoint, robotRel, kDt);
+        return this.setpoint;
     }
 
     public void driveNative(double x, double y, double rotation) {
-        periodicIO.robotCentric.withVelocityX(x).withVelocityY(y).withRotationalRate(rotation);
+        this.robotCentric.withVelocityX(x).withVelocityY(y).withRotationalRate(rotation);
     }
 
     public void driveFieldOriented(double x, double y, double rotation) {
@@ -662,13 +595,12 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
             return;
         }
         SwerveSetpoint setpoint = generate(x, y, rotation);
-        periodicIO
-                .robotCentric
+        this.robotCentric
                 .withVelocityX(setpoint.mChassisSpeeds.vxMetersPerSecond)
                 .withVelocityY(setpoint.mChassisSpeeds.vyMetersPerSecond)
                 .withRotationalRate(setpoint.mChassisSpeeds.omegaRadiansPerSecond);
 
-        periodicIO.masterRequest = periodicIO.robotCentric;
+        this.masterRequest = this.robotCentric;
     }
 
     // public void resetSimOdo(){
@@ -681,12 +613,11 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
             return;
         }
         SwerveSetpoint setpoint = generate(x.getAsDouble(), y, rotation);
-        periodicIO
-                .robotCentric
+        this.robotCentric
                 .withVelocityX(setpoint.mChassisSpeeds.vxMetersPerSecond)
                 .withVelocityY(setpoint.mChassisSpeeds.vyMetersPerSecond)
                 .withRotationalRate(setpoint.mChassisSpeeds.omegaRadiansPerSecond);
-        periodicIO.masterRequest = periodicIO.robotCentric;
+        this.masterRequest = this.robotCentric;
     }
 
     public void driveFieldOriented(DoubleSupplier x, DoubleSupplier y, DoubleSupplier rotation) {
@@ -694,23 +625,16 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
             reset();
             return;
         }
-        SwerveSetpoint setpoint =
-                generate(x.getAsDouble(), y.getAsDouble(), rotation.getAsDouble());
-        periodicIO
-                .robotCentric
+        SwerveSetpoint setpoint = generate(x.getAsDouble(), y.getAsDouble(), rotation.getAsDouble());
+        this.robotCentric
                 .withVelocityX(setpoint.mChassisSpeeds.vxMetersPerSecond)
                 .withVelocityY(setpoint.mChassisSpeeds.vyMetersPerSecond)
                 .withRotationalRate(setpoint.mChassisSpeeds.omegaRadiansPerSecond);
-        periodicIO.masterRequest = periodicIO.robotCentric;
+        this.masterRequest = this.robotCentric;
     }
 
     public SwerveModuleState[] getModuleStates() {
-        return new SwerveModuleState[] {
-            periodicIO.frontLeftState,
-            periodicIO.frontRightState,
-            periodicIO.backLeftState,
-            periodicIO.backRightState
-        };
+        return periodicIO.states;
     }
 
     public double getVel() { // squared

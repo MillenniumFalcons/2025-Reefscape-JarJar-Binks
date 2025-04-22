@@ -7,23 +7,31 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Function;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import team3647.frc2025.constants.FieldConstants;
 import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
 
 public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera {
 
-    AprilTagFieldLayout aprilTagFieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    AprilTagFieldLayout aprilTagFieldLayout;
     PhotonPoseEstimator photonPoseEstimator;
     Transform3d robotToCam;
     private final edu.wpi.first.math.Vector<N3> baseStdDevs;
@@ -38,9 +46,11 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
             String camera,
             Transform3d robotToCam,
             edu.wpi.first.math.Vector<N3> baseStdDevs,
-            Function<EstimatedRobotPose, Boolean> customHeuristics) {
+            Function<EstimatedRobotPose, Boolean> customHeuristics,
+            AprilTagFieldLayout layout) {
 
         super(NetworkTableInstance.getDefault(), camera);
+        this.aprilTagFieldLayout = layout;
         this.name = camera;
         photonPoseEstimator =
                 new PhotonPoseEstimator(
@@ -52,11 +62,11 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
 
     public AprilTagPhotonVision(
             String camera, Transform3d robotToCam, edu.wpi.first.math.Vector<N3> baseStdDevs) {
-        this(camera, robotToCam, baseStdDevs, (update) -> false);
+        this(camera, robotToCam, baseStdDevs, (update) -> false, AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
     }
 
     public AprilTagPhotonVision(String camera, Transform3d robotToCam) {
-        this(camera, robotToCam, VecBuilder.fill(0.05, 0.05, 0.1), (update) -> false);
+        this(camera, robotToCam, VecBuilder.fill(0.05, 0.05, 0.1), (update) -> false, AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
     }
 
     public AprilTagId getId(int id) {
@@ -218,4 +228,10 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
             return -1;
         }
     }
+
+    // public void addGyroData(Orientation orientation){
+    //     photonPoseEstimator.addHeadingData(Timer.getTimestamp(), Rotation2d.fromDegrees(orientation.yaw()));
+    // }
+
+
 }

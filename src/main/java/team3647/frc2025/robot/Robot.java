@@ -6,8 +6,11 @@ package team3647.frc2025.robot;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RuntimeType;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -26,26 +29,28 @@ import team3647.lib.team6328.VirtualSubsystem;
 
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
+   
 
     private final RobotContainer m_robotContainer;
 
     private final boolean isReplay = false;
 
-    private final boolean rio1 = false;
+
 
     public Robot() {
         Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 
-        if (isReal() && !rio1) {
+        if (super.getRuntimeType().equals(RuntimeType.kRoboRIO2)) {
             Logger.addDataReceiver(
                     new WPILOGWriter("/home/lvuser/logs")); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             new PowerDistribution(1, ModuleType.kRev); // Enables power distribution nlogging
-        } else if (rio1) {
+        } else if (super.getRuntimeType().equals(RuntimeType.kRoboRIO)) {
+            Logger.addDataReceiver(new WPILOGWriter());
             Logger.addDataReceiver(new NT4Publisher());
 
         } else {
-            setUseTiming(false); // Run as fast as possible
+            setUseTiming(true); 
             if (isReplay) {
                 String logPath =
                         LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or
@@ -150,7 +155,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void simulationPeriodic() {
-        Logger.recordOutput("SimulatedArena.getSimulationDt", SimulatedArena.getSimulationDt());
         SimulatedArena.getInstance().simulationPeriodic();
+        m_robotContainer.simVision.periodic();
+        SmartDashboard.putData(m_robotContainer.simVision.getDebugField());
     }
 }
