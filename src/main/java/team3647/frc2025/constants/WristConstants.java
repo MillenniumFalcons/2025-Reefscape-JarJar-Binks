@@ -16,14 +16,14 @@ public class WristConstants {
     public static final Angle kIntakeAngle = Units.Degree.of(2);
     public static final Angle kStowAngle = Units.Degree.of(85);
 
-    public static final Angle kStartingAngle = Degree.of(122.058); // Units.Degree.of(125.38)
+    public static final Angle kStartingAngle = Degree.of(116); // Units.Degree.of(125.38)
 
     ;
 
     public static final Angle kMaxAngle = kStartingAngle;
     public static final Angle kMinAngle = Units.Degree.of(-7);
 
-    public static final Angle kHandoffAngle = Degree.of(50);
+    public static final Angle kHandoffAngle = Degree.of(35);
 
     public static final Angle kStowWithPiece = Degree.of(55);
 
@@ -58,7 +58,7 @@ public class WristConstants {
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
 
-        kMasterConfig.CurrentLimits.StatorCurrentLimit = 40;
+        kMasterConfig.CurrentLimits.StatorCurrentLimit = 30;
         kMasterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
         kMaster.getConfigurator().apply(kMasterConfig);

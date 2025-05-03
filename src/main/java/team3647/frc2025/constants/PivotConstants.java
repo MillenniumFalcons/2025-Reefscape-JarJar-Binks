@@ -26,7 +26,7 @@ public class PivotConstants {
     public static final Angle klowLevelsStow = Radian.of(-0.045);
 
     // idk what the low one is so change this
-    //     public static final Angle kAlgaeAngleHigh = Radian.of(0.1988);
+    public static final Angle kAlgaeAngleLow = Radian.of(-0.072);
     public static final Angle kAlgaeAngleHigh = Radian.of(0.290);
 
     public static final Angle kClearAngle = Radian.of(-0.4);
@@ -42,6 +42,7 @@ public class PivotConstants {
 
     // -1.402692317215491
     public static final Angle kHandoffAngle = Radian.of(-1.407).minus(Degree.of(1.5));
+	
 
     // public static final Angle kBadAngle = Radian.of(0);
     // public static final Angle kBadTolerance = Radian.of(0);

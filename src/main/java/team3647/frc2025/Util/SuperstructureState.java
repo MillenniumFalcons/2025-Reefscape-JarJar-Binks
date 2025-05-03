@@ -1,6 +1,7 @@
 package team3647.frc2025.Util;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Angle;
@@ -41,8 +42,24 @@ public class SuperstructureState {
     public static SuperstructureState HighAlgae =
             new SuperstructureState(
                     PivotConstants.kAlgaeAngleHigh,
-                    ElevatorConstants.kHighAlgaeHeight,
+                    ElevatorConstants.kHighAlgaeHeight.plus(Inches.of(10)),
                     WristConstants.kStowAngle);
+    public static SuperstructureState LowAlgae =
+            new SuperstructureState(
+                    PivotConstants.kAlgaeAngleLow,
+                    ElevatorConstants.kStowHeight,
+                    WristConstants.kStowAngle);
+
+    public static SuperstructureState AlgaeStow =
+            new SuperstructureState(
+                    PivotConstants.kMaxAngle, LowScore.elevatorHeight, WristConstants.kStowAngle);
+
+    public static SuperstructureState AlgaeBarge =
+            new SuperstructureState(
+                    PivotConstants.kMaxAngle.minus(Degree.of(10)),
+                    ElevatorConstants.kMaxHeight,
+                    WristConstants.kStowAngle);
+
     // end algae stuff
 
     public static SuperstructureState Stow =

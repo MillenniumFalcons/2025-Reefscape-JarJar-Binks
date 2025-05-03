@@ -22,7 +22,7 @@ public class LEDs extends VirtualSubsystem {
                     "red",
                     LEDConstants.SOLID_RED,
                     "aligned",
-                    LEDConstants.FLASH_GREEN,
+                    LEDConstants.SOLID_GREEN,
                     "intaking",
                     LEDConstants.FLASH_YELLOW,
                     "hasPiece",

@@ -7,6 +7,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.lib.TalonFXSubsystem;
@@ -18,6 +19,7 @@ public class Pivot extends TalonFXSubsystem {
     private final Angle kClearAngle, kLowClearAngle;
 
     private final Supplier<Distance> elevatorHeight;
+    Trigger ignoreSoftLimits;
 
     double kG, angle = 0;
 
@@ -33,7 +35,8 @@ public class Pivot extends TalonFXSubsystem {
             // lowclearangle = max angle when the pivot is blocked by the intake going up
             Angle kLowClearAngle,
             Supplier<Distance> elevatorHeight,
-            double kDt) {
+            double kDt,
+            Trigger ignoreSoftLimits) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
 
         this.maxAngle = maxAngle;
@@ -41,6 +44,8 @@ public class Pivot extends TalonFXSubsystem {
         this.kClearAngle = kClearAngle;
         this.kLowClearAngle = kLowClearAngle;
         this.elevatorHeight = elevatorHeight;
+
+        this.ignoreSoftLimits = ignoreSoftLimits;
 
         this.kG = kG;
     }
@@ -51,7 +56,8 @@ public class Pivot extends TalonFXSubsystem {
         super.setPositionExpoVoltage(
                 MathUtil.clamp(
                         angle.in(Radian), getMinAngle().in(Radian), getMaxAngle().in(Radian)),
-                0);
+                0,
+                ignoreSoftLimits.getAsBoolean());
     }
 
     public void setAngleRads(double angle) {

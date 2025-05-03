@@ -1,12 +1,8 @@
 package team3647.frc2025.robot;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Value;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.AutoDrive;
-import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.subsystems.Superstructure;
 import team3647.lib.team6328.VirtualSubsystem;
@@ -36,24 +32,24 @@ public class RobotTracker extends VirtualSubsystem {
         // superstructure.getStateScoreAuto();
         currentState = superstructure.getCurrentState();
 
-        fk = InverseKinematics.forwardKinematics(currentState);
+        // fk = InverseKinematics.forwardKinematics(currentState);
 
-        Logger.recordOutput("DEBUG/autowrist/ssX", fk.getMeasureX().in(Inches));
-        Logger.recordOutput("DEBUG/autowrist/ssY", fk.getMeasureY().in(Inches));
-        Logger.recordOutput(
-                "DEBUG/autowrist/ssXThresholdLow",
-                InverseKinematics.rect
-                        .getCenter()
-                        .getMeasureX()
-                        .minus(InverseKinematics.rect.getMeasureXWidth().div(Value.of(2)))
-                        .in(Inches));
-        Logger.recordOutput(
-                "DEBUG/autowrist/ssXThresholdHigh",
-                InverseKinematics.rect
-                        .getCenter()
-                        .getMeasureX()
-                        .plus(InverseKinematics.rect.getMeasureXWidth().div(Value.of(2)))
-                        .in(Inches));
+        // Logger.recordOutput("DEBUG/autowrist/ssX", fk.getMeasureX().in(Inches));
+        // Logger.recordOutput("DEBUG/autowrist/ssY", fk.getMeasureY().in(Inches));
+        // Logger.recordOutput(
+        //         "DEBUG/autowrist/ssXThresholdLow",
+        //         InverseKinematics.rect
+        //                 .getCenter()
+        //                 .getMeasureX()
+        //                 .minus(InverseKinematics.rect.getMeasureXWidth().div(Value.of(2)))
+        //                 .in(Inches));
+        // Logger.recordOutput(
+        //         "DEBUG/autowrist/ssXThresholdHigh",
+        //         InverseKinematics.rect
+        //                 .getCenter()
+        //                 .getMeasureX()
+        //                 .plus(InverseKinematics.rect.getMeasureXWidth().div(Value.of(2)))
+        //                 .in(Inches));
 
         // Logger.recordOutput("zeropose", Pose2d.kZero);
 

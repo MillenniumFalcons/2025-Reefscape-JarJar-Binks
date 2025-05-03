@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
@@ -521,7 +522,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         // data.pose.getRotation().getDegrees(),
         // data.timestamp
         // });
-        addVisionMeasurement(data.pose, data.timestamp, data.stdDevs);
+        addVisionMeasurement(data.pose, Utils.fpgaToCurrentTime(data.timestamp), data.stdDevs);
         // if(RobotBase.isSimulation()){
         // simpleSim.addVisionEstimation(data.pose, data.timestamp, data.stdDevs);
 

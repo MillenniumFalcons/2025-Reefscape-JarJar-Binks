@@ -15,6 +15,7 @@ public class AutoChooser extends SendableChooser<AutoMode> implements AllianceOb
     Consumer<Pose2d> setStartPose;
     List<AutoMode> autosList;
     Alliance chachedColor = Alliance.Red;
+    public static boolean selected = false;
 
     public AutoChooser(AutoCommands commands, Consumer<Pose2d> setStartPose) {
         super();
@@ -24,6 +25,7 @@ public class AutoChooser extends SendableChooser<AutoMode> implements AllianceOb
         onChange(
                 (mode) -> {
                     setStartPose.accept(getSelected().startingPose);
+                    selected = true;
                     // Logger.recordOutput("sellected", getSelected().getName());
                 });
         autosList = autoCommands.redAutosList;

@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import java.lang.StackWalker.Option;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -78,10 +80,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     @Override
     public Optional<Pose3d> camPose() {
 
-        var robotPose =
-                VisionController.hasReset
-                        ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name)
-                        : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
+        var robotPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
         if (robotPose.isEmpty()) {
             return Optional.empty();
         }
@@ -135,15 +134,11 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
             // setIMUMode(2);
         }
 
-        setIMUMode((!VisionController.hasReset || convergeToMT1) ? 3 : 4);
+        setIMUMode((!VisionController.hasReset) ? 1 : 2);
 
         Logger.recordOutput("DEBUG/autoAlign/hasreset", VisionController.hasReset);
         Logger.recordOutput("DEBUG/autoAlign/useMT2", useMt2);
         Logger.recordOutput("DEBUG/autoAlign/is not multitag", !isMultitag());
-
-        getDX().ifPresentOrElse(
-                        pose -> Logger.recordOutput("name", pose),
-                        () -> Logger.recordOutput("name", Pose2d.kZero));
     }
 
     public RawFiducial getBestTagDist(RawFiducial[] fiducials) {
@@ -179,24 +174,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
         return best;
     }
 
-    public Optional<Pose2d> getDX() {
-        var estimate =
-                useMt2
-                        ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name)
-                        : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
-
-        if (estimate.isEmpty()) return Optional.empty();
-
-        return Optional.of(estimate.get().pose);
-    }
-
-    public double getDY() {
-        var estimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
-        if (estimate.isEmpty()) return 0;
-
-        var bestTagID = getBestTag(estimate.get().rawFiducials).id;
-        return aprilTagFieldLayout.getTagPose(bestTagID).get().getY() - estimate.get().pose.getY();
-    }
+  
 
     @Override
     public Optional<VisionMeasurement> QueueToInputs() {
@@ -205,7 +183,9 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
                 VisionController.hasReset
                         ? LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name)
                         : LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
-        if (botPose.isEmpty()) {
+
+		var botPoseRaw = LimelightHelpers.getBotPose3d_wpiBlue(name);
+        if (botPose.isEmpty() || botPoseRaw.isEmpty()) {
             return Optional.empty();
         }
         var result = botPose.get();
@@ -213,11 +193,21 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
             return Optional.empty();
         }
 
+		if (botPoseRaw.get().getZ() > 0.2) {
+			return Optional.empty();
+		}
         var bestTag = getBestTag(result.rawFiducials);
 
+		
         if (bestTag.distToCamera > 3.5) {
             return Optional.empty();
         }
+
+		if (bestTag.ambiguity > 0.2) {
+			return Optional.empty();
+		}
+
+
 
         if (result.pose.getMeasureX().gt(FieldConstants.kFieldLength)
                 || result.pose.getX() < 0
