@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonTargetSortMode;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
@@ -12,6 +13,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public class SimVision {
@@ -27,6 +29,9 @@ public class SimVision {
     Supplier<Pose2d> simPose;
 
     public SimVision(AprilTagFieldLayout tags, Supplier<Pose2d> simPoseSupplier, AprilTagPhotonVision... cameras) {
+        if (RobotBase.isReal()) {
+            throw new IllegalStateException("TRYING TO RUN SIM VISION ON A REAL ROBOT");
+        }
         this.tagLayout = tags;
         this.simPose = simPoseSupplier;
         visionSim.addAprilTags(tags);
@@ -36,19 +41,22 @@ public class SimVision {
         cameraProp.setCalibration(1280, 720, Rotation2d.fromDegrees(70));
         // Approximate detection noise with average and standard deviation error in
         // pixels.
-        cameraProp.setCalibError(0.25, 0.08);
+        cameraProp.setCalibError(0, 0);
         // Set the camera image capture framerate (Note: this is limited by robot loop
         // rate).
-        cameraProp.setFPS(20);
+        cameraProp.setFPS(200);
         // The average and standard deviation in milliseconds of image data latency.
-        cameraProp.setAvgLatencyMs(35);
+        cameraProp.setAvgLatencyMs(25);
         cameraProp.setLatencyStdDevMs(5);
 
         for (int i = 0; i < cameras.length; i++) {
             this.cameras[i] = new PhotonCameraSim(cameras[i], cameraProp);
             visionSim.addCamera(this.cameras[i], cameras[i].robotToCam);
+            this.cameras[i].setTargetSortMode(PhotonTargetSortMode.Largest);
+            
             this.cameras[i].enableProcessedStream(true);
             this.cameras[i].enableDrawWireframe(true);
+            
         }
 
         

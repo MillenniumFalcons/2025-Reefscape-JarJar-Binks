@@ -251,6 +251,12 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     }
 
     @Override
+    public Pose2d getTagPose() {
+        var tagnum = getTagNum();
+        return aprilTagFieldLayout.getTagPose(tagnum).orElse(Pose3d.kZero).toPose2d();
+    }
+
+    @Override
     public double getTx() {
         return LimelightHelpers.getTXNC(name);
     }

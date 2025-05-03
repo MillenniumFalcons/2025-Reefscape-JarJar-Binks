@@ -73,6 +73,7 @@ public class SwerveDriveSim implements SwerveDrive {
     }
 
     public void addVisionData(VisionMeasurement data) {
+        simSwerve.addVisionEstimation(data.pose, data.timestamp, data.stdDevs);
         periodicIO.visionPose = data.pose;
     }
 

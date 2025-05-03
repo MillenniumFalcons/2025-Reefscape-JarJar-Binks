@@ -38,8 +38,8 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
     private Side wantedSide = Side.A;
 
-    public final ProfiledPIDController xController;
-    public final ProfiledPIDController yController;
+    public final PIDController xController;
+    public final PIDController yController;
     public final PIDController rotController;
 
     private Alliance color = Alliance.Red;
@@ -66,8 +66,8 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
             Supplier<Pose2d> odoPoseFunction,
             List<Pose2d> redSourcePoses,
             List<Pose2d> blueSourcePoses,
-            ProfiledPIDController xController,
-            ProfiledPIDController yController,
+            PIDController xController,
+            PIDController yController,
             PIDController rotController,
             List<Pose2d> redSidePoses,
             List<Pose2d> blueSidePoses,
