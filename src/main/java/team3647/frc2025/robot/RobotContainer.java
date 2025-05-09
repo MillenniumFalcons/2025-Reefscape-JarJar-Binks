@@ -5,7 +5,10 @@
 package team3647.frc2025.robot;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import com.ctre.phoenix6.Utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -43,7 +46,9 @@ import team3647.frc2025.subsystems.Coraler;
 import team3647.frc2025.subsystems.Drivetrain.SwerveDrive;
 import team3647.frc2025.subsystems.Drivetrain.SwerveDriveReal;
 import team3647.frc2025.subsystems.Drivetrain.SwerveDriveSim;
-import team3647.frc2025.subsystems.Elevator;
+import team3647.frc2025.subsystems.Elevator.Elevator;
+import team3647.frc2025.subsystems.Elevator.ElevatorReal;
+import team3647.frc2025.subsystems.Elevator.SimElevator;
 import team3647.frc2025.subsystems.LEDs;
 import team3647.frc2025.subsystems.Pivot;
 import team3647.frc2025.subsystems.Rollers;
@@ -75,7 +80,7 @@ public class RobotContainer {
                 configureSmartDashboardLogging();
 
                 superstructure.setIsAlignedFunction(autoDrive.isAlignedToReef());
-                elevator.setEncoderHeight(ElevatorConstants.kStartingHeight);
+                elevator.setEncoderHeight(ElevatorConstants.kStartingHeight.in(Meters));
                 pivot.setEncoderAngle(PivotConstants.kStartingAngle);
                 wrist.setEncoderAngle(WristConstants.kStartingAngle);
 
@@ -125,11 +130,17 @@ public class RobotContainer {
         mainController.leftBumper.whileTrue(superstructure.intake());
         intakeUp.onTrue(superstructure.transfer()).onTrue(autoDrive.setDriveMode(DriveMode.NONE));
         mainController.buttonB.whileTrue(superstructure.transfer());
-        mainController
-                .buttonA
-                .and(mainController.dPadLeft)
-                .whileTrue(autoDrive.setDriveMode(DriveMode.SCORE));
-        mainController.buttonA.and(mainController.dPadLeft).onFalse(autoDrive.clearDriveMode());
+        if (Utils.isSimulation()) {
+                mainController.leftJoyStickPress
+                        .whileTrue(autoDrive.setDriveMode(DriveMode.SCORE));
+                mainController. leftJoyStickPress.onFalse(autoDrive.clearDriveMode());
+        }else{
+                mainController
+                        .buttonA
+                        .and(mainController.dPadLeft)
+                        .whileTrue(autoDrive.setDriveMode(DriveMode.SCORE));
+                mainController.buttonA.and(mainController.dPadLeft).onFalse(autoDrive.clearDriveMode());
+        }
 
         seagullCurrent
                 .and(() -> !superstructure.intakeCurrent())
@@ -295,16 +306,22 @@ public class RobotContainer {
                         GlobalConstants.kNominalVoltage,
                         GlobalConstants.kDt);
 
-        public final Elevator elevator = new Elevator(
-                        ElevatorConstants.kMaster,
-                        ElevatorConstants.kSlave,
-                        ElevatorConstants.kNativeToMeters,
-                        ElevatorConstants.kNativeToMeters,
-                        GlobalConstants.kNominalVoltage,
-                        0,
-                        ElevatorConstants.kMinHeight.in(Units.Meter),
-                        ElevatorConstants.kMaxHeight.in(Units.Meter),
-                        GlobalConstants.kDt);
+        public final Elevator elevator = 
+            new SimElevator(
+                ElevatorConstants.kMinHeight.in(Meters), 
+                ElevatorConstants.kMaxHeight.in(Meters), 
+                GlobalConstants.kNominalVoltage, 
+                GlobalConstants.kDt);
+        // new ElevatorReal(
+        //                 ElevatorConstants.kMaster,
+        //                 ElevatorConstants.kSlave,
+        //                 ElevatorConstants.kNativeToMeters,
+        //                 ElevatorConstants.kNativeToMeters,
+        //                 GlobalConstants.kNominalVoltage,
+        //                 0,
+        //                 ElevatorConstants.kMinHeight.in(Units.Meter),
+        //                 ElevatorConstants.kMaxHeight.in(Units.Meter),
+        //                 GlobalConstants.kDt);
 
     public final Pivot pivot =
             new Pivot(
@@ -436,13 +453,12 @@ public class RobotContainer {
                     swerve::shouldAddData,
                     swerve::resetPose,
                     backLeft,
-                    front);
+                    frontPhotonCam);
     public final RobotTracker tracker = new RobotTracker(superstructure, autoDrive);
 
         public final SimVision simVision = new SimVision(
                         VisionConstants.k2025AprilTags,
                         swerve::getRealPose,
-
                         backRight,
                         frontPhotonCam);
 

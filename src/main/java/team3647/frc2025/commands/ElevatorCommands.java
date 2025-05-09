@@ -12,7 +12,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.ElevatorConstants;
-import team3647.frc2025.subsystems.Elevator;
+import team3647.frc2025.subsystems.Elevator.Elevator;
 
 public class ElevatorCommands {
 

@@ -28,6 +28,7 @@ import team3647.frc2025.commands.RollersCommands;
 import team3647.frc2025.commands.WristCommands;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
+import team3647.frc2025.subsystems.Elevator.Elevator;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
 
@@ -633,7 +634,7 @@ public class Superstructure {
         return Commands.runOnce(
                 () -> {
                     this.wantedLevel = wantedLevel;
-                });
+                }).ignoringDisable(true);
     }
 
     public Level getWantedLevel() {

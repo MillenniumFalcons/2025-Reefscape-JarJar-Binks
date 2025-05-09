@@ -1,4 +1,4 @@
-package team3647.frc2025.subsystems;
+package team3647.frc2025.subsystems.Elevator;
 
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import team3647.lib.ModifiedSignalLogger;
 import team3647.lib.TalonFXSubsystem;
 
-public class Elevator extends TalonFXSubsystem {
+public class ElevatorReal extends TalonFXSubsystem implements Elevator {
 
     final double minLength, maxLength, kG;
     public final SysIdRoutine sysid, voltageSysid;
@@ -26,7 +26,7 @@ public class Elevator extends TalonFXSubsystem {
 
     // TalonFXSimState masterSim;
 
-    public Elevator(
+    public ElevatorReal(
             TalonFX master,
             TalonFX follower,
             double velocityConversion,
@@ -109,8 +109,8 @@ public class Elevator extends TalonFXSubsystem {
                 MathUtil.clamp(nativePos * positionConversion, this.minLength, this.maxLength), 0);
     }
 
-    public void setEncoderHeight(Distance height) {
-        this.setEncoder(height.in(Meter));
+    public void setEncoderHeight(double height) {
+        this.setEncoder(height);
     }
 
     public void setEncoderHeightNative(double rotations) {
@@ -141,6 +141,6 @@ public class Elevator extends TalonFXSubsystem {
     @Override
     public String getName() {
         // TODO Auto-generated method stub
-        return "Elevator";
+        return "Real Elevator";
     }
 }

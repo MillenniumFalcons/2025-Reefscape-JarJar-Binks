@@ -293,6 +293,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         periodicIO.states[3] = this.getModules()[3].getCurrentState();
         periodicIO.gyroRotation = Rotation2d.fromDegrees(periodicIO.heading);
         periodicIO.timestamp = Timer.getFPGATimestamp();
+        
 
         // SmartDashboard.putBoolean("good", periodicIO.good);
 
@@ -305,16 +306,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         setisAccel();
         this.setControl(this.masterRequest);
         // simpleSim.periodic();
-        Logger.recordOutput("Robot/targets", periodicIO.targets);
-        Logger.recordOutput("Robot/states", periodicIO.states);
-        Logger.recordOutput("Robot/pose", periodicIO.pose);
-
-        Logger.recordOutput(
-                "operatorpserpective",
-                new Pose2d(
-                        periodicIO.pose.getX(),
-                        periodicIO.pose.getY(),
-                        getOperatorForwardDirection()));
+ 
         // SmartDashboard.putNumber("heading", getRawHeading());
     }
 
@@ -440,7 +432,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         return periodicIO.rawHeading;
     }
 
-    @AutoLogOutput
+
     public Pose2d getOdoPose() {
 
         // return RobotBase.isReal()? periodicIO.pose :
@@ -533,7 +525,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
     public void onAllianceFound(Alliance color) {
         periodicIO.color = color;
 
-        var rot = color == Alliance.Red ? Rotation2d.k180deg : Rotation2d.kZero;
+        // var rot = color == Alliance.Red ? Rotation2d.k180deg : Rotation2d.kZero;
 
         // setOperatorPerspectiveForward(rot);
     }

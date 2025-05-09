@@ -20,6 +20,8 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.Utils;
+
 import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
@@ -30,7 +32,8 @@ public class SwerveDriveSim implements SwerveDrive {
     private final double kDt;
 
     public SwerveDriveSim(DriveTrainSimulationConfig config, double kDt) {
-        if(RobotBase.isReal()) throw new IllegalStateException("TRYING TO RUN SIM DT ON REAL RIO");
+        if(!Utils.isSimulation()) throw new IllegalStateException("TRYING TO RUN SIM DT ON REAL RIO");
+
         this.simSwerve =
                 new SelfControlledSwerveDriveSimulation(
                         new SwerveDriveSimulation(
@@ -47,7 +50,6 @@ public class SwerveDriveSim implements SwerveDrive {
 
         periodicIO.fieldRelative = false;
     }
-    Pose2d previouspose = new Pose2d();
 
     @Override
     public void driveFieldOriented(double x, double y, double rotation) {
@@ -105,8 +107,6 @@ public class SwerveDriveSim implements SwerveDrive {
         periodicIO.actualSpeeds = simSwerve.getActualSpeedsFieldRelative();
         periodicIO.timestamp = Timer.getFPGATimestamp();
 
-        Logger.recordOutput("vel", periodicIO.simPose.minus(previouspose).getX()/(0.004));
-
 
         Logger.recordOutput("simSwerve.maxLinearVelocity", simSwerve.maxLinearVelocity().in(MetersPerSecond));
 
@@ -114,7 +114,7 @@ public class SwerveDriveSim implements SwerveDrive {
 
         Logger.processInputs(getName(), periodicIO);
 
-        previouspose = periodicIO.simPose;
+      
 
     }
     @Override

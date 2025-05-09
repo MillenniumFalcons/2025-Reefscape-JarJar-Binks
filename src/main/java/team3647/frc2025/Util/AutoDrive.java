@@ -155,7 +155,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     }
 
     public Command setDriveMode(DriveMode mode) {
-        return Commands.runOnce(() -> this.wantedMode = mode);
+        return Commands.runOnce(() -> this.wantedMode = mode).ignoringDisable(true);
     }
 
     // TODO: ground intake implementatoin

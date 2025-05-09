@@ -9,6 +9,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorConstants {
@@ -49,6 +51,11 @@ public class ElevatorConstants {
     public static final TalonFXConfiguration kMasterConfig = new TalonFXConfiguration();
 
     public static final TalonFXConfiguration kSlaveConfig;
+
+    public static final double kGearRatio = 7.777;
+    public static final double kElevatorDrumRadius = Units.inchesToMeters(1.5);
+    public static final double kCarriageMass = Units.lbsToKilograms(4.263  + 1.241 + 5.779); // arm & claw + carriage + gearbox
+    
 
     // multiply native by this to get meters 121 - 85 cm @ 19.855 native
 
