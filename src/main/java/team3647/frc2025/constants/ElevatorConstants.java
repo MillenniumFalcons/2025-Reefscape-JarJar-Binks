@@ -9,7 +9,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 
@@ -24,6 +25,9 @@ public class ElevatorConstants {
     public static final Distance kHandoffHeight = kStowHeight.plus(Inches.of(3));
 
     public static final Distance kMaxHeight = Meters.of(84.27 * kNativeToMeters);
+
+    public static final double kMaxPossibleHeightM = 1.63;
+    public static final double kZeroHeightForAscope = 0.89;
 
     // all heights measured as center dist from the pivot pivoting bar
 
@@ -54,8 +58,10 @@ public class ElevatorConstants {
 
     public static final double kGearRatio = 7.777;
     public static final double kElevatorDrumRadius = Units.inchesToMeters(1.5);
-    public static final double kCarriageMass = Units.lbsToKilograms(4.263  + 1.241 + 5.779); // arm & claw + carriage + gearbox
-    
+    public static final double kCarriageMass =
+            Units.lbsToKilograms(4.263 + 1.241 + 5.779); // arm & claw + carriage + gearbox
+    public static final Pose3d[] kZeroedElevPose =
+            new Pose3d[] {new Pose3d(0.0127, 0, kZeroHeightForAscope, new Rotation3d())};
 
     // multiply native by this to get meters 121 - 85 cm @ 19.855 native
 

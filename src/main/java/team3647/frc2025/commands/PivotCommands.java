@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.PivotConstants;
-import team3647.frc2025.subsystems.Pivot;
+import team3647.frc2025.subsystems.pivot.Pivot;
 
 public class PivotCommands {
 
@@ -33,10 +33,6 @@ public class PivotCommands {
     public Command setAngle(DoubleSupplier angleRads) {
         return Commands.run(() -> pivot.setAngleRads(angleRads.getAsDouble()), pivot)
                 .until(() -> pivot.angleReached(Radian.of(angleRads.getAsDouble()), Degree.of(2)));
-    }
-
-    public Command setOpenLoop(DoubleSupplier out) {
-        return Commands.run(() -> pivot.setOpenLoop(out.getAsDouble()), pivot);
     }
 
     public Command holdPositionAtCall() {

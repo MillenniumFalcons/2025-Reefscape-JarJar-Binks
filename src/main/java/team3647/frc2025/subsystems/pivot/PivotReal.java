@@ -1,4 +1,4 @@
-package team3647.frc2025.subsystems;
+package team3647.frc2025.subsystems.pivot;
 
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Radian;
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.lib.TalonFXSubsystem;
 
-public class Pivot extends TalonFXSubsystem {
+public class PivotReal extends TalonFXSubsystem implements Pivot {
 
     private final Angle maxAngle;
     private final Angle minAngle;
@@ -23,7 +23,7 @@ public class Pivot extends TalonFXSubsystem {
 
     double kG, angle = 0;
 
-    public Pivot(
+    public PivotReal(
             TalonFX master,
             Angle maxAngle,
             Angle minAngle,
@@ -75,6 +75,10 @@ public class Pivot extends TalonFXSubsystem {
         this.setEncoder(angle.in(Radian));
     }
 
+    public void setEncoderAngle(double angleRads) {
+        this.setEncoder(angleRads);
+    }
+
     public double getAngleRads() {
         return getAngle().in(Radian);
     }
@@ -106,10 +110,6 @@ public class Pivot extends TalonFXSubsystem {
 
     public boolean angleReached(Angle angle, Angle tolerance) {
         return getAngle().minus(angle).abs(Radian) < tolerance.in(Radian);
-    }
-
-    public void setOpenLoop(double out) {
-        this.setOpenloop(out);
     }
 
     @Override

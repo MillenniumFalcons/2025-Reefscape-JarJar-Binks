@@ -1,11 +1,10 @@
 package team3647.frc2025.commands;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
+import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
@@ -17,12 +16,14 @@ import team3647.lib.team9442.AllianceObserver;
 
 public class SwerveDriveCommands implements AllianceObserver {
     private final SwerveDrive swerve;
-    private final LinearVelocity kMaxSpeed;
+    private final double kMaxSpeedMps;
+    private final double kMaxRotRadPs;
     private Alliance color = Alliance.Red;
 
-    public SwerveDriveCommands(SwerveDrive swerve, LinearVelocity maxSpeed) {
+    public SwerveDriveCommands(SwerveDrive swerve, double maxSpeedMps, double kMaxRotRadPs) {
         this.swerve = swerve;
-        this.kMaxSpeed = maxSpeed;
+        this.kMaxSpeedMps = maxSpeedMps;
+        this.kMaxRotRadPs = kMaxRotRadPs;
     }
 
     @Override
@@ -38,13 +39,14 @@ public class SwerveDriveCommands implements AllianceObserver {
             Supplier<DriveMode> getMode,
             BooleanSupplier autoDriveEnabled,
             BooleanSupplier hasTargets,
-            BooleanSupplier slowMode) {
+            BooleanSupplier robotRelative) {
 
         return Commands.run(
                 () -> {
                     var isAutoDrive = autoDriveEnabled.getAsBoolean();
                     var velocities = autoDriveVelocities.get();
-                    var slow = slowMode.getAsBoolean() ? 0.4 : 1;
+                    var robotRel = robotRelative.getAsBoolean();
+                    SmartDashboard.putBoolean("MONBEIONS", robotRel);
                     // Logger.recordOutput("hastarget@cmds", toRun);
 
                     int invert = 1;
@@ -59,17 +61,18 @@ public class SwerveDriveCommands implements AllianceObserver {
                     double xSquared =
                             Math.pow(x.getAsDouble(), 2) * Math.signum(x.getAsDouble()) * 1.05;
 
-                    double motionXComponent =
-                            ySquared * invert * kMaxSpeed.in(MetersPerSecond) * slow;
-                    double motionYComponent =
-                            -xSquared * invert * kMaxSpeed.in(MetersPerSecond) * slow;
-                    double motionTurnComponent =
-                            rot.getAsDouble() * -1 * kMaxSpeed.in(MetersPerSecond);
+                    double motionXComponent = ySquared * invert * kMaxSpeedMps;
+                    double motionYComponent = -xSquared * invert * kMaxSpeedMps;
+                    double motionTurnComponent = rot.getAsDouble() * -1 * kMaxRotRadPs;
 
                     if (!isAutoDrive || getMode.get().equals(DriveMode.NONE)) {
 
-                        swerve.driveFieldOriented(
-                                motionXComponent, motionYComponent, motionTurnComponent);
+                        if (robotRel && Utils.isSimulation()) {
+                            swerve.drive(-motionXComponent, -motionYComponent, motionTurnComponent);
+                        } else {
+                            swerve.driveFieldOriented(
+                                    motionXComponent, motionYComponent, motionTurnComponent);
+                        }
 
                     } else if (isAutoDrive && (getMode.get().equals(DriveMode.SCORE))) {
                         motionXComponent = velocities.dx + motionXComponent * 0.3;

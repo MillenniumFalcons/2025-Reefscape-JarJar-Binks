@@ -1,20 +1,15 @@
 package team3647.lib.vision;
 
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonTargetSortMode;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import java.util.function.Supplier;
+import org.photonvision.PhotonTargetSortMode;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 
 public class SimVision {
     // A vision system sim labelled as "main" in NetworkTables
@@ -28,7 +23,10 @@ public class SimVision {
 
     Supplier<Pose2d> simPose;
 
-    public SimVision(AprilTagFieldLayout tags, Supplier<Pose2d> simPoseSupplier, AprilTagPhotonVision... cameras) {
+    public SimVision(
+            AprilTagFieldLayout tags,
+            Supplier<Pose2d> simPoseSupplier,
+            AprilTagPhotonVision... cameras) {
         if (RobotBase.isReal()) {
             throw new IllegalStateException("TRYING TO RUN SIM VISION ON A REAL ROBOT");
         }
@@ -53,22 +51,17 @@ public class SimVision {
             this.cameras[i] = new PhotonCameraSim(cameras[i], cameraProp);
             visionSim.addCamera(this.cameras[i], cameras[i].robotToCam);
             this.cameras[i].setTargetSortMode(PhotonTargetSortMode.Largest);
-            
+
             this.cameras[i].enableProcessedStream(true);
             this.cameras[i].enableDrawWireframe(true);
-            
         }
-
-        
-        
     }
 
-    public void periodic(){
+    public void periodic() {
         visionSim.update(simPose.get());
-        
     }
 
-    public Field2d getDebugField(){
+    public Field2d getDebugField() {
         return visionSim.getDebugField();
     }
 }

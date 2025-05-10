@@ -18,10 +18,8 @@ public class AutoConstants {
             new Trajectory<SwerveSample>(
                     "kEmtpy", List.of(kEmptySample), List.of(1), List.of(kEmptyEventMarker));
 
-    public static final PIDController xController =
-            new PIDController(1.5, 0, 0);
-    public static final PIDController yController =
-            new PIDController(2.5, 0, 0.015);
+    public static final PIDController xController = new PIDController(1.5, 0, 0);
+    public static final PIDController yController = new PIDController(2.5, 0, 0.015);
     public static final ProfiledPIDController profiledRotController =
             new ProfiledPIDController(4.5, 0, 0.045, new Constraints(5, 5));
     public static final PIDController rotController = new PIDController(4, 0, 0);

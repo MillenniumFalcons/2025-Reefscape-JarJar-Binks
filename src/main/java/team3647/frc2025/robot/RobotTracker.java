@@ -1,9 +1,15 @@
 package team3647.frc2025.robot;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+
+import static edu.wpi.first.units.Units.Meters;
+
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.AutoDrive;
 import team3647.frc2025.Util.SuperstructureState;
+import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.subsystems.Superstructure;
 import team3647.lib.team6328.VirtualSubsystem;
 
@@ -27,6 +33,21 @@ public class RobotTracker extends VirtualSubsystem {
         Logger.recordOutput("Superstructure/Level", superstructure.getWantedLevel());
 
         Logger.recordOutput("Robot/drive mode", autoDrive.getWantedMode());
+
+
+        Pose3d[] poses = new Pose3d[]{
+            new Pose3d(
+                    ElevatorConstants.kZeroedElevPose[0].getX(),
+                    ElevatorConstants.kZeroedElevPose[0].getY(),
+                    superstructure.elevator.getHeight().in(Meters),
+                    Rotation3d.kZero), 
+            new Pose3d(
+                    0.1257,
+                    ElevatorConstants.kZeroedElevPose[0].getY(),
+                    superstructure.elevator.getHeight().in(Meters),
+                    new Rotation3d(0, superstructure.pivot.getAngleRads(), 0))
+            };
+        Logger.recordOutput("Superstructure/Components", poses);
 
         // debug
         // superstructure.getStateScoreAuto();

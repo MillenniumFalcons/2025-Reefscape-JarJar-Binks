@@ -1,6 +1,5 @@
 package team3647.frc2025.subsystems.Elevator;
 
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;

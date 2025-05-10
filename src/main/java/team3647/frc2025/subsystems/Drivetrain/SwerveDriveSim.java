@@ -1,27 +1,20 @@
 package team3647.frc2025.subsystems.Drivetrain;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix6.Utils;
-
 import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
@@ -32,7 +25,8 @@ public class SwerveDriveSim implements SwerveDrive {
     private final double kDt;
 
     public SwerveDriveSim(DriveTrainSimulationConfig config, double kDt) {
-        if(!Utils.isSimulation()) throw new IllegalStateException("TRYING TO RUN SIM DT ON REAL RIO");
+        if (!Utils.isSimulation())
+            throw new IllegalStateException("TRYING TO RUN SIM DT ON REAL RIO");
 
         this.simSwerve =
                 new SelfControlledSwerveDriveSimulation(
@@ -53,8 +47,9 @@ public class SwerveDriveSim implements SwerveDrive {
 
     @Override
     public void driveFieldOriented(double x, double y, double rotation) {
-        periodicIO.outputSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, rotation, periodicIO.simPose.getRotation());
-
+        periodicIO.outputSpeeds =
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                        x, y, rotation, periodicIO.simPose.getRotation());
 
         periodicIO.fieldRelative = false;
     }
@@ -83,13 +78,10 @@ public class SwerveDriveSim implements SwerveDrive {
     public void writePeriodicOutputs() {
         simSwerve.periodic();
         simSwerve.runChassisSpeeds(
-                periodicIO.outputSpeeds.times(1),    
+                periodicIO.outputSpeeds.times(1),
                 periodicIO.centerOfRotation,
                 periodicIO.fieldRelative,
                 true);
-
-
-        
     }
 
     @Override
@@ -99,24 +91,20 @@ public class SwerveDriveSim implements SwerveDrive {
         periodicIO.states[2] = simSwerve.getMeasuredStates()[2];
         periodicIO.states[3] = simSwerve.getMeasuredStates()[3];
 
-        
-
         periodicIO.pose = simSwerve.getOdometryEstimatedPose();
         periodicIO.simPose = simSwerve.getActualPoseInSimulationWorld();
         periodicIO.measuredSpeeds = simSwerve.getMeasuredSpeedsFieldRelative(true);
         periodicIO.actualSpeeds = simSwerve.getActualSpeedsFieldRelative();
         periodicIO.timestamp = Timer.getFPGATimestamp();
 
-
-        Logger.recordOutput("simSwerve.maxLinearVelocity", simSwerve.maxLinearVelocity().in(MetersPerSecond));
+        Logger.recordOutput(
+                "simSwerve.maxLinearVelocity", simSwerve.maxLinearVelocity().in(MetersPerSecond));
 
         // periodicIO.visionPose = //set when poton sim is done
 
         Logger.processInputs(getName(), periodicIO);
-
-      
-
     }
+
     @Override
     public void resetPose(Pose2d pose) {
         simSwerve.resetOdometry(pose);

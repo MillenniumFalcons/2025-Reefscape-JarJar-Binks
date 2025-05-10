@@ -41,7 +41,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
@@ -102,15 +101,18 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
     public SysIdSwerveSteerGains steerVoltageRequest = new SysIdSwerveSteerGains();
     public SwerveFOCRequest driveFOCRequest = new SwerveFOCRequest(true);
     public SwerveFOCRequest steerFOCRequest = new SwerveFOCRequest(false);
-    public FieldCentric fieldCentric = new FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-    public RobotCentric robotCentric = new RobotCentric()
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-            .withSteerRequestType(
-                    com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType.MotionMagicExpo);
+    public FieldCentric fieldCentric =
+            new FieldCentric().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+    public RobotCentric robotCentric =
+            new RobotCentric()
+                    .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+                    .withSteerRequestType(
+                            com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType.MotionMagicExpo);
 
-    public SwerveSetpoint setpoint = new SwerveSetpoint(
-            new team3647.lib.team254.swerve.ChassisSpeeds(),
-            new team3647.lib.team254.swerve.SwerveModuleState[4]);
+    public SwerveSetpoint setpoint =
+            new SwerveSetpoint(
+                    new team3647.lib.team254.swerve.ChassisSpeeds(),
+                    new team3647.lib.team254.swerve.SwerveModuleState[4]);
 
     public SwerveDriveReal(
             SwerveDrivetrainConstants swerveDriveConstants,
@@ -119,7 +121,9 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
             double kDt,
             RobotConfig ppRobotConfig,
             SwerveKinematicLimits limits,
-            SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>... swerveModuleConstants) {
+            SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+                            ...
+                    swerveModuleConstants) {
         super(swerveDriveConstants, swerveModuleConstants);
         registerTelemetry(this::setStuff);
 
@@ -135,114 +139,126 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         this.limits.kMaxDriveAcceleration = 5 / 0.1; // defaultAccel;
         this.limits.kMaxSteeringVelocity = Units.Degree.of(1500).in(Units.Radians);
 
-        this.kTurnMotorRoutineVoltage = new SysIdRoutine(
-                new SysIdRoutine.Config(
-                        null, // Use default ramp rate (1 V/s)
-                        Volts.of(7), // Use dynamic voltage of 7 V
-                        null, // Use default timeout (10 s)
-                        // Log state with SignalLogger class
-                        state -> SignalLogger.writeString(
-                                "SysIdSteer_State", state.toString())),
-                new SysIdRoutine.Mechanism(
-                        volts -> setControl(this.steerVoltageRequest.withVolts(volts)),
-                        null,
-                        this,
-                        "steer motor voltage"));
+        this.kTurnMotorRoutineVoltage =
+                new SysIdRoutine(
+                        new SysIdRoutine.Config(
+                                null, // Use default ramp rate (1 V/s)
+                                Volts.of(7), // Use dynamic voltage of 7 V
+                                null, // Use default timeout (10 s)
+                                // Log state with SignalLogger class
+                                state ->
+                                        SignalLogger.writeString(
+                                                "SysIdSteer_State", state.toString())),
+                        new SysIdRoutine.Mechanism(
+                                volts -> setControl(this.steerVoltageRequest.withVolts(volts)),
+                                null,
+                                this,
+                                "steer motor voltage"));
 
-        this.m_driveSysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(
-                        Units.Volts.of(10).per(Units.Second),
-                        Units.Volts.of(30),
-                        Units.Seconds.of(4),
-                        ModifiedSignalLogger.logState()),
-                new SysIdRoutine.Mechanism(
-                        (Voltage volts) -> setControl(
-                                this.driveFOCRequest.withVoltage(
-                                        volts.in(Units.Volts))),
-                        null,
-                        this,
-                        "Drive motor foc"));
+        this.m_driveSysIdRoutine =
+                new SysIdRoutine(
+                        new SysIdRoutine.Config(
+                                Units.Volts.of(10).per(Units.Second),
+                                Units.Volts.of(30),
+                                Units.Seconds.of(4),
+                                ModifiedSignalLogger.logState()),
+                        new SysIdRoutine.Mechanism(
+                                (Voltage volts) ->
+                                        setControl(
+                                                this.driveFOCRequest.withVoltage(
+                                                        volts.in(Units.Volts))),
+                                null,
+                                this,
+                                "Drive motor foc"));
 
-        this.m_steerSysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(
-                        Units.Volts.of(3).per(Units.Second),
-                        Units.Volts.of(10),
-                        Units.Seconds.of(4),
-                        ModifiedSignalLogger.logState()),
-                new SysIdRoutine.Mechanism(
-                        (Voltage volts) -> setControl(
-                                this.steerFOCRequest.withVoltage(
-                                        volts.in(Units.Volts))),
-                        null,
-                        this,
-                        "steer motor FOC"));
+        this.m_steerSysIdRoutine =
+                new SysIdRoutine(
+                        new SysIdRoutine.Config(
+                                Units.Volts.of(3).per(Units.Second),
+                                Units.Volts.of(10),
+                                Units.Seconds.of(4),
+                                ModifiedSignalLogger.logState()),
+                        new SysIdRoutine.Mechanism(
+                                (Voltage volts) ->
+                                        setControl(
+                                                this.steerFOCRequest.withVoltage(
+                                                        volts.in(Units.Volts))),
+                                null,
+                                this,
+                                "steer motor FOC"));
 
-        this.kSpinSysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(
-                        Units.Volts.of(1).per(Second),
-                        Units.Volts.of(3),
-                        Second.of(10),
-                        ModifiedSignalLogger.logState()),
-                new Mechanism(
-                        (Voltage volts) -> setControl(
-                                this.spinSysidRequest.withRotationalRate(
-                                        volts.in(Units.Volts))),
-                        null,
-                        this,
-                        "Robot MOI Characterization"));
+        this.kSpinSysIdRoutine =
+                new SysIdRoutine(
+                        new SysIdRoutine.Config(
+                                Units.Volts.of(1).per(Second),
+                                Units.Volts.of(3),
+                                Second.of(10),
+                                ModifiedSignalLogger.logState()),
+                        new Mechanism(
+                                (Voltage volts) ->
+                                        setControl(
+                                                this.spinSysidRequest.withRotationalRate(
+                                                        volts.in(Units.Volts))),
+                                null,
+                                this,
+                                "Robot MOI Characterization"));
 
         // "voltage" is velocity and "Velocity" is also velocity and "position" is
         // position in the
         // sysid app
         // ^ will lead to shit ff gains but hopefully good pid gains
-        this.xControllerTuning = new SysIdRoutine(
-                new Config(
-                        Volts.of(0.4).per(Seconds),
-                        Volts.of(0.6),
-                        Seconds.of(10),
-                        ModifiedSignalLogger.logState()),
-                new Mechanism(
-                        (xVel) -> driveFieldOriented(xVel.in(Volts), 0, 0),
-                        null,
-                        this,
-                        getName() + " X Controller"));
+        this.xControllerTuning =
+                new SysIdRoutine(
+                        new Config(
+                                Volts.of(0.4).per(Seconds),
+                                Volts.of(0.6),
+                                Seconds.of(10),
+                                ModifiedSignalLogger.logState()),
+                        new Mechanism(
+                                (xVel) -> driveFieldOriented(xVel.in(Volts), 0, 0),
+                                null,
+                                this,
+                                getName() + " X Controller"));
         // "voltage" is velocity and "Velocity" is also velocity and "position" is
         // position for the
         // sysid app
         // ^ will lead to shit ff gains but hopefully good pid gains
-        this.yControllerTuning = new SysIdRoutine(
-                new Config(
-                        Volts.of(0.2).per(Seconds),
-                        Volts.of(0.6),
-                        Seconds.of(5),
-                        ModifiedSignalLogger.logState()),
-                new Mechanism(
-                        (yVel) -> drive(0, yVel.in(Volts), 0),
-                        null,
-                        this,
-                        getName() + " Y Controller"));
+        this.yControllerTuning =
+                new SysIdRoutine(
+                        new Config(
+                                Volts.of(0.2).per(Seconds),
+                                Volts.of(0.6),
+                                Seconds.of(5),
+                                ModifiedSignalLogger.logState()),
+                        new Mechanism(
+                                (yVel) -> drive(0, yVel.in(Volts), 0),
+                                null,
+                                this,
+                                getName() + " Y Controller"));
 
-        this.rotControllerTuning = new SysIdRoutine(
-                new Config(
-                        Volts.of(0.4).per(Seconds),
-                        Volts.of(0.8),
-                        Seconds.of(10),
-                        ModifiedSignalLogger.logState()),
-                new Mechanism(
-                        (rotVel) -> drive(0, 0, rotVel.in(Volts)),
-                        null,
-                        this,
-                        getName() + " Rot Controller"));
+        this.rotControllerTuning =
+                new SysIdRoutine(
+                        new Config(
+                                Volts.of(0.4).per(Seconds),
+                                Volts.of(0.8),
+                                Seconds.of(10),
+                                ModifiedSignalLogger.logState()),
+                        new Mechanism(
+                                (rotVel) -> drive(0, 0, rotVel.in(Volts)),
+                                null,
+                                this,
+                                getName() + " Rot Controller"));
 
         AutoBuilder.configure(
                 this::getOdoPose, // Robot pose supplier
                 this::resetPose, // Method to reset odometry (will be called if your auto has a
                 // starting pose)
                 this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (ChassisSpeeds speeds) -> this.drive(
-                        speeds.vxMetersPerSecond,
-                        speeds.vyMetersPerSecond,
-                        speeds.omegaRadiansPerSecond), // Method that will drive the robot
+                (ChassisSpeeds speeds) ->
+                        this.drive(
+                                speeds.vxMetersPerSecond,
+                                speeds.vyMetersPerSecond,
+                                speeds.omegaRadiansPerSecond), // Method that will drive the robot
                 // given ROBOT RELATIVE
                 // ChassisSpeeds. Also optionally outputs individual module
                 // feedforwards
@@ -257,7 +273,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
                                 AutoConstants.rotController.getP(),
                                 AutoConstants.rotController.getI(),
                                 AutoConstants.rotController.getD()) // Rotation PID constants
-                ),
+                        ),
                 ppRobotConfig,
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red
@@ -272,7 +288,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
                     return false;
                 },
                 this // Reference to this subsystem to set requirements
-        );
+                );
 
         wantedRoutine = this.m_driveSysIdRoutine;
     }
@@ -293,7 +309,6 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         periodicIO.states[3] = this.getModules()[3].getCurrentState();
         periodicIO.gyroRotation = Rotation2d.fromDegrees(periodicIO.heading);
         periodicIO.timestamp = Timer.getFPGATimestamp();
-        
 
         // SmartDashboard.putBoolean("good", periodicIO.good);
 
@@ -306,7 +321,7 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         setisAccel();
         this.setControl(this.masterRequest);
         // simpleSim.periodic();
- 
+
         // SmartDashboard.putNumber("heading", getRawHeading());
     }
 
@@ -350,10 +365,11 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     public void reset() {
         for (int i = 0; i < 4; ++i) {
-            this.setpoint.mModuleStates[i] = new team3647.lib.team254.swerve.SwerveModuleState(
-                    0.0,
-                    team3647.lib.team254.geometry.Rotation2d.fromRadians(
-                            this.getModulePositions()[i].angle.getRadians()));
+            this.setpoint.mModuleStates[i] =
+                    new team3647.lib.team254.swerve.SwerveModuleState(
+                            0.0,
+                            team3647.lib.team254.geometry.Rotation2d.fromRadians(
+                                    this.getModulePositions()[i].angle.getRadians()));
         }
         periodicIO.good = true;
     }
@@ -432,7 +448,6 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         return periodicIO.rawHeading;
     }
 
-
     public Pose2d getOdoPose() {
 
         // return RobotBase.isReal()? periodicIO.pose :
@@ -474,10 +489,10 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     public SwerveModulePosition[] getModulePositions() {
         return new SwerveModulePosition[] {
-                this.getModules()[0].getPosition(true),
-                this.getModules()[1].getPosition(true),
-                this.getModules()[2].getPosition(true),
-                this.getModules()[3].getPosition(true)
+            this.getModules()[0].getPosition(true),
+            this.getModules()[1].getPosition(true),
+            this.getModules()[2].getPosition(true),
+            this.getModules()[3].getPosition(true)
         };
     }
 
@@ -498,7 +513,8 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     public boolean shouldAddData(VisionMeasurement measurement) {
         double distance = measurement.pose.minus(getOdoPose()).getTranslation().getNorm();
-        double angle = measurement.pose.getRotation().minus(getOdoPose().getRotation()).getDegrees();
+        double angle =
+                measurement.pose.getRotation().minus(getOdoPose().getRotation()).getDegrees();
         return (distance < MathUtil.clamp(getVel(), 0.25, 1.5) && Math.abs(angle) < 15)
                 || DriverStation.isAutonomous();
     }
@@ -555,12 +571,13 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     public SwerveSetpoint generate(double x, double y, double omega) {
         Logger.recordOutput("prevspt", this.setpoint.mChassisSpeeds.vyMetersPerSecond);
-        var robotRel = team3647.lib.team254.swerve.ChassisSpeeds.fromFieldRelativeSpeeds(
-                x,
-                y,
-                omega,
-                team3647.lib.team254.geometry.Rotation2d.fromDegrees(
-                        this.getOdoPose().getRotation().getDegrees()));
+        var robotRel =
+                team3647.lib.team254.swerve.ChassisSpeeds.fromFieldRelativeSpeeds(
+                        x,
+                        y,
+                        omega,
+                        team3647.lib.team254.geometry.Rotation2d.fromDegrees(
+                                this.getOdoPose().getRotation().getDegrees()));
 
         this.setpoint = setpointGenerator.generateSetpoint(limits, this.setpoint, robotRel, kDt);
 
@@ -618,7 +635,8 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
             reset();
             return;
         }
-        SwerveSetpoint setpoint = generate(x.getAsDouble(), y.getAsDouble(), rotation.getAsDouble());
+        SwerveSetpoint setpoint =
+                generate(x.getAsDouble(), y.getAsDouble(), rotation.getAsDouble());
         this.robotCentric
                 .withVelocityX(setpoint.mChassisSpeeds.vxMetersPerSecond)
                 .withVelocityY(setpoint.mChassisSpeeds.vyMetersPerSecond)

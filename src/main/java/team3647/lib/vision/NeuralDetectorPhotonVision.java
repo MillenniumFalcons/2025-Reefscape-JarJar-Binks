@@ -1,7 +1,6 @@
 package team3647.lib.vision;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
-
 import org.photonvision.PhotonCamera;
 
 public class NeuralDetectorPhotonVision extends PhotonCamera implements NeuralDetector {

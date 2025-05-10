@@ -49,7 +49,7 @@ public class SwerveDriveConstants {
                     // Configures the track length and track width (spacing between swerve modules)
                     .withTrackLengthTrackWidth(Inches.of(22), Inches.of(22))
                     // Configures the bumper size (dimensions of the robot bumper)
-                    .withBumperSize(Inches.of(27), Inches.of(27));
+                    .withBumperSize(Inches.of(34.25), Inches.of(34.25));
 
     // public static final TalonFX kFrontLeftDrive =
     // new TalonFX(GlobalConstants.SwerveDriveIds.kFrontLeftDriveId, "rio");

@@ -42,7 +42,12 @@ public class PivotConstants {
 
     // -1.402692317215491
     public static final Angle kHandoffAngle = Radian.of(-1.407).minus(Degree.of(1.5));
-	
+
+    //vibes aah gear ratio
+    public static final double kGearRatio = 50;
+    public static final double kArmLengthM = 0.53594;
+    public static final double kArmMassKg = 1.9214;
+    public static final double kArmMoiKg2M = 0.017847302;
 
     // public static final Angle kBadAngle = Radian.of(0);
     // public static final Angle kBadTolerance = Radian.of(0);

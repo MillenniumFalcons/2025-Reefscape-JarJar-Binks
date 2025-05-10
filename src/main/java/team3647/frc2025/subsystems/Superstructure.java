@@ -28,18 +28,19 @@ import team3647.frc2025.commands.RollersCommands;
 import team3647.frc2025.commands.WristCommands;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
-import team3647.frc2025.subsystems.Elevator.Elevator;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
+import team3647.frc2025.subsystems.Elevator.Elevator;
+import team3647.frc2025.subsystems.pivot.Pivot;
 
 public class Superstructure {
 
-    private final Coraler coraler;
-    private final Elevator elevator;
-    private final Pivot pivot;
-    private final Wrist wrist;
-    private final Seagull seagull;
-    private final Rollers rollers;
+    public final Coraler coraler;
+    public final Elevator elevator;
+    public final Pivot pivot;
+    public final Wrist wrist;
+    public final Seagull seagull;
+    public final Rollers rollers;
 
     public final CoralerCommands coralerCommands;
     public final ElevatorCommands elevatorCommands;
@@ -632,9 +633,10 @@ public class Superstructure {
 
     public Command setWantedLevel(Level wantedLevel) {
         return Commands.runOnce(
-                () -> {
-                    this.wantedLevel = wantedLevel;
-                }).ignoringDisable(true);
+                        () -> {
+                            this.wantedLevel = wantedLevel;
+                        })
+                .ignoringDisable(true);
     }
 
     public Level getWantedLevel() {
