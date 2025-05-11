@@ -192,6 +192,6 @@ public class SimElevator implements Elevator {
     @Override
     public String getName() {
 
-        return "Simulated Elevator";
+        return "Elevator";
     }
 }

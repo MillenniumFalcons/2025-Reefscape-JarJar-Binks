@@ -26,6 +26,10 @@ public class RobotTracker extends VirtualSubsystem {
         this.autoDrive = autoDrive;
     }
 
+    public double realToSimCoordsPivot(double pivotAngle){
+        return -pivotAngle;
+      }
+
     @Override
     public void periodic() {
         Logger.recordOutput("Superstructure/pivotoffset", superstructure.getPivotOffset());
@@ -34,6 +38,7 @@ public class RobotTracker extends VirtualSubsystem {
 
         Logger.recordOutput("Robot/drive mode", autoDrive.getWantedMode());
 
+        
 
         Pose3d[] poses = new Pose3d[]{
             new Pose3d(
@@ -45,7 +50,7 @@ public class RobotTracker extends VirtualSubsystem {
                     0.1257,
                     ElevatorConstants.kZeroedElevPose[0].getY(),
                     superstructure.elevator.getHeight().in(Meters),
-                    new Rotation3d(0, superstructure.pivot.getAngleRads(), 0))
+                    new Rotation3d(0, realToSimCoordsPivot(superstructure.pivot.getAngleRads()), 0))
             };
         Logger.recordOutput("Superstructure/Components", poses);
 

@@ -191,7 +191,7 @@ public class SimPivot implements Pivot {
 
     @Override
     public String getName() {
-        return "Simulated Pivot";
+        return "Pivot";
     }
 
 

@@ -140,6 +140,6 @@ public class ElevatorReal extends TalonFXSubsystem implements Elevator {
     @Override
     public String getName() {
         // TODO Auto-generated method stub
-        return "Real Elevator";
+        return "Elevator";
     }
 }

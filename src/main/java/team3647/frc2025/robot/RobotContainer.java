@@ -129,7 +129,7 @@ public class RobotContainer {
         intakeUp.onTrue(superstructure.transfer()).onTrue(autoDrive.setDriveMode(DriveMode.NONE));
         mainController.buttonB.whileTrue(superstructure.transfer());
         if (Utils.isSimulation()) {
-            mainController.leftJoyStickPress.whileTrue(autoDrive.setDriveMode(DriveMode.SCORE));
+            mainController.leftJoyStickPress.whileTrue(autoDrive.setDriveMode(DriveMode.TEST));
             mainController.leftJoyStickPress.onFalse(autoDrive.clearDriveMode());
         } else {
             mainController

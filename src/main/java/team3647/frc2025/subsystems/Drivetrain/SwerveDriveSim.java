@@ -1,5 +1,6 @@
 package team3647.frc2025.subsystems.Drivetrain;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.ctre.phoenix6.Utils;
@@ -15,6 +16,8 @@ import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.Logger;
+
+import team3647.frc2025.constants.TunerConstants;
 import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
@@ -31,7 +34,8 @@ public class SwerveDriveSim implements SwerveDrive {
         this.simSwerve =
                 new SelfControlledSwerveDriveSimulation(
                         new SwerveDriveSimulation(
-                                config, Pose2d.kZero.rotateBy(Rotation2d.k180deg)));
+                                config, Pose2d.kZero.rotateBy(Rotation2d.k180deg)))
+            .withCurrentLimits(Amps.of(60), Amps.of(60));
         this.kDt = kDt;
         SimulatedArena.getInstance().addDriveTrainSimulation(simSwerve.getDriveTrainSimulation());
     }
@@ -143,6 +147,6 @@ public class SwerveDriveSim implements SwerveDrive {
 
     @Override
     public String getName() {
-        return "SimulatedSwerve";
+        return "Swerve Drivetrain";
     }
 }
