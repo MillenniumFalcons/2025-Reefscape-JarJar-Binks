@@ -12,7 +12,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -31,7 +30,7 @@ public class SimElevator implements Elevator {
     // This gearbox represents a gearbox containing 4 Vex 775pro motors.
     private final DCMotor m_elevatorGearbox = DCMotor.getKrakenX60(2);
 
-    // Standard classes for controlling our elevator
+    // using wpilib pid controllers to take the place of the talonfx pid controllers
     private final ProfiledPIDController m_controller =
             new ProfiledPIDController(50, 0, 0, new TrapezoidProfile.Constraints(5, 10));
     ElevatorFeedforward m_feedforward =
@@ -43,7 +42,8 @@ public class SimElevator implements Elevator {
                             * ElevatorConstants.kElevatorDrumRadius
                             / ElevatorConstants.kGearRatio);
 
-    // Simulation classes help us simulate what's going on, including gravity.
+    // Simulation class to deal w the phyiscs for us, acts like the simulated motor, except we can
+    // only give it voltage input
     private final ElevatorSim Sim =
             new ElevatorSim(
                     m_elevatorGearbox,
@@ -71,7 +71,7 @@ public class SimElevator implements Elevator {
         public double masterCurrent = 0;
         public double demand = position;
 
-        public ControlModeValue controlMode = ControlModeValue.PositionVoltage;
+        public ControlModeValue controlMode = ControlModeValue.MotionMagicVoltage;
     }
 
     private final double kDt;
@@ -141,6 +141,7 @@ public class SimElevator implements Elevator {
         }
 
         switch (periodicIO.controlMode) {
+                // duty cycle is j a percentage of the battery voltage, so we can do this
             case DutyCycleOut -> Sim.setInputVoltage(periodicIO.demand / this.nominalVoltage);
 
             case VoltageOut -> Sim.setInputVoltage(periodicIO.demand);
@@ -149,6 +150,7 @@ public class SimElevator implements Elevator {
                     m_controller.calculate(periodicIO.position, periodicIO.demand)
                             + m_feedforward.calculate(m_controller.getSetpoint().velocity));
 
+                // copied this one from 6328, no clue how it works
             case TorqueCurrentFOC -> Sim.setInputVoltage(
                     m_elevatorGearbox.getVoltage(
                             periodicIO.demand,

@@ -1,6 +1,5 @@
 package team3647.frc2025.Util;
 
-import com.ctre.phoenix.Util;
 import com.ctre.phoenix6.Utils;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
@@ -81,9 +80,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
             AprilTagCamera frontLL) {
         super();
         this.odoPoseFunction = odoPoseFunction;
-        this.xController = Utils.isSimulation()? new PIDController(4, 0,0) : xController;
-        this.yController = Utils.isSimulation()? new PIDController(4,0,0) : yController;
-        this.rotController = Utils.isSimulation()? new PIDController(5,0,0) : rotController;
+        this.xController = Utils.isSimulation() ? new PIDController(4, 0, 0) : xController;
+        this.yController = Utils.isSimulation() ? new PIDController(4, 0, 0) : yController;
+        this.rotController = Utils.isSimulation() ? new PIDController(5, 0, 0) : rotController;
         this.wantedScoringPos = ScoringPos.NONE;
         this.redSourcePoses = redSourcePoses;
         this.blueSourcePoses = blueSourcePoses;
@@ -182,8 +181,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                                 : 0;
                 ;
                 return kIntake;
-            
-            case TEST : return xController.calculate(getPose().getX(), 6);
+
+            case TEST:
+                return xController.calculate(getPose().getX(), 6);
 
             default:
                 return xController.calculate(
@@ -214,8 +214,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                                 : 0;
 
                 return kintake;
-            
-            case TEST: return yController.calculate(getPose().getY(), 6);
+
+            case TEST:
+                return yController.calculate(getPose().getY(), 6);
 
             default:
                 return yController.calculate(

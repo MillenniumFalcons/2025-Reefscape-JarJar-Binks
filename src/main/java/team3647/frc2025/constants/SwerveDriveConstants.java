@@ -8,12 +8,11 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import team3647.lib.team254.geometry.Translation2d;
 import team3647.lib.team254.swerve.SwerveDriveKinematics;
@@ -36,7 +35,7 @@ public class SwerveDriveConstants {
     public static final DriveTrainSimulationConfig driveTrainSimulationConfig =
             DriveTrainSimulationConfig.Default()
                     // Specify gyro type (for realistic gyro drifting and error simulation)
-                    .withGyro(COTS.ofPigeon2())
+                    .withGyro(() -> new GyroSimulation(0.01, 0.02))
                     // Specify swerve module (for realistic swerve dynamics)
                     .withSwerveModule(
                             COTS.ofMark4i(
@@ -142,6 +141,7 @@ public class SwerveDriveConstants {
         }
     }
 
+    // NOTE: ALL THESE CONSTANTS ARE WRONG, THEY MEAN FUCKALL
     // config conversion factors here for each module. in meters for postiion and
     // radians for
     // rotation.
@@ -154,74 +154,76 @@ public class SwerveDriveConstants {
     public static final double kWheelRadiusInches = 1.9;
 
     // // divide for tick to deg
-    public static final double kTurnMotorNativeToDeg = kTurnMotorGearRatio * 360.0;
+    // public static final double kTurnMotorNativeToDeg = kTurnMotorGearRatio * 360.0;
 
-    public static final double kTurnMotorNativeToDPS = kTurnMotorNativeToDeg; // RPS / Native/10ms
+    // public static final double kTurnMotorNativeToDPS = kTurnMotorNativeToDeg; // RPS /
+    // Native/10ms
 
-    public static final double kWheelRotationToMetersDrive =
-            kWheelDiameterMeters * Math.PI * kDriveMotorGearRatio;
+    // public static final double kWheelRotationToMetersDrive =
+    //         kWheelDiameterMeters * Math.PI * kDriveMotorGearRatio;
 
-    // Multiply by 10 because velocity is in ticks/100ms
-    public static final double kFalconVelocityToMpS = kWheelRotationToMetersDrive;
+    // // Multiply by 10 because velocity is in ticks/100ms
+    // public static final double kFalconVelocityToMpS = kWheelRotationToMetersDrive;
 
-    public static final double kFalconTicksToMeters = kWheelRotationToMetersDrive;
+    // public static final double kFalconTicksToMeters = kWheelRotationToMetersDrive;
 
     public static final double kNominalVoltage = 10;
     public static final double kStallCurrent = 35;
     public static final double kMaxCurrent = 60;
 
-    // comp bot
-    private static final double kFrontLeftEncoderOffset = -0.738037109375;
-    private static final double kFrontRightEncoderOffset = -0.18115234375;
-    private static final double kBackLeftEncoderOffset = -0.618408203125;
-    private static final double kBackRightEncoderOffset = -0.34228515625;
+    // // comp bot
+    // private static final double kFrontLeftEncoderOffset = -0.738037109375;
+    // private static final double kFrontRightEncoderOffset = -0.18115234375;
+    // private static final double kBackLeftEncoderOffset = -0.618408203125;
+    // private static final double kBackRightEncoderOffset = -0.34228515625;
 
     // max speed limits that we want
     public static final double kTeleopDriveMaxAccelUnitsPerSec = kDrivePossibleMaxSpeedMPS / 2;
     public static final double kTeleopDriveMaxAngularAccelUnitsPerSec =
             kRotPossibleMaxSpeedRadPerSec / 3;
 
-    // public static final Pigeon2Configurator kGyroConfig =
-    // kGyro.getConfigurator();
+    // // public static final Pigeon2Configurator kGyroConfig =
+    // // kGyro.getConfigurator();
 
-    // master FF for drive for all modules
-    public static final double kS = 0.22; // (0.56744 / 12); // 0.56744; // Volts
-    public static final double kV = 0.47; // (2.5 / 12.0); // Volts
-    public static final double kA = 0.0; // (0.0 / 12); // Volts
+    // // master FF for drive for all modules
+    // public static final double kS = 0.22; // (0.56744 / 12); // 0.56744; // Volts
+    // public static final double kV = 0.47; // (2.5 / 12.0); // Volts
+    // public static final double kA = 0.0; // (0.0 / 12); // Volts
 
-    public static final SimpleMotorFeedforward kMasterDriveFeedforward =
-            new SimpleMotorFeedforward(kS, kV, kA);
+    // public static final SimpleMotorFeedforward kMasterDriveFeedforward =
+    //         new SimpleMotorFeedforward(kS, kV, kA);
 
-    // master PID constants for turn and drive for all modules
-    public static final double kDriveP = 0.02; // 0.00014;
-    public static final double kDriveI = 0.0;
-    public static final double kDriveD = 0.0;
+    // // master PID constants for turn and drive for all modules
+    // public static final double kDriveP = 0.02; // 0.00014;
+    // public static final double kDriveI = 0.0;
+    // public static final double kDriveD = 0.0;
 
-    public static final Slot0Configs kDriveGains =
-            new Slot0Configs()
-                    .withKP(kDriveP)
-                    .withKI(kDriveI)
-                    .withKD(kDriveD)
-                    .withKS(kS)
-                    .withKA(kA)
-                    .withKV(kV);
+    // public static final Slot0Configs kDriveGains =
+    //         new Slot0Configs()
+    //                 .withKP(kDriveP)
+    //                 .withKI(kDriveI)
+    //                 .withKD(kDriveD)
+    //                 .withKS(kS)
+    //                 .withKA(kA)
+    //                 .withKV(kV);
 
-    public static final double kTurnP = 0.4;
-    public static final double kTurnI = 0.0;
-    public static final double kTurnD = 0;
+    // public static final double kTurnP = 0.4;
+    // public static final double kTurnI = 0.0;
+    // public static final double kTurnD = 0;
 
-    public static final Slot0Configs kTurnGains =
-            new Slot0Configs().withKP(kTurnP).withKI(kTurnI).withKD(kTurnD);
+    // public static final Slot0Configs kTurnGains =
+    //         new Slot0Configs().withKP(kTurnP).withKI(kTurnI).withKD(kTurnD);
 
-    public static final double kYP = 1;
-    public static final double kYI = 0.0;
-    public static final double kYD = 0;
+    // public static final double kYP = 1;
+    // public static final double kYI = 0.0;
+    // public static final double kYD = 0;
 
-    public static final PIDController kYController = new PIDController(kYP, kYI, kYD);
+    // public static final PIDController kYController = new PIDController(kYP, kYI, kYD);
 
-    public static final PIDController kAutoSteerXYPIDController = new PIDController(0.05, 0, 0);
-    // 3*Pi = move at 10 rads per second if we are 180* away from target heading
-    public static final PIDController kAutoSteerHeadingController = new PIDController(0.03, 0, 0);
+    // public static final PIDController kAutoSteerXYPIDController = new PIDController(0.05, 0, 0);
+    // // 3*Pi = move at 10 rads per second if we are 180* away from target heading
+    // public static final PIDController kAutoSteerHeadingController = new PIDController(0.03, 0,
+    // 0);
 
     public static final Slot0Configs BRSteerGains =
             new Slot0Configs()
@@ -343,38 +345,6 @@ public class SwerveDriveConstants {
                     * (1 / 6)
                     * Units.Inch.of(19).in(Units.Meter)
                     * Units.Inch.of(19).in(Units.Meter);
-
-    // public static final DriveTrainSimulationConfig simConfig =
-    // DriveTrainSimulationConfig.Default()
-    // .withTrackLengthTrackWidth(Units.Inch.of(27), Units.Inches.of(27))
-    // .withGyro(COTS.ofPigeon2())
-    // .withRobotMass(Units.Pound.of(125))
-    // .withSwerveModule(
-    // new SwerveModuleSimulationConfig(
-    // DCMotor.getFalcon500(1),
-    // DCMotor.getFalcon500(1),
-    // TunerConstants.FrontLeft.DriveMotorGearRatio,
-    // TunerConstants.FrontLeft.SteerMotorGearRatio,
-    // Volts.of(TunerConstants.FrontLeft.DriveFrictionVoltage),
-    // Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
-    // Inches.of(2),
-    //
-    // KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
-    // COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof))
-    // .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
-
-    // public static final DriveTrainSimulationConfig kBetterSimConfig =
-    // DriveTrainSimulationConfig.Default()
-    // .withTrackLengthTrackWidth(Units.Inch.of(19), Units.Inches.of(19))
-    // .withGyro(COTS.ofPigeon2())
-    // .withRobotMass(Units.Pound.of(120))
-    // .withSwerveModule(
-    // COTS.ofMark4i(
-    // DCMotor.getKrakenX60Foc(1),
-    // DCMotor.getFalcon500Foc(1),
-    // COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof,
-    // 4))
-    // .withBumperSize(Units.Inches.of(32), Units.Inch.of(32));
 
     static {
     }

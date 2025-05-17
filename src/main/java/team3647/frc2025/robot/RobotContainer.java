@@ -6,7 +6,6 @@ package team3647.frc2025.robot;
 
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Newton;
 import static edu.wpi.first.units.Units.Radian;
 
 import com.ctre.phoenix6.Utils;
@@ -53,7 +52,6 @@ import team3647.frc2025.subsystems.Superstructure.Branch;
 import team3647.frc2025.subsystems.Superstructure.Level;
 import team3647.frc2025.subsystems.Wrist;
 import team3647.frc2025.subsystems.pivot.Pivot;
-import team3647.frc2025.subsystems.pivot.PivotReal;
 import team3647.frc2025.subsystems.pivot.SimPivot;
 import team3647.lib.GroupPrinter;
 import team3647.lib.inputs.Joysticks;
@@ -326,25 +324,25 @@ public class RobotContainer {
 
     public final Pivot pivot =
             new SimPivot(
-                PivotConstants.kMinAngle.in(Radian), 
-                PivotConstants.kMaxAngle.in(Radian), 
-                elevator::getHeight, 
-                PivotConstants.kClearAngle, 
-                GlobalConstants.kNominalVoltage, 
-                GlobalConstants.kDt);
-            // new PivotReal(
-            //         PivotConstants.kMaster,
-            //         PivotConstants.kMaxAngle,
-            //         PivotConstants.kMinAngle,
-            //         0,
-            //         PivotConstants.kNativeToRad,
-            //         PivotConstants.kNativeToRad,
-            //         GlobalConstants.kNominalVoltage,
-            //         PivotConstants.kClearAngle,
-            //         PivotConstants.kLowClearAngle,
-            //         elevator::getHeight,
-            //         GlobalConstants.kDt,
-            //         mainController.rightTrigger);
+                    PivotConstants.kMinAngle.in(Radian),
+                    PivotConstants.kMaxAngle.in(Radian),
+                    elevator::getHeight,
+                    PivotConstants.kClearAngle,
+                    GlobalConstants.kNominalVoltage,
+                    GlobalConstants.kDt);
+    // new PivotReal(
+    //         PivotConstants.kMaster,
+    //         PivotConstants.kMaxAngle,
+    //         PivotConstants.kMinAngle,
+    //         0,
+    //         PivotConstants.kNativeToRad,
+    //         PivotConstants.kNativeToRad,
+    //         GlobalConstants.kNominalVoltage,
+    //         PivotConstants.kClearAngle,
+    //         PivotConstants.kLowClearAngle,
+    //         elevator::getHeight,
+    //         GlobalConstants.kDt,
+    //         mainController.rightTrigger);
 
     public final Wrist wrist =
             new Wrist(

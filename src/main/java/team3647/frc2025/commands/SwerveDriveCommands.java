@@ -7,9 +7,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
-import static edu.wpi.first.units.Units.Second;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -76,17 +73,15 @@ public class SwerveDriveCommands implements AllianceObserver {
                             swerve.driveFieldOriented(
                                     motionXComponent, motionYComponent, motionTurnComponent);
                         }
-                    }
-                    else if(isAutoDrive && getMode.get().equals(DriveMode.TEST)){
+                    } else if (isAutoDrive && getMode.get().equals(DriveMode.TEST)) {
                         motionXComponent = velocities.dx + motionXComponent * 0.3;
                         motionYComponent = velocities.dy + motionYComponent * 0.3;
                         motionTurnComponent = velocities.dtheta + motionTurnComponent * 0.3;
 
                         swerve.driveFieldOriented(
                                 motionXComponent, motionYComponent, motionTurnComponent);
-                        
 
-                    }else if (isAutoDrive && (getMode.get().equals(DriveMode.SCORE))) {
+                    } else if (isAutoDrive && (getMode.get().equals(DriveMode.SCORE))) {
                         motionXComponent = velocities.dx + motionXComponent * 0.3;
                         motionYComponent = velocities.dy + motionYComponent * 0.3;
                         motionTurnComponent = velocities.dtheta + motionTurnComponent * 0.3;

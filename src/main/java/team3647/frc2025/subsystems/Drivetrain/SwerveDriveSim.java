@@ -16,8 +16,6 @@ import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.Logger;
-
-import team3647.frc2025.constants.TunerConstants;
 import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
@@ -33,9 +31,9 @@ public class SwerveDriveSim implements SwerveDrive {
 
         this.simSwerve =
                 new SelfControlledSwerveDriveSimulation(
-                        new SwerveDriveSimulation(
-                                config, Pose2d.kZero.rotateBy(Rotation2d.k180deg)))
-            .withCurrentLimits(Amps.of(60), Amps.of(60));
+                                new SwerveDriveSimulation(
+                                        config, Pose2d.kZero.rotateBy(Rotation2d.k180deg)))
+                        .withCurrentLimits(Amps.of(60), Amps.of(60));
         this.kDt = kDt;
         SimulatedArena.getInstance().addDriveTrainSimulation(simSwerve.getDriveTrainSimulation());
     }
@@ -103,8 +101,6 @@ public class SwerveDriveSim implements SwerveDrive {
 
         Logger.recordOutput(
                 "simSwerve.maxLinearVelocity", simSwerve.maxLinearVelocity().in(MetersPerSecond));
-
-        // periodicIO.visionPose = //set when poton sim is done
 
         Logger.processInputs(getName(), periodicIO);
     }
