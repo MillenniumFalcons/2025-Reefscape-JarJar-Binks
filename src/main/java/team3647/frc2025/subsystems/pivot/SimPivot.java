@@ -1,14 +1,11 @@
 package team3647.frc2025.subsystems.pivot;
 
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radian;
 
 import com.ctre.phoenix6.signals.ControlModeValue;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -20,7 +17,6 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
-
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.PivotConstants;
 
@@ -56,7 +52,7 @@ public class SimPivot implements Pivot {
 
     @AutoLog
     public static class PeriodicIO {
-        public Pose3d[] armPose = ElevatorConstants.kZeroedElevPose; 
+        public Pose3d[] armPose = ElevatorConstants.kZeroedElevPose;
 
         public double position = PivotConstants.kStartingAngle.in(Radian);
         public double velocity = 0;
@@ -69,7 +65,12 @@ public class SimPivot implements Pivot {
     PeriodicIOAutoLogged periodicIO = new PeriodicIOAutoLogged();
 
     public SimPivot(
-            double minAngleRads, double maxAngleRads, Supplier<Distance> elevHeightSupplier, Angle kClearAngle, double nominalVoltage, double kDt) {
+            double minAngleRads,
+            double maxAngleRads,
+            Supplier<Distance> elevHeightSupplier,
+            Angle kClearAngle,
+            double nominalVoltage,
+            double kDt) {
         this.minAngleRads = minAngleRads;
         this.maxAngleRads = maxAngleRads;
         this.elevHeightSupplier = elevHeightSupplier;
@@ -80,7 +81,7 @@ public class SimPivot implements Pivot {
         AutoLogOutputManager.addObject(this);
     }
 
-    public void setOpenLoop(double percent){
+    public void setOpenLoop(double percent) {
         periodicIO.demand = percent;
         periodicIO.controlMode = ControlModeValue.DutyCycleOut;
     }
@@ -95,7 +96,6 @@ public class SimPivot implements Pivot {
     public void setAngleRads(double angleRads) {
         periodicIO.demand = angleRads;
         periodicIO.controlMode = ControlModeValue.MotionMagicVoltage;
-
     }
 
     @Override
@@ -113,14 +113,15 @@ public class SimPivot implements Pivot {
 
         if (!DriverStationSim.getEnabled()) setOpenLoop(0);
 
-        switch(periodicIO.controlMode){
+        switch (periodicIO.controlMode) {
             case VoltageOut -> Sim.setInputVoltage(periodicIO.demand);
-            case DutyCycleOut -> Sim.setInputVoltage(periodicIO.demand/nominalVoltage);
+            case DutyCycleOut -> Sim.setInputVoltage(periodicIO.demand / nominalVoltage);
 
             case MotionMagicVoltage -> Sim.setInputVoltage(
-                m_controller.calculate(periodicIO.position, periodicIO.demand)
-                + m_feedforward.calculate(m_controller.getSetpoint().position, m_controller.getSetpoint().velocity)
-            );
+                    m_controller.calculate(periodicIO.position, periodicIO.demand)
+                            + m_feedforward.calculate(
+                                    m_controller.getSetpoint().position,
+                                    m_controller.getSetpoint().velocity));
 
             default -> throw new IllegalArgumentException("Unimplemented Control Mode in Pivot!");
         }
@@ -133,7 +134,7 @@ public class SimPivot implements Pivot {
         periodicIO.masterCurrent = Sim.getCurrentDrawAmps();
         periodicIO.position = Sim.getAngleRads();
         periodicIO.velocity = Sim.getVelocityRadPerSec();
-        
+
         // periodicIO.armPose[0] =
         //         new Pose3d(
         //                 ElevatorConstants.kZeroedElevPose[0].getX(),
@@ -141,11 +142,8 @@ public class SimPivot implements Pivot {
         //                 elevHeightSupplier.get().in(Meter),
         //                 new Rotation3d(0, periodicIO.position, 0));
 
-
         Logger.processInputs(getName(), periodicIO);
-
     }
-
 
     @Override
     public Angle getAngle() {
@@ -161,7 +159,6 @@ public class SimPivot implements Pivot {
     public double getAngleDegs() {
         return Units.radiansToDegrees(periodicIO.position);
     }
-
 
     @Override
     public Angle getMaxAngle() {
@@ -193,7 +190,4 @@ public class SimPivot implements Pivot {
     public String getName() {
         return "Simulated Pivot";
     }
-
-
-
 }

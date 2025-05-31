@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.DoubleSupplier;
-import team3647.frc2025.subsystems.Coraler;
+import team3647.frc2025.subsystems.Indexer;
 
 public class CoralerCommands {
 
@@ -36,9 +36,9 @@ public class CoralerCommands {
         return new Trigger(() -> coraler.getMasterCurrent() > 50);
     }
 
-    public Coraler coraler;
+    public Indexer coraler;
 
-    public CoralerCommands(Coraler coraler) {
+    public CoralerCommands(Indexer coraler) {
         this.coraler = coraler;
     }
 }

@@ -16,22 +16,25 @@ import edu.wpi.first.units.measure.Distance;
 
 public class ElevatorConstants {
 
-    public static final double kNativeToMeters = (1.21 - 0.85) / 19.855;
+    public static final double kSpoolDiam = Units.inchesToMeters(2);
 
-    public static final Distance kStartingHeight = Meters.of(0.85);
-    public static final Distance kStowHeight = kStartingHeight.plus(Centimeter.of(5));
-    public static final Distance kLowScoreHeight = kStartingHeight.plus(Meters.of(0.03));
+    public static final Distance kStartingHeight = Meters.of(0);
 
-    public static final Distance kHandoffHeight = kStowHeight.plus(Inches.of(3));
+    
 
-    public static final Distance kMaxHeight = Meters.of(84.27 * kNativeToMeters);
+    public static final Distance kHandoffHeight = kStartingHeight.plus(Inches.of(8.175));
+    public static final Distance kStowHeight = kHandoffHeight.plus(Inches.of(4));
+    public static final Distance kMaxHeight = Inches.of(56.375);
 
-    public static final double kMaxPossibleHeightM = 1.63;
-    public static final double kZeroHeightForAscope = 0.89;
+//     public static final double kMaxPossibleHeightM = Units.inchesToMeters(61);
+//     public static final Distance kLowScoreHeight = kStartingHeight.plus(Meters.of(0.03));
 
-    // all heights measured as center dist from the pivot pivoting bar
-
-    public static final Distance kLevel4Height = Meters.of(1.529);
+    // all heights measured as the carriage bottom
+    public static final Distance kNetHeight = Inches.of(56.125);
+    public static final Distance kLevel4Height = Inches.of(56.125);
+    public static final Distance kLevel3Height = Inches.of(17.402);
+    public static final Distance kLevel2Height = Inches.of(1.532);
+    public static final Distance kLevel1Height = Inches.of(0);
 
     // high needs tuning, low doesn't; tune for same angle at both heights
 
@@ -42,7 +45,13 @@ public class ElevatorConstants {
 
     public static final Distance kIntakeHeight = kStartingHeight;
 
+    public static final Distance annoyinAssCarriageToPivotPointOffest = Inches.of(7.719);
+
+    public static final double kStage2Threshold = Units.inchesToMeters(33) - annoyinAssCarriageToPivotPointOffest.abs(Meters);
+
     public static final Distance kMinHeight = kStartingHeight;
+
+    public static final Distance kCarriageStartingHeight = Meters.of(0);
 
     public static final Distance kClearHeight = Meters.of(1.254);
 
@@ -56,12 +65,14 @@ public class ElevatorConstants {
 
     public static final TalonFXConfiguration kSlaveConfig;
 
-    public static final double kGearRatio = 7.777;
-    public static final double kElevatorDrumRadius = Units.inchesToMeters(1.5);
+    public static final double kGearRatio = 5.6667;
+    public static final double kElevatorDrumRadius = Units.inchesToMeters(2);
     public static final double kCarriageMass =
-            Units.lbsToKilograms(4.263 + 1.241 + 5.779); // arm & claw + carriage + gearbox
+            Units.lbsToKilograms(15); // arm & claw + carriage + gearbox
     public static final Pose3d[] kZeroedElevPose =
-            new Pose3d[] {new Pose3d(0.0127, 0, kZeroHeightForAscope, new Rotation3d())};
+            new Pose3d[] {
+                new Pose3d(0, 0, 0, new Rotation3d()), new Pose3d(0, 0, 0, new Rotation3d())
+            };
 
     // multiply native by this to get meters 121 - 85 cm @ 19.855 native
 
@@ -95,10 +106,10 @@ public class ElevatorConstants {
         kMasterConfig.MotionMagic.MotionMagicAcceleration = 500;
 
         kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-                kMaxHeight.in(Meters) / kNativeToMeters; // native units
+                kMaxHeight.in(Meters) / kSpoolDiam; // native units
         kMasterConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-                kStartingHeight.in(Meters) / kNativeToMeters; // native units
+                kStartingHeight.in(Meters) / kSpoolDiam; // native units
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
         kSlaveConfig = kMasterConfig;

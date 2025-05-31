@@ -12,7 +12,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -64,7 +63,7 @@ public class SimElevator implements Elevator {
 
     @AutoLog
     public static class PeriodicIO {
-        public Pose3d[] elevatorPose = ElevatorConstants.kZeroedElevPose;
+        public Pose3d[] elevPoses = ElevatorConstants.kZeroedElevPose;
 
         public double position = ElevatorConstants.kStartingHeight.in(Meters);
         public double velocity = 0;

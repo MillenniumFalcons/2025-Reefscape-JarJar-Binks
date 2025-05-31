@@ -1,4 +1,4 @@
-package team3647.frc2025.subsystems;
+package team3647.frc2025.subsystems.wrist;
 
 import static edu.wpi.first.units.Units.Degree;
 
@@ -10,23 +10,22 @@ import edu.wpi.first.units.measure.Distance;
 import java.util.function.Supplier;
 import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.Util.SuperstructureState;
+import team3647.frc2025.constants.WristConstants;
 import team3647.lib.TalonFXSubsystem;
 
-public class Wrist extends TalonFXSubsystem {
+public class WristReal extends TalonFXSubsystem implements Wrist {
 
     Angle minAngle, maxAngle;
 
     private final Supplier<Angle> getPivotAngle;
-    private final Supplier<Distance> getElevHeight;
 
-    public Wrist(
+    public WristReal(
             TalonFX master,
             double velocityConversion,
             double positionConversion,
             double nominalVoltage,
             Angle minAngle,
             Angle maxAngle,
-            Supplier<Distance> elevHeight,
             Supplier<Angle> pivotAngle,
             double kDt) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
@@ -34,7 +33,6 @@ public class Wrist extends TalonFXSubsystem {
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;
 
-        this.getElevHeight = elevHeight;
         this.getPivotAngle = pivotAngle;
     }
 
@@ -49,12 +47,6 @@ public class Wrist extends TalonFXSubsystem {
     public void setEncoderAngle(Angle angle) {
 
         setEncoder(angle.in(Degree));
-    }
-
-    public Angle getMaxAngle() {
-        return InverseKinematics.getWristOutofTheWayMaxAngle(
-                new SuperstructureState(getPivotAngle.get(), getElevHeight.get(), getAngle()),
-                maxAngle);
     }
 
     public Angle getAngle() {
@@ -82,5 +74,10 @@ public class Wrist extends TalonFXSubsystem {
     @Override
     public String getName() {
         return "Wrist";
+    }
+
+    @Override
+    public Angle getMaxAngle() {
+        return WristConstants.kMaxAngle;
     }
 }

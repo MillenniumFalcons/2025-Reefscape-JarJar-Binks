@@ -13,7 +13,7 @@ import edu.wpi.first.math.numbers.N3;
 
 public class VisionConstants {
     public static final AprilTagFieldLayout k2025AprilTags =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+            AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     public static final Vector<N3> baseStdDevs = VecBuilder.fill(0.05, 0.05, 0.1);
 

@@ -1,4 +1,4 @@
-package team3647.frc2025.subsystems;
+package team3647.frc2025.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Inch;
@@ -30,12 +30,17 @@ import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
+import team3647.frc2025.subsystems.Indexer;
+import team3647.frc2025.subsystems.Rollers;
+import team3647.frc2025.subsystems.Seagull;
 import team3647.frc2025.subsystems.Elevator.Elevator;
 import team3647.frc2025.subsystems.pivot.Pivot;
+import team3647.frc2025.subsystems.wrist.Wrist;
+import team3647.lib.PeriodicSubsystem;
 
-public class Superstructure {
+public abstract class Superstructure implements PeriodicSubsystem{
 
-    public final Coraler coraler;
+    public final Indexer coraler;
     public final Elevator elevator;
     public final Pivot pivot;
     public final Wrist wrist;
@@ -48,29 +53,29 @@ public class Superstructure {
     public final WristCommands wristCommands;
     public final RollersCommands rollersCommands;
 
-    private BooleanSupplier isAligned;
+    protected BooleanSupplier isAligned;
 
-    private MutDistance elevOffset;
+    protected MutDistance elevOffset;
 
-    private MutAngle pivotOffset;
+    protected MutAngle pivotOffset;
 
-    private Level wantedLevel;
+    protected Level wantedLevel;
 
-    private boolean hasPeice = true;
+    protected boolean hasPeice = true;
 
-    private boolean hasAlgae = false;
+    protected boolean hasAlgae = false;
 
-    private ScoringPos wantedScoringPos = ScoringPos.NONE;
+    protected ScoringPos wantedScoringPos = ScoringPos.NONE;
 
-    private Trigger overridePiece;
+    protected Trigger overridePiece;
 
-    private double currentLimit = 57;
-    private double SeagullCurrentLimit = 30;
-    private double algaeCurrentLimit = 47;
+    protected double currentLimit = 57;
+    protected double SeagullCurrentLimit = 30;
+    protected double algaeCurrentLimit = 47;
 
-    private double wristOffset = 0;
+    protected double wristOffset = 0;
 
-    private Map<Level, SuperstructureState> kLevelToScoreMap;
+    protected Map<Level, SuperstructureState> kLevelToScoreMap;
 
     public enum Side {
         A,
@@ -93,7 +98,7 @@ public class Superstructure {
     }
 
     public Superstructure(
-            Coraler coraler,
+            Indexer coraler,
             Elevator elevator,
             Pivot pivot,
             Wrist wrist,
@@ -181,11 +186,16 @@ public class Superstructure {
                         // state.get().elevatorHeight)),
                         elevatorCommands.setHeight(() -> state.get().elevatorHeight),
                         pivotCommands.setAngle(
-                                () ->
+                                () -> {
+                                        double angle =
                                         MathUtil.clamp(
-                                                state.get().pivotAngle.in(Radian),
-                                                getPivotMinAngle(),
-                                                pivot.getMaxAngle().in(Radian))),
+                                            state.get().pivotAngle.in(Radian),
+                                            PivotConstants.kMinAngle.in(Radian),
+                                            PivotConstants.kMaxAngle.in(Radian));
+                                        System.out.println("angle" + angle);
+                                        Logger.recordOutput("PIVOT INTAKING ANGLE", angle);
+                                        Logger.recordOutput("PIVOT INTAKING ANGLE/desired", state.get().pivotAngle.in(Radian));
+                                            return angle;}),
                         Commands.either(
                                 Commands.none(),
                                 wristCommands.setAngle(state.get().wristAngle),
@@ -239,8 +249,8 @@ public class Superstructure {
                                 () ->
                                         MathUtil.clamp(
                                                 state.get().pivotAngle.in(Radian),
-                                                getPivotMinAngle(),
-                                                pivot.getMaxAngle().in(Radian))),
+                                                PivotConstants.kMinAngle.in(Radian),
+                                                PivotConstants.kMaxAngle.in(Radian))),
                         Commands.either(
                                 Commands.none(),
                                 wristCommands.setAngle(state.get().wristAngle),
@@ -397,9 +407,12 @@ public class Superstructure {
     }
 
     public Command intake() {
-        return Commands.parallel(
+        return Commands.sequence (Commands.parallel(
                 goToStateParalell(() -> SuperstructureState.Intake),
-                rollersCommands.setOpenLoop(0.25));
+                rollersCommands.setOpenLoop(0.25)).withTimeout(0.3),//add TOF sensor here .until(),
+                goToStateParalell(() -> SuperstructureState.Transfer).withTimeout(0.3), //add Current sensing here
+                goToStateParalell(()-> SuperstructureState.Stow).until(() -> getCurrentState() == SuperstructureState.Stow)
+                );
     }
 
     public Command transfer() {
@@ -420,7 +433,7 @@ public class Superstructure {
     public Command stowc() {
         return Commands.sequence(
                 elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                pivotCommands.setAngle(PivotConstants.kStartingAngle),
+                pivotCommands.setAngle(PivotConstants.kStowAngle),
                 elevatorCommands.setHeight(ElevatorConstants.kStowHeight));
     }
 
@@ -488,14 +501,14 @@ public class Superstructure {
     public Command scoreL3() {
         return Commands.sequence(
                 clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
-                elevatorCommands.setHeight(ElevatorConstants.kLowScoreHeight),
+                elevatorCommands.setHeight(ElevatorConstants.kLevel3Height),
                 pivotCommands.setAngle(PivotConstants.kL3prep));
     }
 
     public Command scoreL2() {
         return Commands.sequence(
                 clearElevatorGoingUpNoDown(PivotConstants.kL2Prep),
-                elevatorCommands.setHeight(ElevatorConstants.kLowScoreHeight),
+                elevatorCommands.setHeight(ElevatorConstants.kLevel2Height),
                 pivotCommands.setAngle(PivotConstants.kLevel2Angle));
     }
 
@@ -665,5 +678,13 @@ public class Superstructure {
 
     public boolean seagullCurrent() {
         return rollersCommands.seagullCurrentGreater(SeagullCurrentLimit);
+    }
+
+    public Command stopIntaking(){
+        return Commands.none();
+    }
+
+    public Command ejectCoral(){
+        return Commands.none();
     }
 }

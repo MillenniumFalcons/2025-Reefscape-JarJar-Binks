@@ -66,7 +66,7 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
                 robotToCam,
                 baseStdDevs,
                 update -> false,
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
+                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded));
     }
 
     public AprilTagPhotonVision(String camera, Transform3d robotToCam) {
@@ -75,7 +75,7 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
                 robotToCam,
                 VecBuilder.fill(0.05, 0.05, 0.1),
                 update -> false,
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
+                AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded));
     }
 
     public AprilTagId getId(int id) {
@@ -100,7 +100,9 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
     public Optional<Pose3d> camPose() {
         var update =
                 photonPoseEstimator.update(
-                        this.getLatestResult(), this.getCameraMatrix(), this.getDistCoeffs());
+                        this.getAllUnreadResults().get(0),
+                        this.getCameraMatrix(),
+                        this.getDistCoeffs());
         if (update.isEmpty()) {
             return Optional.empty();
         }
@@ -250,9 +252,8 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
     }
 
     public int getTagNum() {
-        var result = this.getLatestResult();
-        if (result.hasTargets()) {
-            return result.getBestTarget().getFiducialId();
+        if (this.hasTarget()) {
+            return this.getTagNum();
         } else {
             return -1;
         }

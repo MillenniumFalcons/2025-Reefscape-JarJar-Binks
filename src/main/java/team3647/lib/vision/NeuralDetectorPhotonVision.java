@@ -9,25 +9,22 @@ public class NeuralDetectorPhotonVision extends PhotonCamera implements NeuralDe
     }
 
     public double getTX() {
-        var result = this.getLatestResult();
-        if (result.hasTargets()) {
-            return result.getBestTarget().getYaw();
+        if (this.hasTarget()) {
+            return this.getTX();
         } else {
             return 0;
         }
     }
 
     public double getTY() {
-        var result = this.getLatestResult();
-        if (result.hasTargets()) {
-            return result.getBestTarget().getPitch();
+        if (this.hasTarget()) {
+            return this.getTY();
         } else {
             return 0;
         }
     }
 
     public boolean hasTarget() {
-        var result = this.getLatestResult();
-        return result.hasTargets();
+        return this.hasTarget();
     }
 }

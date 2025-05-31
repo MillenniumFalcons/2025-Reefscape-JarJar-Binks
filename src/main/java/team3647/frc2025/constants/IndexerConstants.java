@@ -5,7 +5,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-public class CoralerConstants {
+public class IndexerConstants {
 
     public static final TalonFX kMaster =
             new TalonFX(GlobalConstants.CoralerIds.kMasterId, GlobalConstants.kSubsystemCanbusName);

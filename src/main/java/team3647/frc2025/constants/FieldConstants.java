@@ -50,41 +50,41 @@ public class FieldConstants {
     // A1 is the left branch on the closest side, cOUTERcLOCKwISE from there
     // A1? AI? ccw? ccp? deepseek? dont ask deepseek to do 8*8 and turn it into a date
     public enum ScoringPos {
-        A1(new Pose2d(3.153, 4.192, new Rotation2d(0))),
-        A2(new Pose2d(3.153, 3.861, new Rotation2d(0))),
-        B1(new Pose2d(3.631, 2.9876, new Rotation2d(Radians.of(Math.PI / 3.0)))),
-        B2(new Pose2d(3.92493, 2.818, new Rotation2d(Radians.of(Math.PI / 3.0)))),
+        A1(new Pose2d(3.072, 4.185, new Rotation2d(0))),
+        A2(new Pose2d(3.072, 3.853, new Rotation2d(0))),
+        B1(new Pose2d(3.652, 2.892, new Rotation2d(Radians.of(Math.PI / 3.0)))),
+        B2(new Pose2d(3.933, 2.726, new Rotation2d(Radians.of(Math.PI / 3.0)))),
         C1(
                 new Pose2d(
-                        4.999 + 0.0575,
-                        2.8158 - 0.101,
+                        5.046,
+                        2.711,
                         new Rotation2d(Radians.of((2.0 * Math.PI) / 3.0)))),
         C2(
                 new Pose2d(
-                        5.282 + 0.0575,
-                        2.9829 - 0.101,
+                        5.328,
+                        2.871,
                         new Rotation2d(Radians.of((2.0 * Math.PI) / 3.0)))),
-        D1(new Pose2d(5.779 + 0.114, 3.858, new Rotation2d(Radians.of(Math.PI)))),
-        D2(new Pose2d(5.790 + 0.114, 4.1887, new Rotation2d(Radians.of(Math.PI)))),
+        D1(new Pose2d(5.918, 3.828, new Rotation2d(Radians.of(Math.PI)))),
+        D2(new Pose2d(5.918, 4.191, new Rotation2d(Radians.of(Math.PI)))),
         E1(
                 new Pose2d(
-                        5.2765 + 0.05175,
-                        5.06289 + 0.0989,
+                        5.336,
+                        5.158,
                         new Rotation2d(Radians.of((-2.0 * Math.PI) / 3.0)))),
         E2(
                 new Pose2d(
-                        4.998 + 0.051875,
-                        5.2329 + 0.0989,
+                        5.07,
+                        5.355,
                         new Rotation2d(Radians.of((-2.0 * Math.PI) / 3.0)))),
         F1(
                 new Pose2d(
-                        3.9867 + 0.0989,
-                        5.2277 + 0.05175,
+                        3.935,
+                        5.335,
                         new Rotation2d(Radians.of((-Math.PI) / 3.0)))),
         F2(
                 new Pose2d(
-                        3.7016 + 0.0989,
-                        5.06289 + 0.05175,
+                        3.652,
+                        5.164,
                         new Rotation2d(Radians.of((-Math.PI) / 3.0)))),
         NONE(new Pose2d());
 

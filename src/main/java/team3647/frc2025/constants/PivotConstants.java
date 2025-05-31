@@ -8,18 +8,24 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
-    public static final Angle kMinAngle = Radian.of(-1.591);
-    public static final Angle kLevel1Angle = Radian.of(-0.3266473090985561).minus(Degree.of(10));
-    public static final Angle kLevel2Angle = Radian.of(-0.279).plus(Degree.of(25));
-    public static final Angle kLevel3Angle = Radian.of(0.4650).plus(Degree.of(25));
-    public static final Angle kLevel4Angle = Radian.of(0.251).plus(Degree.of(30));
+    public static final Angle kMaxAngle = Radian.of(Math.PI/2);
+    public static final Angle kStartingAngle = Radian.of(0);
+    //0 is perfectly vertical
+    public static final Angle kMinAngle = Degree.of(-183.2);
+    public static final Angle kLevel1Angle = Degree.of(-80);
+    public static final Angle kLevel2Angle = Degree.of(-55);
+    public static final Angle kLevel3Angle = Degree.of(-55);
+    public static final Angle kLevel4Angle = Degree.of(-80);
 
     public static final Angle kL2Prep = Radian.of(-0.1);
     public static final Angle KL1Prep = kLevel1Angle;
-    public static final Angle kStartingAngle = kMinAngle;
+    
     public static final Angle kL4Prep = Radian.of(0.606);
     public static final Angle kL3prep = Radian.of(0.601);
 
@@ -33,17 +39,29 @@ public class PivotConstants {
     // lowclearangle = max angle when the pivot is blocked by the intake going up
     public static final Angle kLowClearAngle = Radian.of(0);
 
-    public static final Angle kStowAngle = Degree.of(-90);
+    public static final Angle kHandoffAngle = Degree.of(4.04-180);
+    public static final Angle kStowAngle = Degree.of(4.004-180);
     public static final Angle kStowAngleUp = Radian.of(1.3638929658036516);
 
     public static final double kNativeToRad = 1 / (10.081055 / (Math.PI / 2));
 
-    public static final Angle kMaxAngle = Radian.of(1.4771008593051909);
+
 
     // -1.402692317215491
-    public static final Angle kHandoffAngle = Radian.of(-1.407).minus(Degree.of(1.5));
+    // public static final Angle kHandoffAngle = Radian.of(-1.407).minus(Degree.of(1.5));
 
-    //vibes aah gear ratio
+    public static final Pose3d kZeroedPivotPose = new Pose3d(
+        0.0991362,
+        0,
+        .4836414,
+        new Rotation3d(
+            0,
+            0,
+            0
+        )
+    );
+
+    // vibes aah gear ratio
     public static final double kGearRatio = 50;
     public static final double kArmLengthM = 0.53594;
     public static final double kArmMassKg = 1.9214;

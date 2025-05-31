@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.Set;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.WristConstants;
-import team3647.frc2025.subsystems.Wrist;
+import team3647.frc2025.subsystems.wrist.Wrist;
 
 public class WristCommands {
     public final Wrist wrist;

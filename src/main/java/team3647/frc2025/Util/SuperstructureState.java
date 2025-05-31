@@ -20,17 +20,17 @@ public class SuperstructureState {
     public static SuperstructureState TroughScore =
             new SuperstructureState(
                     PivotConstants.kLevel1Angle,
-                    ElevatorConstants.kLowScoreHeight,
+                    ElevatorConstants.kLevel1Height,
                     WristConstants.kStowAngle);
     public static SuperstructureState LowScore =
             new SuperstructureState(
                     PivotConstants.kLevel2Angle,
-                    ElevatorConstants.kLowScoreHeight,
+                    ElevatorConstants.kLevel2Height,
                     WristConstants.kStowAngle);
     public static SuperstructureState MidScore =
             new SuperstructureState(
                     PivotConstants.kLevel3Angle,
-                    ElevatorConstants.kLowScoreHeight,
+                    ElevatorConstants.kLevel3Height,
                     WristConstants.kStowAngle);
     public static SuperstructureState HighScore =
             new SuperstructureState(
@@ -77,13 +77,13 @@ public class SuperstructureState {
     public static SuperstructureState StowScore =
             new SuperstructureState(
                     InverseKinematics.getMinAngle(LowScore),
-                    ElevatorConstants.kLowScoreHeight,
+                    ElevatorConstants.kLevel1Height,
                     WristConstants.kStowAngle);
 
     public static SuperstructureState Intake =
             new SuperstructureState(
                     PivotConstants.kStowAngle,
-                    ElevatorConstants.kHandoffHeight,
+                    ElevatorConstants.kStowHeight,
                     WristConstants.kIntakeAngle);
 
     public static SuperstructureState Transfer =
@@ -95,7 +95,7 @@ public class SuperstructureState {
     public static SuperstructureState Handoff =
             new SuperstructureState(
                     PivotConstants.kStowAngle,
-                    ElevatorConstants.kStartingHeight,
+                    ElevatorConstants.kHandoffHeight,
                     WristConstants.kStowWithPiece);
 
     public SuperstructureState(Angle pivotAngle, Distance elevatorHeight, Angle wristAngle) {

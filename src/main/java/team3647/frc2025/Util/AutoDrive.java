@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
+import team3647.frc2025.subsystems.superstructure.Superstructure.Branch;
+import team3647.frc2025.subsystems.superstructure.Superstructure.Side;
 import team3647.frc2025.constants.SwerveDriveConstants;
-import team3647.frc2025.subsystems.Superstructure.Branch;
-import team3647.frc2025.subsystems.Superstructure.Side;
 import team3647.lib.team6328.VirtualSubsystem;
 import team3647.lib.team9442.AllianceObserver;
 import team3647.lib.vision.AprilTagCamera;
@@ -43,7 +43,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
     private final PIDController intakeXController, intakeYController;
 
-    private Alliance color = Alliance.Red;
+    private Alliance color = Alliance.Blue;
 
     private DriveMode wantedMode = DriveMode.NONE;
 

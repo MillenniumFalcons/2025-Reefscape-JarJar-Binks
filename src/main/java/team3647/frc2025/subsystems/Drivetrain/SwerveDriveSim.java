@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
@@ -19,7 +20,7 @@ import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
 public class SwerveDriveSim implements SwerveDrive {
-    private final SelfControlledSwerveDriveSimulation simSwerve;
+    public final SelfControlledSwerveDriveSimulation simSwerve;
 
     private PeriodicIOAutoLogged periodicIO = new PeriodicIOAutoLogged();
     private final double kDt;
@@ -144,5 +145,9 @@ public class SwerveDriveSim implements SwerveDrive {
     @Override
     public String getName() {
         return "SimulatedSwerve";
+    }
+
+    public AbstractDriveTrainSimulation getDTSim(){
+        return this.simSwerve.getDriveTrainSimulation();
     }
 }

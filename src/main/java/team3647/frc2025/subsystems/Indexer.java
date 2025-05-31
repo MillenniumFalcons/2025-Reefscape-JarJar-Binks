@@ -3,9 +3,9 @@ package team3647.frc2025.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import team3647.lib.TalonFXSubsystem;
 
-public class Coraler extends TalonFXSubsystem {
+public class Indexer extends TalonFXSubsystem {
 
-    public Coraler(
+    public Indexer(
             TalonFX master,
             double velocityConversion,
             double positionConversion,
