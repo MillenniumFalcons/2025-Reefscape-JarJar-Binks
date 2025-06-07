@@ -84,6 +84,8 @@ public class PivotConstants {
                 kMinAngle.in(Radian) / kNativeToRad;
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
+        
+
         kMasterConfig.MotionMagic.MotionMagicCruiseVelocity = 120;
         kMasterConfig.MotionMagic.MotionMagicAcceleration = 1200;
         kMasterConfig.MotionMagic.MotionMagicJerk = 5000;

@@ -99,8 +99,7 @@ public class SwerveDriveSim implements SwerveDrive {
         periodicIO.actualSpeeds = simSwerve.getActualSpeedsFieldRelative();
         periodicIO.timestamp = Timer.getFPGATimestamp();
 
-        Logger.recordOutput(
-                "simSwerve.maxLinearVelocity", simSwerve.maxLinearVelocity().in(MetersPerSecond));
+
 
         Logger.processInputs(getName(), periodicIO);
     }
@@ -127,9 +126,6 @@ public class SwerveDriveSim implements SwerveDrive {
         return periodicIO.simPose;
     }
 
-    public Pose2d getSimPose() {
-        return periodicIO.simPose;
-    }
 
     @Override
     public Orientation getPigeonOrientation() {
