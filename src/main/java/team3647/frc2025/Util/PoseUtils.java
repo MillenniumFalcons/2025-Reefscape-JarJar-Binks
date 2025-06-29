@@ -2,6 +2,7 @@ package team3647.frc2025.Util;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import edu.wpi.first.math.geometry.Ellipse2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -39,4 +40,5 @@ public class PoseUtils {
     public static boolean inRect(Pose2d pose, Rectangle2d rect) {
         return inRect(pose.getTranslation(), rect);
     }
+
 }

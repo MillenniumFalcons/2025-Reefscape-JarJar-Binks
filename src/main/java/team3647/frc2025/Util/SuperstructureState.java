@@ -1,6 +1,7 @@
 package team3647.frc2025.Util;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
@@ -14,6 +15,7 @@ public class SuperstructureState {
     public Angle pivotAngle;
     public Distance elevatorHeight;
     public Angle wristAngle;
+    public String name;
 
     public static SuperstructureState kInvalidState =
             new SuperstructureState(Degree.of(-100), Meters.of(-1), Degree.of(-100));
@@ -21,22 +23,27 @@ public class SuperstructureState {
             new SuperstructureState(
                     PivotConstants.kLevel1Angle,
                     ElevatorConstants.kLevel1Height,
-                    WristConstants.kStowAngle);
+                    WristConstants.kStowAngle, "L1");
     public static SuperstructureState LowScore =
             new SuperstructureState(
                     PivotConstants.kLevel2Angle,
                     ElevatorConstants.kLevel2Height,
-                    WristConstants.kStowAngle);
+                    WristConstants.kStowAngle, "L2");
     public static SuperstructureState MidScore =
             new SuperstructureState(
                     PivotConstants.kLevel3Angle,
-                    ElevatorConstants.kLevel3Height,
-                    WristConstants.kStowAngle);
+                    ElevatorConstants.kThreeHeight,
+                    WristConstants.kStowAngle, "L3");
     public static SuperstructureState HighScore =
             new SuperstructureState(
                     PivotConstants.kLevel4Angle,
                     ElevatorConstants.kLevel4Height,
-                    WristConstants.kStowAngle);
+                    WristConstants.kStowAngle, "L4");
+    public static SuperstructureState preloadScore = 
+                new SuperstructureState(
+                        PivotConstants.kLevel4Angle.plus(Degrees.of(10)),
+                         ElevatorConstants.kMaxHeight,
+                          WristConstants.kStowAngle);
 
     // gg more algae stuff
     public static SuperstructureState HighAlgae =
@@ -57,6 +64,7 @@ public class SuperstructureState {
     public static SuperstructureState AlgaeBarge =
             new SuperstructureState(
                     PivotConstants.kMaxAngle.minus(Degree.of(10)),
+                    // PivotConstants.kAlgaeAngleHigh,
                     ElevatorConstants.kMaxHeight,
                     WristConstants.kStowAngle);
 
@@ -76,7 +84,7 @@ public class SuperstructureState {
 
     public static SuperstructureState StowScore =
             new SuperstructureState(
-                    InverseKinematics.getMinAngle(LowScore),
+                    InverseKinematics.getPivotMin(LowScore.elevatorHeight),
                     ElevatorConstants.kLevel1Height,
                     WristConstants.kStowAngle);
 
@@ -104,6 +112,11 @@ public class SuperstructureState {
         this.wristAngle = wristAngle;
     }
 
+    public SuperstructureState(Angle pivotAngle, Distance elevatorHeight, Angle wristAngle, String name) {
+       this(pivotAngle, elevatorHeight, wristAngle);
+       this.name = name;
+    }
+
     public SuperstructureState withPivotAngle(Angle pivotAngle) {
         return new SuperstructureState(pivotAngle, this.elevatorHeight, this.wristAngle);
     }
@@ -124,5 +137,19 @@ public class SuperstructureState {
 
         return this.elevatorHeight.equals(((SuperstructureState) obj).elevatorHeight)
                 && this.pivotAngle.equals(((SuperstructureState) obj).pivotAngle);
+    }
+
+    public boolean equalsWithTolerance(
+            SuperstructureState state,
+            Distance elevatorTolerance,
+            Angle pivotTolerance,
+            Angle wristTolerance) {
+        return this.elevatorHeight.isNear(state.elevatorHeight, elevatorTolerance)
+                && this.pivotAngle.isNear(state.pivotAngle, pivotTolerance)
+                && this.wristAngle.isNear(state.wristAngle, wristTolerance);
+    }
+
+    public boolean equalsWithTolerance(SuperstructureState state) {
+        return equalsWithTolerance(state, Inches.of(1), Degrees.of(1), Degrees.of(1));
     }
 }

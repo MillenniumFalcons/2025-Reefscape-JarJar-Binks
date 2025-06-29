@@ -17,6 +17,8 @@ public interface AprilTagCamera {
 
     public double getTa();
 
+    public Optional<Pose3d> getBotPoseTagRelative();
+
     public boolean hasTarget();
 
     public Pose2d getTagPose();

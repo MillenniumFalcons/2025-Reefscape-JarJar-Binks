@@ -29,7 +29,7 @@ public class AutoChooser extends SendableChooser<AutoMode> implements AllianceOb
                     // Logger.recordOutput("sellected", getSelected().getName());
                 });
         autosList = autoCommands.redAutosList;
-        setDefaultOption("DEFAULT AUTO CHANE THIS", autosList.get(0));
+        setDefaultOption("DEFAULT AUTO CHANGE THIS", autosList.get(0));
     }
 
     @Override

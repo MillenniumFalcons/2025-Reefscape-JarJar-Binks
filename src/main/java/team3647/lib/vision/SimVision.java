@@ -5,13 +5,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import team3647.lib.team6328.VirtualSubsystem;
+
 import java.util.function.Supplier;
 import org.photonvision.PhotonTargetSortMode;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 
-public class SimVision {
+public class SimVision extends VirtualSubsystem{
     // A vision system sim labelled as "main" in NetworkTables
     VisionSystemSim visionSim = new VisionSystemSim("main");
     SimCameraProperties cameraProp = new SimCameraProperties();
@@ -27,6 +29,7 @@ public class SimVision {
             AprilTagFieldLayout tags,
             Supplier<Pose2d> simPoseSupplier,
             AprilTagPhotonVision... cameras) {
+        super();
         if (RobotBase.isReal()) {
             throw new IllegalStateException("TRYING TO RUN SIM VISION ON A REAL ROBOT");
         }
@@ -57,6 +60,7 @@ public class SimVision {
         }
     }
 
+    @Override
     public void periodic() {
         visionSim.update(simPose.get());
     }

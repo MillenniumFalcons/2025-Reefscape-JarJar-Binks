@@ -9,13 +9,13 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.function.Supplier;
-import team3647.frc2025.constants.ElevatorConstants;
+import team3647.frc2025.Util.InverseKinematics;
 import team3647.lib.TalonFXSubsystem;
 
 public class PivotReal extends TalonFXSubsystem implements Pivot {
 
-    private final Angle maxAngle;
-    private final Angle minAngle;
+    private final Angle hardMaxAngle;
+    private final Angle hardMinAngle;
     private final Angle kClearAngle, kLowClearAngle;
 
     private final Supplier<Distance> elevatorHeight;
@@ -25,8 +25,8 @@ public class PivotReal extends TalonFXSubsystem implements Pivot {
 
     public PivotReal(
             TalonFX master,
-            Angle maxAngle,
-            Angle minAngle,
+            Angle hardMaxAngle,
+            Angle hardMinAngle,
             double kG,
             double positionConversion,
             double velocityConversion,
@@ -39,8 +39,8 @@ public class PivotReal extends TalonFXSubsystem implements Pivot {
             Trigger ignoreSoftLimits) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
 
-        this.maxAngle = maxAngle;
-        this.minAngle = minAngle;
+        this.hardMaxAngle = hardMaxAngle;
+        this.hardMinAngle = hardMinAngle;
         this.kClearAngle = kClearAngle;
         this.kLowClearAngle = kLowClearAngle;
         this.elevatorHeight = elevatorHeight;
@@ -91,17 +91,12 @@ public class PivotReal extends TalonFXSubsystem implements Pivot {
         super.setEncoderNative(position);
     }
 
-    public boolean needToClearElevator() {
-        return getPosition() < kClearAngle.in(Radian)
-                && elevatorHeight.get().lt(ElevatorConstants.kClearHeight);
-    }
-
     public Angle getMinAngle() {
-        return minAngle;
+        return InverseKinematics.getPivotMin(elevatorHeight.get());
     }
 
     public Angle getMaxAngle() {
-        return maxAngle;
+        return InverseKinematics.getPivotMax(elevatorHeight.get());
     }
 
     public boolean angleWithin(double lowBound, double highBound) {

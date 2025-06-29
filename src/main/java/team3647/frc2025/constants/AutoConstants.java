@@ -3,6 +3,7 @@ package team3647.frc2025.constants;
 import choreo.trajectory.EventMarker;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -23,6 +24,9 @@ public class AutoConstants {
     public static final ProfiledPIDController profiledRotController =
             new ProfiledPIDController(4.5, 0, 0.045, new Constraints(5, 5));
     public static final PIDController rotController = new PIDController(4, 0, 0);
+    public static final PIDController slowerXController = new PIDController(3, 0, 0.15);
+    public static final PIDController slowerYController = new PIDController(3, 0, 0.15);
     public static final PIDController autoXController = new PIDController(4, 0, 0.1);
     public static final PIDController autoYController = new PIDController(4, 0, 0.1);
+
 }

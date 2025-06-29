@@ -3,10 +3,13 @@ package team3647.frc2025.constants;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
+import org.photonvision.simulation.SimCameraProperties;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
@@ -72,4 +75,11 @@ public class VisionConstants {
                     Inches.of(0),
                     Inches.of(1.5),
                     new Rotation3d(0, Math.toRadians(-24.529), 0));
+                    
+//     public static final SimCameraProperties frontPVSim = new SimCameraProperties()
+//     .setCalibration(1280, 800, Rotation2d.fromDegrees(70))
+//     .setCalibError(0.25, 0.08)
+//     .setFPS(40)
+//     .setAvgLatencyMs(40)
+//     .setLatencyStdDevMs(5);
 }

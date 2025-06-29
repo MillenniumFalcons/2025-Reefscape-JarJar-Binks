@@ -1,6 +1,5 @@
 package team3647.frc2025.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 
@@ -39,16 +38,16 @@ public class RobotTracker extends VirtualSubsystem {
 
         Pose3d[] poses =
                 new Pose3d[] {
-                //     Pose3d.kZero,
-                //     Pose3d.kZero,
-                //     Pose3d.kZero,
-                //     Pose3d.kZero
+                    //     Pose3d.kZero,
+                    //     Pose3d.kZero,
+                    //     Pose3d.kZero,
+                    //     Pose3d.kZero
                     new Pose3d(
                             ElevatorConstants.kZeroedElevPose[0].getX(),
                             ElevatorConstants.kZeroedElevPose[0].getY(),
                             Math.max(
                                     superstructure.elevator.getHeight().in(Meters)
-                                            - ElevatorConstants.kStage2Threshold,
+                                            - ElevatorConstants.kStage2Threshold.in(Meters),
                                     0),
                             Rotation3d.kZero),
                     new Pose3d(
@@ -59,8 +58,10 @@ public class RobotTracker extends VirtualSubsystem {
                     new Pose3d(
                             PivotConstants.kZeroedPivotPose.getX(),
                             PivotConstants.kZeroedPivotPose.getY(),
-                            superstructure.elevator.getHeight().in(Meters) + PivotConstants.kZeroedPivotPose.getZ(),
-                            new Rotation3d(0, -superstructure.pivot.getAngleRads() + Math.PI/2, 0)),
+                            superstructure.elevator.getHeight().in(Meters)
+                                    + PivotConstants.kZeroedPivotPose.getZ(),
+                            new Rotation3d(
+                                    0, -superstructure.pivot.getAngleRads() + Math.PI / 2, 0)),
                     new Pose3d(
                             WristConstants.kZeroedIntakePose.getX(),
                             WristConstants.kZeroedIntakePose.getY(),

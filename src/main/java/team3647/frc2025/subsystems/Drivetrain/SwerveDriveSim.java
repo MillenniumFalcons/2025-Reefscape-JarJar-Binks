@@ -3,7 +3,13 @@ package team3647.frc2025.subsystems.Drivetrain;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.ctre.phoenix6.Utils;
+
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
+import choreo.trajectory.TrajectorySample;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -16,6 +22,8 @@ import org.ironmaple.simulation.drivesims.SelfControlledSwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.Logger;
+
+import team3647.frc2025.autos.AutoCommands.ChoreoController;
 import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
@@ -107,11 +115,6 @@ public class SwerveDriveSim implements SwerveDrive {
     }
 
     @Override
-    public void resetPose(Pose2d pose) {
-        simSwerve.resetOdometry(pose);
-    }
-
-    @Override
     public void setRobotPose(Pose2d pose) {
         simSwerve.resetOdometry(pose);
         simSwerve.setSimulationWorldPose(pose);
@@ -147,7 +150,33 @@ public class SwerveDriveSim implements SwerveDrive {
         return "SimulatedSwerve";
     }
 
-    public AbstractDriveTrainSimulation getDTSim(){
+    public AbstractDriveTrainSimulation getDTSim() {
         return this.simSwerve.getDriveTrainSimulation();
+    }
+
+    @Override
+    public void followTrajectory(SwerveSample sample, PIDController xController, PIDController yController, PIDController thetaController) {
+        Pose2d robotPose = getOdoPose();
+        Pose2d samplePose = sample.getPose();
+        thetaController.enableContinuousInput(-Math.PI - 0.1, Math.PI + 0.1);
+        Logger.recordOutput("Drivetrain/PID ROT BOTPOSE", robotPose.getRotation().getRadians());
+        Logger.recordOutput("Drivetrain/PID ROT DESIRED", samplePose.getRotation().getRadians());
+        ChassisSpeeds pid = 
+                new ChassisSpeeds(
+                        xController.calculate(robotPose.getX(), samplePose.getX()),
+                        yController.calculate(robotPose.getY(), samplePose.getY()),
+                        thetaController.calculate(robotPose.getRotation().getRadians(), samplePose.getRotation().getRadians()));
+        Logger.recordOutput("Drivetrain/Traj pid speeds", pid);
+        Logger.recordOutput("Drivetrain/Traj sample pose", samplePose);
+        Logger.recordOutput("Drivetrain/Robot thinks its pose", robotPose);
+        Logger.recordOutput("Drivetrain/Normal traj speeds", sample.getChassisSpeeds());
+        periodicIO.outputSpeeds = pid.plus(sample.getChassisSpeeds());
+                // sample.getChassisSpeeds();
+        periodicIO.fieldRelative = true;
+    }
+
+    public void followTrajectory(SwerveSample sample, ChoreoController controller) {
+        periodicIO.outputSpeeds = controller.apply(getOdoPose(), sample);
+        periodicIO.fieldRelative = false;
     }
 }

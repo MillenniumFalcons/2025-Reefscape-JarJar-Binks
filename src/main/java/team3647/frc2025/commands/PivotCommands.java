@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.PivotConstants;
@@ -20,9 +21,12 @@ public class PivotCommands {
                 .until(() -> pivot.angleReached(angleRads, Degree.of(2)));
     }
 
+    public Command setAngle(Supplier<Angle> angleRads, BooleanSupplier end) {
+        return Commands.run(() -> pivot.setAngle(angleRads.get()), pivot).until(end);
+    }
+
     public Command setAngle(Supplier<Angle> angleRads) {
-        return Commands.run(() -> pivot.setAngle(angleRads.get()), pivot)
-                .until(() -> pivot.angleReached(angleRads.get(), Degree.of(2)));
+        return setAngle(angleRads, () -> pivot.angleReached(angleRads.get(), Degree.of(2)));
     }
 
     public Command setAngle(double angleRads) {

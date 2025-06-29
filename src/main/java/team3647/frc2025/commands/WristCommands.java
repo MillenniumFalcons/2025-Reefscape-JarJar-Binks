@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.wrist.Wrist;
@@ -42,9 +43,12 @@ public class WristCommands {
                 .until(() -> wrist.angleReached(angle.in(Degree), 2));
     }
 
+    public Command setAngle(Supplier<Angle> angle, BooleanSupplier end) {
+        return Commands.run(() -> wrist.setAngle(angle.get()), wrist).until(end);
+    }
+
     public Command setAngle(Supplier<Angle> angle) {
-        return Commands.run(() -> wrist.setAngle(angle.get()), wrist)
-                .until(() -> wrist.angleReached(angle.get().in(Degree), 2));
+        return setAngle(angle, () -> wrist.angleReached(angle.get().in(Degree), 2));
     }
 
     public Command holdPositionAtCall() {

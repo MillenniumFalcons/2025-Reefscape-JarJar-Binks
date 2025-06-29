@@ -271,4 +271,9 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     public String getName() {
         return name;
     }
+
+    @Override
+    public Optional<Pose3d> getBotPoseTagRelative() {
+           return LimelightHelpers.getBotPose3d_TargetSpace(name);
+    }
 }

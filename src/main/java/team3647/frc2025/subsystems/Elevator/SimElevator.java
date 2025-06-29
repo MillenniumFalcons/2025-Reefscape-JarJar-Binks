@@ -12,6 +12,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -166,12 +167,12 @@ public class SimElevator implements Elevator {
         periodicIO.position = this.Sim.getPositionMeters();
         periodicIO.velocity = this.Sim.getVelocityMetersPerSecond();
         periodicIO.masterCurrent = this.Sim.getCurrentDrawAmps();
-        // periodicIO.elevatorPose[0] =
-        //         new Pose3d(
-        //                 ElevatorConstants.kZeroedElevPose[0].getX(),
-        //                 ElevatorConstants.kZeroedElevPose[0].getY(),
-        //                 periodicIO.position,
-        //                 Rotation3d.kZero);
+        periodicIO.elevPoses[0] =
+                new Pose3d(
+                        ElevatorConstants.kZeroedElevPose[0].getX(),
+                        ElevatorConstants.kZeroedElevPose[0].getY(),
+                        periodicIO.position,
+                        Rotation3d.kZero);
 
         ElevatorMech2d.setLength(periodicIO.position);
         Logger.recordOutput(getName() + "/ Mechanism2d", Mech2d);

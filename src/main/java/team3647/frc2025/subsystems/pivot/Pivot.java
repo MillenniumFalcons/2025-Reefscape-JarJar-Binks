@@ -23,8 +23,6 @@ public interface Pivot extends PeriodicSubsystem {
 
     public boolean angleWithin(double lowBound, double highBound);
 
-    public boolean needToClearElevator();
-
     public Angle getMaxAngle();
 
     public Angle getMinAngle();

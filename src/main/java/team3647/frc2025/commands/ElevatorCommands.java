@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -31,9 +32,12 @@ public class ElevatorCommands {
                 .until(() -> elevator.heightReached(Meters.of(height.getAsDouble()), Inches.of(1)));
     }
 
+    public Command setHeight(Supplier<Distance> height, BooleanSupplier end) {
+        return Commands.run(() -> elevator.setHeight(height.get()), elevator).until(end);
+    }
+
     public Command setHeight(Supplier<Distance> height) {
-        return Commands.run(() -> elevator.setHeight(height.get()), elevator)
-                .until(() -> elevator.heightReached(height.get(), Inches.of(1)));
+        return setHeight(height, () -> elevator.heightReached(height.get(), Inches.of(1)));
     }
 
     public Command setHeight(Distance height) {

@@ -1,35 +1,84 @@
 package team3647.frc2025.constants;
 
-import static edu.wpi.first.units.Units.Centimeter;
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import team3647.frc2025.Util.AllianceFlip;
+
 import java.util.List;
 
 public class FieldConstants {
+    public static Distance kFieldLength = Centimeter.of(1755);
+    public static double kFieldLengthM = kFieldLength.in(Meter);
+    public static Distance kFieldWidth = Centimeter.of(805);
+    public static double kFieldWidthM = kFieldWidth.in(Meter);
 
     public static final Rotation2d kDefaultRot = new Rotation2d();
+    public static final Translation2d kRobotToReefA1 = new Translation2d(Inches.of(22), Inches.of(-12.94/2.0));
+    public static final Translation2d kRobotToReefA1Safe = new Translation2d(Inches.of(29), Inches.of(-12.94/2.0));
+
+    public static final Translation2d kRobotToReefFaceA = new Translation2d(Inches.of(17), Inches.of(0));
+    private static final Pose2d BlueReefAMidpt = new Pose2d(Inches.of(144), Centimeter.of(805.0/2.0), Rotation2d.k180deg);
+    public static final Translation2d kBlueReefOrigin = new Translation2d(Inches.of(144.0 - 14.0 + 93.5/2), Centimeter.of(805.0/2.0));
+    public static final Pose2d kBlueReefA1 = BlueReefAMidpt.transformBy(new Transform2d(
+        kRobotToReefA1,
+        Rotation2d.k180deg
+    ));
+
+    public static final Pose2d kBlueReefA1Safe = BlueReefAMidpt.transformBy(new Transform2d(
+        kRobotToReefA1Safe,
+        Rotation2d.k180deg
+    ));
+
+    public static final Pose2d kBlueReefA2 = BlueReefAMidpt.transformBy(new Transform2d(
+        new Translation2d(
+            kRobotToReefA1.getX(),
+            kRobotToReefA1.getY() * -1
+        ),
+        Rotation2d.k180deg
+    ));
+
+    public static final Pose2d kBlueReefA2Safe = BlueReefAMidpt.transformBy(new Transform2d(
+        new Translation2d(
+            kRobotToReefA1Safe.getX(),
+            kRobotToReefA1Safe.getY() * -1
+        ),
+        Rotation2d.k180deg
+    ));
+    public static final Pose2d kBlueReefFaceA = BlueReefAMidpt.transformBy(new Transform2d(
+        kRobotToReefFaceA,
+        Rotation2d.k180deg
+    ));
 
     public static final List<Pose2d> blueReefSides =
             List.of(
-                    new Pose2d(5.10, 5.11, Rotation2d.kZero), // e
-                    new Pose2d(5.73, 4.02, new Rotation2d(Radians.of(Math.PI / 3.0))), // d
-                    new Pose2d(5.11, 2.96, new Rotation2d(Radians.of((2.0 * Math.PI) / 3.0))), // c
-                    new Pose2d(3.87, 2.96, new Rotation2d(Radians.of(Math.PI))), // b
-                    new Pose2d(3.25, 4.02, new Rotation2d(Radians.of((-2.0 * Math.PI) / 3.0))), // a
-                    new Pose2d(3.87, 5.09, new Rotation2d(Radians.of((-Math.PI) / 3.0)))); // f
+                new Pose2d(kBlueReefFaceA.getTranslation().rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(4.0 * Math.PI / 3.0))), kDefaultRot), // e
+                    new Pose2d(kBlueReefFaceA.getTranslation().rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI))), kDefaultRot), // d
+                    new Pose2d(kBlueReefFaceA.getTranslation().rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(2.0 * Math.PI / 3.0))), kDefaultRot), // c
+                    new Pose2d(kBlueReefFaceA.getTranslation().rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI / 3.0))), kDefaultRot), // b
+                    kBlueReefFaceA,
+                    new Pose2d(kBlueReefFaceA.getTranslation().rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(5.0 * Math.PI / 3.0))), kDefaultRot) // F
+                );
 
-    public static final List<Pose2d> redReefSides =
-            List.of(
-                    new Pose2d(12.45, 2.96, kDefaultRot), // E
-                    new Pose2d(11.83, 4.02, kDefaultRot), // D
-                    new Pose2d(12.45, 5.09, kDefaultRot), // C
-                    new Pose2d(13.69, 5.11, kDefaultRot), // b
-                    new Pose2d(14.3, 4.02, kDefaultRot), // A
-                    new Pose2d(13.69, 2.96, kDefaultRot)); // F
+    public static final List<Pose2d> redReefSides = 
+        getRedFromBlue(blueReefSides); 
+
+    public static List<Pose2d> getRedFromBlue(List<Pose2d> poses){
+        return List.of(
+            AllianceFlip.flip(blueReefSides.get(0), Alliance.Red),
+            AllianceFlip.flip(blueReefSides.get(1), Alliance.Red),
+            AllianceFlip.flip(blueReefSides.get(2), Alliance.Red),
+            AllianceFlip.flip(blueReefSides.get(3), Alliance.Red),
+            AllianceFlip.flip(blueReefSides.get(4), Alliance.Red),
+            AllianceFlip.flip(blueReefSides.get(5), Alliance.Red)
+        );
+        
+    }
 
     public static final Pose2d blueProcessor = new Pose2d(6.35, 0.48, kDefaultRot);
     public static final Pose2d redProcessor = new Pose2d(11.522, 7.568, kDefaultRot);
@@ -50,53 +99,59 @@ public class FieldConstants {
     // A1 is the left branch on the closest side, cOUTERcLOCKwISE from there
     // A1? AI? ccw? ccp? deepseek? dont ask deepseek to do 8*8 and turn it into a date
     public enum ScoringPos {
-        A1(new Pose2d(3.072, 4.185, new Rotation2d(0))),
-        A2(new Pose2d(3.072, 3.853, new Rotation2d(0))),
-        B1(new Pose2d(3.652, 2.892, new Rotation2d(Radians.of(Math.PI / 3.0)))),
-        B2(new Pose2d(3.933, 2.726, new Rotation2d(Radians.of(Math.PI / 3.0)))),
-        C1(
-                new Pose2d(
-                        5.046,
-                        2.711,
-                        new Rotation2d(Radians.of((2.0 * Math.PI) / 3.0)))),
-        C2(
-                new Pose2d(
-                        5.328,
-                        2.871,
-                        new Rotation2d(Radians.of((2.0 * Math.PI) / 3.0)))),
-        D1(new Pose2d(5.918, 3.828, new Rotation2d(Radians.of(Math.PI)))),
-        D2(new Pose2d(5.918, 4.191, new Rotation2d(Radians.of(Math.PI)))),
-        E1(
-                new Pose2d(
-                        5.336,
-                        5.158,
-                        new Rotation2d(Radians.of((-2.0 * Math.PI) / 3.0)))),
-        E2(
-                new Pose2d(
-                        5.07,
-                        5.355,
-                        new Rotation2d(Radians.of((-2.0 * Math.PI) / 3.0)))),
-        F1(
-                new Pose2d(
-                        3.935,
-                        5.335,
-                        new Rotation2d(Radians.of((-Math.PI) / 3.0)))),
-        F2(
-                new Pose2d(
-                        3.652,
-                        5.164,
-                        new Rotation2d(Radians.of((-Math.PI) / 3.0)))),
-        NONE(new Pose2d());
+
+        A1(kBlueReefA1, kBlueReefA1Safe),
+        A2(kBlueReefA2, kBlueReefA2Safe),
+        B1(kBlueReefA1.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI/3.0))), kBlueReefA1Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI/3.0)))),
+        B2(kBlueReefA2.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI/3.0))), kBlueReefA2Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI/3.0)))),
+        C1(kBlueReefA1.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(2.0 * Math.PI/3.0))), kBlueReefA1Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(2.0 * Math.PI/3.0)))),
+        C2(kBlueReefA2.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(2.0 * Math.PI/3.0))),  kBlueReefA2Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(2.0 * Math.PI/3.0)))),
+        D1(kBlueReefA1.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI))),  kBlueReefA1Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI)))),
+        D2(kBlueReefA2.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI))),  kBlueReefA2Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(Math.PI)))),
+        E1(kBlueReefA1.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(4.0 * Math.PI/3.0))),  kBlueReefA1Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(4.0* Math.PI/3.0)))),
+        E2(kBlueReefA2.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(4.0 * Math.PI/3.0))),  kBlueReefA2Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(4.0* Math.PI/3.0)))),
+        F1(kBlueReefA1.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(5.0 * Math.PI/3.0))),  kBlueReefA1Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(5.0* Math.PI/3.0)))),
+        F2(kBlueReefA2.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(5.0 * Math.PI/3.0))),  kBlueReefA2Safe.rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(5.0 * Math.PI/3.0)))),
+        PreloadF2BRUH(kBlueReefA2.plus(new Transform2d(-0.03, 0.0, Rotation2d.kZero)).rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(5.0 * Math.PI/3.0))),  kBlueReefA2Safe.plus(new Transform2d(-0.3, 0, Rotation2d.kZero)).rotateAround(kBlueReefOrigin, new Rotation2d(Radians.of(5.0 * Math.PI/3.0)))),
+
+        NONE(new Pose2d(), new Pose2d());
 
         public Pose2d pose;
+        public Pose2d safePose;
+        public static Pose2d[] allPoses = {
+            A1.pose, 
+            A2.pose,
+            B1.pose,
+            B2.pose,
+            C1.pose,
+            C2.pose,
+            D1.pose,
+            D2.pose,
+            E1.pose,
+            E2.pose,
+            F1.pose,
+            F2.pose,
+            A1.safePose,
+            A2.safePose,
+            B1.safePose,
+            B2.safePose,
+            C1.safePose,
+            C2.safePose,
+            D1.safePose,
+            D2.safePose,
+            E1.safePose,
+            E2.safePose,
+            F1.safePose,
+            F2.safePose,
+            PreloadF2BRUH.pose,
+            PreloadF2BRUH.safePose
+        };
 
-        ScoringPos(Pose2d pose) {
+        ScoringPos(Pose2d pose, Pose2d safe) {
             this.pose = pose;
+            this.safePose = safe;
+
         }
     }
 
-    public static Distance kFieldLength = Centimeter.of(1755);
-    public static double kFieldLengthM = kFieldLength.in(Meter);
-    public static Distance kFieldWidth = Centimeter.of(805);
-    public static double kFieldWidthM = kFieldWidth.in(Meter);
 }

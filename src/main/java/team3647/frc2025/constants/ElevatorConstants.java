@@ -1,6 +1,5 @@
 package team3647.frc2025.constants;
 
-import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
@@ -20,20 +19,18 @@ public class ElevatorConstants {
 
     public static final Distance kStartingHeight = Meters.of(0);
 
-    
-
     public static final Distance kHandoffHeight = kStartingHeight.plus(Inches.of(8.175));
     public static final Distance kStowHeight = kHandoffHeight.plus(Inches.of(4));
     public static final Distance kMaxHeight = Inches.of(56.375);
 
-//     public static final double kMaxPossibleHeightM = Units.inchesToMeters(61);
-//     public static final Distance kLowScoreHeight = kStartingHeight.plus(Meters.of(0.03));
+    //     public static final double kMaxPossibleHeightM = Units.inchesToMeters(61);
+    //     public static final Distance kLowScoreHeight = kStartingHeight.plus(Meters.of(0.03));
 
-    // all heights measured as the carriage bottom
+    // all heights measured as the pivot point ?
     public static final Distance kNetHeight = Inches.of(56.125);
     public static final Distance kLevel4Height = Inches.of(56.125);
-    public static final Distance kLevel3Height = Inches.of(17.402);
-    public static final Distance kLevel2Height = Inches.of(1.532);
+    public static final Distance kThreeHeight = Inches.of(23); // 17.402
+    public static final Distance kLevel2Height = Inches.of(7);
     public static final Distance kLevel1Height = Inches.of(0);
 
     // high needs tuning, low doesn't; tune for same angle at both heights
@@ -42,18 +39,18 @@ public class ElevatorConstants {
     //     public static final Distance kHighAlgaeHeight = Meters.of(1.368);
 
     public static final Distance kHighAlgaeHeight = kStartingHeight.plus(Meters.of(0.25));
-
-    public static final Distance kIntakeHeight = kStartingHeight;
-
+    // carriage bottom to piv point
     public static final Distance annoyinAssCarriageToPivotPointOffest = Inches.of(7.719);
 
-    public static final double kStage2Threshold = Units.inchesToMeters(33) - annoyinAssCarriageToPivotPointOffest.abs(Meters);
+    public static final Distance kCarriageHeight = Inches.of(4.625);
+    public static final Distance kStage2Threshold = Inches.of(28).minus(kCarriageHeight);
 
     public static final Distance kMinHeight = kStartingHeight;
 
-    public static final Distance kCarriageStartingHeight = Meters.of(0);
-
-    public static final Distance kClearHeight = Meters.of(1.254);
+    public static final Distance kClearHeight = kStowHeight;
+    // this is when the claw pivots with an algae in it, and the algae has to clear the elevator top
+    // bar
+    public static final double kAlgaeElevatorClear = Units.inchesToMeters(12);
 
     public static final TalonFX kMaster =
             new TalonFX(

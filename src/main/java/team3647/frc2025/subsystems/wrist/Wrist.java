@@ -11,8 +11,6 @@ public interface Wrist extends PeriodicSubsystem {
 
     public Angle getAngle();
 
-    public Angle getMaxAngle();
-
     public double getAngleDegs();
 
     public boolean angleWithin(double lowBound, double highBound);

@@ -265,6 +265,21 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
         return aprilTagFieldLayout.getTagPose(tagnum).orElse(Pose3d.kZero).toPose2d();
     }
 
+    @Override
+    public Optional<Pose3d> getBotPoseTagRelative() {
+        var resultList = this.getAllUnreadResults();
+        if (resultList.size() <= 0) {
+            return Optional.empty();
+        }
+
+        var result = resultList.get(0);
+        if (!result.hasTargets()) return Optional.empty();
+
+        return Optional.of(
+            result.getBestTarget().getBestCameraToTarget()
+        );
+    }
+
     // public void addGyroData(Orientation orientation){
     //     photonPoseEstimator.addHeadingData(Timer.getTimestamp(),
     // Rotation2d.fromDegrees(orientation.yaw()));

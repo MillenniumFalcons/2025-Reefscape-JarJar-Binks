@@ -1,12 +1,22 @@
 package team3647.frc2025.subsystems.Drivetrain;
 
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
+
 import org.littletonrobotics.junction.AutoLog;
+
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
+import choreo.trajectory.TrajectorySample;
+import team3647.frc2025.autos.AutoCommands.ChoreoController;
 import team3647.lib.PeriodicSubsystem;
 import team3647.lib.team9442.AllianceObserver;
 import team3647.lib.vision.Orientation;
@@ -18,7 +28,8 @@ public interface SwerveDrive extends PeriodicSubsystem, AllianceObserver {
 
     public void driveFieldOriented(double x, double y, double rotation);
 
-    public void resetPose(Pose2d pose);
+    public void followTrajectory(SwerveSample sample, PIDController xController, PIDController yController, PIDController thetaController);
+    public void followTrajectory(SwerveSample sample, ChoreoController controller);
 
     public void setRobotPose(Pose2d pose);
 

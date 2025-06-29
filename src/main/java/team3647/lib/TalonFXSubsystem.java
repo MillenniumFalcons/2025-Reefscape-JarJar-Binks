@@ -52,6 +52,7 @@ public abstract class TalonFXSubsystem implements PeriodicSubsystem {
     protected final double kDt;
     public static final int kLongStatusTimeMS = 255;
     public static final int kTimeoutMS = 100;
+
     private PeriodicIOAutoLogged ioAutoLogged = new PeriodicIOAutoLogged();
 
     protected TalonFXSubsystem(
@@ -97,7 +98,6 @@ public abstract class TalonFXSubsystem implements PeriodicSubsystem {
     @Override
     public void writePeriodicOutputs() {
         master.setControl(controlMode);
-        // master.setControl(controlMode);
         for (var follower : followers) {
             follower.setControl(masterOutput);
         }

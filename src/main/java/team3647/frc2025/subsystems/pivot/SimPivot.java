@@ -1,11 +1,14 @@
 package team3647.frc2025.subsystems.pivot;
 
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
 
 import com.ctre.phoenix6.signals.ControlModeValue;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -40,7 +43,7 @@ public class SimPivot implements Pivot {
                     gearbox,
                     PivotConstants.kGearRatio,
                     PivotConstants.kArmMoiKg2M,
-                    PivotConstants.kArmLengthM,
+                    PivotConstants.kArmLength.in(Meters),
                     PivotConstants.kMinAngle.in(Radian),
                     PivotConstants.kMaxAngle.in(Radian),
                     true,
@@ -135,12 +138,12 @@ public class SimPivot implements Pivot {
         periodicIO.position = Sim.getAngleRads();
         periodicIO.velocity = Sim.getVelocityRadPerSec();
 
-        // periodicIO.armPose[0] =
-        //         new Pose3d(
-        //                 ElevatorConstants.kZeroedElevPose[0].getX(),
-        //                 ElevatorConstants.kZeroedElevPose[0].getY(),
-        //                 elevHeightSupplier.get().in(Meter),
-        //                 new Rotation3d(0, periodicIO.position, 0));
+        periodicIO.armPose[0] =
+                new Pose3d(
+                        ElevatorConstants.kZeroedElevPose[0].getX(),
+                        ElevatorConstants.kZeroedElevPose[0].getY(),
+                        elevHeightSupplier.get().in(Meter),
+                        new Rotation3d(0, periodicIO.position, 0));
 
         Logger.processInputs(getName(), periodicIO);
     }
@@ -178,12 +181,6 @@ public class SimPivot implements Pivot {
     @Override
     public boolean angleWithin(double lowBound, double highBound) {
         return getAngleRads() > lowBound && getAngleRads() < highBound;
-    }
-
-    @Override
-    public boolean needToClearElevator() {
-        return periodicIO.position < kClearAngle.in(Radian)
-                && elevHeightSupplier.get().lt(ElevatorConstants.kClearHeight);
     }
 
     @Override

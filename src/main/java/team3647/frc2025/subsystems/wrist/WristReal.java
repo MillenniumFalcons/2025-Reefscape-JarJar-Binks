@@ -6,41 +6,29 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import java.util.function.Supplier;
-import team3647.frc2025.Util.InverseKinematics;
-import team3647.frc2025.Util.SuperstructureState;
-import team3647.frc2025.constants.WristConstants;
 import team3647.lib.TalonFXSubsystem;
 
 public class WristReal extends TalonFXSubsystem implements Wrist {
 
     Angle minAngle, maxAngle;
 
-    private final Supplier<Angle> getPivotAngle;
-
     public WristReal(
             TalonFX master,
-            double velocityConversion,
-            double positionConversion,
-            double nominalVoltage,
-            Angle minAngle,
             Angle maxAngle,
-            Supplier<Angle> pivotAngle,
+            Angle minAngle,
+            double positionConversion,
+            double velocityConversion,
+            double nominalVoltage,
             double kDt) {
-        super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
-
+        super(master, positionConversion, velocityConversion, nominalVoltage, kDt);
         this.maxAngle = maxAngle;
         this.minAngle = minAngle;
-
-        this.getPivotAngle = pivotAngle;
     }
 
     public void setAngle(Angle angle) {
 
         setPositionExpoVoltage(
-                MathUtil.clamp(
-                        angle.in(Units.Degree), minAngle.in(Degree), getMaxAngle().in(Degree)),
+                MathUtil.clamp(angle.in(Units.Degree), minAngle.in(Degree), maxAngle.in(Degree)),
                 0);
     }
 
@@ -68,16 +56,11 @@ public class WristReal extends TalonFXSubsystem implements Wrist {
     @Override
     public void periodic() {
         // TODO Auto-generated method stub
-        super.periodic();
+        periodic();
     }
 
     @Override
     public String getName() {
         return "Wrist";
-    }
-
-    @Override
-    public Angle getMaxAngle() {
-        return WristConstants.kMaxAngle;
     }
 }

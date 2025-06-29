@@ -21,7 +21,14 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
+import choreo.trajectory.TrajectorySample;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -34,6 +41,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -42,6 +50,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
+
+import team3647.frc2025.autos.AutoCommands.ChoreoController;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.constants.TunerConstants.TunerSwerveDrivetrain;
@@ -310,10 +320,9 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         periodicIO.gyroRotation = Rotation2d.fromDegrees(periodicIO.heading);
         periodicIO.timestamp = Timer.getFPGATimestamp();
 
-        // SmartDashboard.putBoolean("good", periodicIO.good);
+        SmartDashboard.putBoolean("good", periodicIO.good);
 
-        // SmartDashboard.putNumber("characterization voltage",
-        // periodicIO.characterizationVoltage);
+        SmartDashboard.putNumber("characterization voltage", periodicIO.characterizationVoltage);
     }
 
     @Override
@@ -390,7 +399,8 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
         return m_steerSysIdRoutine.dynamic(direction);
     }
 
-    public void setRobotPose(Pose2d pose) {
+
+    public void setRobotPose (Pose2d pose) {
 
         resetPose(pose);
         periodicIO = new PeriodicIOAutoLogged();
@@ -456,23 +466,23 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
     }
 
     public void setStuff(SwerveDriveState state) {
-        // SignalLogger.writeDoubleArray(
-        // "odometry",
-        // new double[] {
-        // state.Pose.getX(), state.Pose.getY(), state.Pose.getRotation().getDegrees()
-        // });
+        SignalLogger.writeDoubleArray(
+                "odometry",
+                new double[] {
+                    state.Pose.getX(), state.Pose.getY(), state.Pose.getRotation().getDegrees()
+                });
         periodicIO.pose = state.Pose;
         periodicIO.measuredSpeeds = state.Speeds;
         periodicIO.states = state.ModuleStates;
         periodicIO.targets = state.ModuleTargets;
 
-        // SignalLogger.writeDoubleArray(
-        // "speeds",
-        // new double[] {
-        // periodicIO.speeds.vxMetersPerSecond,
-        // periodicIO.speeds.vyMetersPerSecond,
-        // periodicIO.speeds.omegaRadiansPerSecond
-        // });
+        SignalLogger.writeDoubleArray(
+                "speeds",
+                new double[] {
+                    periodicIO.outputSpeeds.vxMetersPerSecond,
+                    periodicIO.outputSpeeds.vyMetersPerSecond,
+                    periodicIO.outputSpeeds.omegaRadiansPerSecond
+                });
     }
 
     public Rotation2d getOdoRot() {
@@ -521,15 +531,15 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
 
     public void addVisionData(VisionMeasurement data) {
         periodicIO.visionPose = data.pose;
-        // SmartDashboard.putNumber("timestamped viison", data.timestamp);
-        // SignalLogger.writeDoubleArray(
-        // "vision pose",
-        // new double[] {
-        // data.pose.getX(),
-        // data.pose.getY(),
-        // data.pose.getRotation().getDegrees(),
-        // data.timestamp
-        // });
+        SmartDashboard.putNumber("timestamped viison", data.timestamp);
+        SignalLogger.writeDoubleArray(
+                "vision pose",
+                new double[] {
+                    data.pose.getX(),
+                    data.pose.getY(),
+                    data.pose.getRotation().getDegrees(),
+                    data.timestamp
+                });
         addVisionMeasurement(data.pose, Utils.fpgaToCurrentTime(data.timestamp), data.stdDevs);
         // if(RobotBase.isSimulation()){
         // simpleSim.addVisionEstimation(data.pose, data.timestamp, data.stdDevs);
@@ -665,5 +675,21 @@ public class SwerveDriveReal extends TunerSwerveDrivetrain implements SwerveDriv
     @Override
     public String getName() {
         return "Swerve Drivetrain";
+    }
+
+    @Override
+    public void followTrajectory(SwerveSample sample, PIDController xController, PIDController yController, PIDController thetaController) {
+        Pose2d robotPose = getOdoPose();
+        Pose2d samplePose = sample.getPose();
+
+        this.masterRequest = fieldCentric
+            .withVelocityX(sample.vx + xController.calculate(robotPose.getX(), samplePose.getX()))
+            .withVelocityY(sample.vy + yController.calculate(robotPose.getY(), samplePose.getY()))
+            .withRotationalRate(sample.omega + thetaController.calculate(robotPose.getRotation().getRadians(), samplePose.getRotation().getRadians()));
+    }
+    @Override
+    public void followTrajectory(SwerveSample sample, ChoreoController controller) {
+        ChassisSpeeds outputSpeeds = controller.apply(getOdoPose(), sample);
+        drive(outputSpeeds.vxMetersPerSecond, outputSpeeds.vyMetersPerSecond, outputSpeeds.omegaRadiansPerSecond);
     }
 }

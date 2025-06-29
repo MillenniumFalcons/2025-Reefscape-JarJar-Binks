@@ -1,6 +1,7 @@
 package team3647.frc2025.constants;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radian;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -8,15 +9,15 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 
 public class PivotConstants {
-    public static final Angle kMaxAngle = Radian.of(Math.PI/2);
+    public static final Angle kMaxAngle = Radian.of(Math.PI / 2);
     public static final Angle kStartingAngle = Radian.of(0);
-    //0 is perfectly vertical
+    // 0 is perfectly vertical
     public static final Angle kMinAngle = Degree.of(-183.2);
     public static final Angle kLevel1Angle = Degree.of(-80);
     public static final Angle kLevel2Angle = Degree.of(-55);
@@ -25,7 +26,7 @@ public class PivotConstants {
 
     public static final Angle kL2Prep = Radian.of(-0.1);
     public static final Angle KL1Prep = kLevel1Angle;
-    
+
     public static final Angle kL4Prep = Radian.of(0.606);
     public static final Angle kL3prep = Radian.of(0.601);
 
@@ -39,31 +40,31 @@ public class PivotConstants {
     // lowclearangle = max angle when the pivot is blocked by the intake going up
     public static final Angle kLowClearAngle = Radian.of(0);
 
-    public static final Angle kHandoffAngle = Degree.of(4.04-180);
-    public static final Angle kStowAngle = Degree.of(4.004-180);
-    public static final Angle kStowAngleUp = Radian.of(1.3638929658036516);
+    public static final Angle kHandoffAngle = Degree.of(4.04 - 180);
+    public static final Angle kStowAngle = Degree.of(4.004 - 180);
 
     public static final double kNativeToRad = 1 / (10.081055 / (Math.PI / 2));
 
-
+    // basically, I use a triangle with the elevator height as one side, claw as hypotenuse, and
+    // distance from pivot to drivetrain intersection as the other side
+    public static final Distance kLowIntersectOffset = Inches.of(14);
+    // to see when the polycarb plates is above the elevator top bar, so that the tube is the only
+    // thing interferring
+    public static final Distance weirdPolycarbClear = Inches.of(12.5);
+    // this is the distance from the elevator top bar to the face of the claw tube
+    public static final Distance kHighIntersectXOffset = Inches.of(5.356);
+    // distance from pivoting point to elevator top bar at full extension
+    public static final Distance kHighIntersectYOffset = Inches.of(2.094);
 
     // -1.402692317215491
     // public static final Angle kHandoffAngle = Radian.of(-1.407).minus(Degree.of(1.5));
 
-    public static final Pose3d kZeroedPivotPose = new Pose3d(
-        0.0991362,
-        0,
-        .4836414,
-        new Rotation3d(
-            0,
-            0,
-            0
-        )
-    );
+    public static final Pose3d kZeroedPivotPose =
+            new Pose3d(0.0991362, 0, .4836414, new Rotation3d(0, 0, 0));
 
     // vibes aah gear ratio
     public static final double kGearRatio = 50;
-    public static final double kArmLengthM = 0.53594;
+    public static final Distance kArmLength = Inches.of(22.378);
     public static final double kArmMassKg = 1.9214;
     public static final double kArmMoiKg2M = 0.017847302;
 

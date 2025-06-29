@@ -5,16 +5,22 @@ import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radian;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -30,17 +36,18 @@ import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
-import team3647.frc2025.subsystems.Indexer;
+import team3647.frc2025.subsystems.Elevator.Elevator;
+import team3647.frc2025.subsystems.Coraler;
 import team3647.frc2025.subsystems.Rollers;
 import team3647.frc2025.subsystems.Seagull;
-import team3647.frc2025.subsystems.Elevator.Elevator;
 import team3647.frc2025.subsystems.pivot.Pivot;
 import team3647.frc2025.subsystems.wrist.Wrist;
+import team3647.frc2025.Util.AllianceFlip;
 import team3647.lib.PeriodicSubsystem;
 
-public abstract class Superstructure implements PeriodicSubsystem{
+public abstract class Superstructure implements PeriodicSubsystem {
 
-    public final Indexer coraler;
+    public final Coraler coraler;
     public final Elevator elevator;
     public final Pivot pivot;
     public final Wrist wrist;
@@ -55,6 +62,8 @@ public abstract class Superstructure implements PeriodicSubsystem{
 
     protected BooleanSupplier isAligned;
 
+    protected Supplier<Pose2d> robotPose;
+
     protected MutDistance elevOffset;
 
     protected MutAngle pivotOffset;
@@ -62,6 +71,8 @@ public abstract class Superstructure implements PeriodicSubsystem{
     protected Level wantedLevel;
 
     protected boolean hasPeice = true;
+
+    public boolean preloaded;
 
     protected boolean hasAlgae = false;
 
@@ -98,19 +109,21 @@ public abstract class Superstructure implements PeriodicSubsystem{
     }
 
     public Superstructure(
-            Indexer coraler,
+            Coraler coraler,
             Elevator elevator,
             Pivot pivot,
             Wrist wrist,
             Rollers rollers,
             Seagull seagull,
-            Trigger pieceOverride) {
+            Trigger pieceOverride,
+            Supplier<Pose2d> robotPose) {
         this.coraler = coraler;
         this.elevator = elevator;
         this.pivot = pivot;
         this.wrist = wrist;
         this.seagull = seagull;
         this.rollers = rollers;
+        this.robotPose = robotPose;
 
         this.coralerCommands = new CoralerCommands(this.coraler);
         this.elevatorCommands = new ElevatorCommands(this.elevator);
@@ -155,14 +168,21 @@ public abstract class Superstructure implements PeriodicSubsystem{
         NONE
     }
 
+    public Command goToState(Supplier<SuperstructureState> finalState){
+        return new GoToState(finalState);
+    }
+
+    public Command goToState(SuperstructureState finalState){
+        return new GoToState(() -> finalState).until(()->getCurrentState().equalsWithTolerance(finalState));
+    }
+
+    public Command goToState(SuperstructureState finalState, boolean overridden){
+        return new GoToState(() -> finalState, overridden).until(()->getCurrentState().equalsWithTolerance(finalState));
+    }
+
     public void setIsAlignedFunction(BooleanSupplier isAligned) {
         this.isAligned = isAligned;
         DriverStation.reportError("IsAligned function has been set, all is well", false);
-    }
-
-    public boolean shouldClear() {
-        return pivot.getAngle().gt(Radian.of(-0.7))
-                && elevator.getHeight().lt(ElevatorConstants.kClearHeight);
     }
 
     public boolean isAligned() {
@@ -178,148 +198,11 @@ public abstract class Superstructure implements PeriodicSubsystem{
         DriverStation.reportError(message, true);
     }
 
-    public Command goToStateParalell(Supplier<SuperstructureState> state) {
-
-        return Commands.either(
-                Commands.parallel(
-                        // Commands.run(() -> Logger.recordOutput("monkeyballs",
-                        // state.get().elevatorHeight)),
-                        elevatorCommands.setHeight(() -> state.get().elevatorHeight),
-                        pivotCommands.setAngle(
-                                () -> {
-                                        double angle =
-                                        MathUtil.clamp(
-                                            state.get().pivotAngle.in(Radian),
-                                            PivotConstants.kMinAngle.in(Radian),
-                                            PivotConstants.kMaxAngle.in(Radian));
-                                        System.out.println("angle" + angle);
-                                        Logger.recordOutput("PIVOT INTAKING ANGLE", angle);
-                                        Logger.recordOutput("PIVOT INTAKING ANGLE/desired", state.get().pivotAngle.in(Radian));
-                                            return angle;}),
-                        Commands.either(
-                                Commands.none(),
-                                wristCommands.setAngle(state.get().wristAngle),
-                                () -> state.get().wristAngle.equals(WristConstants.idrc))
-                        // Commands.run(() ->
-                        // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
-
-                        ),
-                Commands.none(),
-                () -> !state.get().equals(SuperstructureState.kInvalidState));
-    }
-
-    public Command goToStateParalellNoWrist(Supplier<SuperstructureState> state) {
-
-        return Commands.either(
-                Commands.parallel(
-                        // Commands.run(() -> Logger.recordOutput("monkeyballs",
-                        // state.get().elevatorHeight)),
-                        elevatorCommands.setHeight(() -> state.get().elevatorHeight),
-                        pivotCommands.setAngle(
-                                () ->
-                                        MathUtil.clamp(
-                                                state.get().pivotAngle.in(Radian),
-                                                pivot.getMinAngle().in(Radian),
-                                                pivot.getMaxAngle().in(Radian)))
-                        // Commands.run(() ->
-                        // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
-
-                        ),
-                Commands.none(),
-                () -> !state.get().equals(SuperstructureState.kInvalidState));
-    }
-
-    /**
-     * delayed elevator
-     *
-     * @param state
-     * @return gotostate with a delayed elevator
-     */
-    public Command goToStatePerpendicular(Supplier<SuperstructureState> state) {
-
-        return Commands.either(
-                Commands.parallel(
-                        // .run(() -> Logger.recordOutput("monkeyballs",
-                        // state.get().elevatorHeight)),
-                        Commands.waitSeconds(0.1)
-                                .andThen(
-                                        elevatorCommands.setHeight(
-                                                () -> state.get().elevatorHeight)),
-                        pivotCommands.setAngle(
-                                () ->
-                                        MathUtil.clamp(
-                                                state.get().pivotAngle.in(Radian),
-                                                PivotConstants.kMinAngle.in(Radian),
-                                                PivotConstants.kMaxAngle.in(Radian))),
-                        Commands.either(
-                                Commands.none(),
-                                wristCommands.setAngle(state.get().wristAngle),
-                                () -> state.get().wristAngle.equals(WristConstants.idrc))
-                        // Commands.run(() ->
-                        // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
-
-                        ),
-                Commands.none(),
-                () -> !state.get().equals(SuperstructureState.kInvalidState));
-    }
-
-    public Command goToStateNoWrist(Supplier<SuperstructureState> state) {
-        return Commands.either(
-                Commands.parallel(
-                        // Commands.run(() -> Logger.recordOutput("monkeyballs",
-                        // state.get().elevatorHeight)),
-                        Commands.waitSeconds(0.1)
-                                .andThen(
-                                        elevatorCommands.setHeight(
-                                                () -> state.get().elevatorHeight)),
-                        (pivotCommands.setAngle(() -> state.get().pivotAngle))
-                        // Commands.either(
-                        // 		Commands.none(),
-                        // 		wristCommands.setAngle(state.get().wristAngle),
-                        // 		() -> state.get().wristAngle.equals(WristConstants.idrc))
-                        // Commands.run(() ->
-                        // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
-
-                        ),
-                Commands.none(),
-                () -> !state.get().equals(SuperstructureState.kInvalidState));
-    }
-
     public SuperstructureState getStateScoreAuto() {
         var prelimWantedState =
                 kLevelToScoreMap.getOrDefault(getWantedLevel(), SuperstructureState.kInvalidState);
-
+        Logger.recordOutput("Superstructure/wanted state", prelimWantedState.name);
         return prelimWantedState;
-    }
-
-    /**
-     * delayed elevator
-     *
-     * @param state
-     * @return gotostate with a delayed elevator
-     */
-    public Command goToStatePerpendicular(
-            Supplier<SuperstructureState> state, DoubleSupplier delay) {
-
-        return Commands.either(
-                Commands.parallel(
-                        // Commands.run(() -> Logger.recordOutput("monkeyballs",
-                        // state.get().elevatorHeight)),
-                        Commands.waitSeconds(delay.getAsDouble())
-                                .andThen(
-                                        elevatorCommands.setHeight(
-                                                () -> state.get().elevatorHeight)),
-                        (pivotCommands.setAngle(() -> state.get().pivotAngle))
-                        // Commands.either(
-                        // 		Commands.none(),
-                        // 		wristCommands.setAngle(state.get().wristAngle),
-                        // 		() -> state.get().wristAngle.equals(WristConstants.idrc))
-                        // Commands.run(() ->
-                        // Logger.recordOutput("ballsmonkey",state.get().pivotAngle))
-
-                        ),
-                Commands.none(),
-                () -> !state.get().equals(SuperstructureState.kInvalidState));
     }
 
     public boolean hasPeice() {
@@ -336,10 +219,6 @@ public abstract class Superstructure implements PeriodicSubsystem{
         return Commands.runOnce(() -> this.hasPeice = false);
     }
 
-    public double getPivotMinAngle() {
-        return InverseKinematics.getMinAngle(getCurrentState()).in(Radian);
-    }
-
     public SuperstructureState getCurrentState() {
         return new SuperstructureState(pivot.getAngle(), elevator.getHeight(), wrist.getAngle());
     }
@@ -354,16 +233,12 @@ public abstract class Superstructure implements PeriodicSubsystem{
 
     public Command takeOffAlgaeHigh() {
         return Commands.parallel(
-                elevatorCommands.setHeight(ElevatorConstants.kHighAlgaeHeight),
-                pivotCommands.setAngle(PivotConstants.kAlgaeAngleHigh),
-                coralerCommands.intake());
+                goToState(() -> SuperstructureState.HighAlgae), coralerCommands.intake());
     }
 
     public Command takeOffAlgaeLow() {
         return Commands.parallel(
-                elevatorCommands.setHeight(ElevatorConstants.kStowHeight),
-                pivotCommands.setAngle(PivotConstants.kAlgaeAngleLow),
-                coralerCommands.intake());
+                goToState(() -> SuperstructureState.LowAlgae), coralerCommands.intake());
     }
 
     public Command scoreAlgaeBarge() {
@@ -379,7 +254,7 @@ public abstract class Superstructure implements PeriodicSubsystem{
 
     public Command stowAlgaeBarge() {
         return Commands.parallel(
-                stow(),
+                Stow(),
                 Commands.sequence(
                         Commands.waitSeconds(0.025),
                         coralerCommands.setOpenLoop(-1.0).withTimeout(0.5)));
@@ -397,38 +272,31 @@ public abstract class Superstructure implements PeriodicSubsystem{
         return hasAlgae;
     }
 
-    // end of algae stuff
-
-    public boolean shouldClearGoingUp() {
-        return pivot.angleWithin(
-                        PivotConstants.kMinAngle.minus(Degree.of((5))).in(Radian),
-                        PivotConstants.kClearAngle.in(Radian))
-                && elevator.getHeight().lt(ElevatorConstants.kClearHeight);
+    public Command intake() {
+        return intake(false);
     }
 
-    public Command intake() {
-        return Commands.sequence (Commands.parallel(
-                goToStateParalell(() -> SuperstructureState.Intake),
-                rollersCommands.setOpenLoop(0.25)).withTimeout(0.3),//add TOF sensor here .until(),
-                goToStateParalell(() -> SuperstructureState.Transfer).withTimeout(0.3), //add Current sensing here
-                goToStateParalell(()-> SuperstructureState.Stow).until(() -> getCurrentState() == SuperstructureState.Stow)
-                );
+    public Command intake(boolean overridden){
+        return Commands.parallel(
+                                goToState(SuperstructureState.Intake, overridden),
+                                rollersCommands.setOpenLoop(0.25))
+                        .withTimeout(0.3).andThen( // add TOF sensor here .until(),
+                transfer());
     }
 
     public Command transfer() {
         return Commands.parallel(
-                goToStateParalell(() -> SuperstructureState.Transfer),
-                rollersCommands.setOpenLoop(0.6, -0.1));
+                goToState(SuperstructureState.Transfer),
+                rollersCommands.setOpenLoop(0.6, -0.1))//.until(TOF)
+                .andThen(Stow());
     }
 
     public Command handoff() {
         return Commands.parallel(
                 rollersCommands.kill(),
-                goToStateParalell(() -> SuperstructureState.Handoff),
+                goToState(() -> SuperstructureState.Handoff),
                 coralerCommands.intake());
     }
-
-    //
 
     public Command stowc() {
         return Commands.sequence(
@@ -437,77 +305,20 @@ public abstract class Superstructure implements PeriodicSubsystem{
                 elevatorCommands.setHeight(ElevatorConstants.kStowHeight));
     }
 
-    public Command clearElevatorGoingUpNoDown() {
-        return Commands.either(
-                Commands.sequence(
-                        Commands.deadline(
-                                elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                                pivotCommands.setAngle(PivotConstants.kStartingAngle)),
-                        pivotCommands.setAngle(PivotConstants.kClearAngle)),
-                Commands.none(),
-                () ->
-                        pivot.angleWithin(
-                                        PivotConstants.kStartingAngle.in(Radian),
-                                        PivotConstants.kClearAngle.in(Radian))
-                                && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
-    }
-
-    public Command clearElevatorGoingUpNoDown(Angle finalPivotAngle) {
-        return Commands.either(
-                Commands.sequence(
-                        Commands.deadline(
-                                elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                                pivotCommands.setAngle(PivotConstants.kStowAngle),
-                                wristCommands.stow()),
-                        pivotCommands.setAngle(
-                                MathUtil.clamp(
-                                        finalPivotAngle.in(Radian),
-                                        PivotConstants.kClearAngle.in(Radian),
-                                        PivotConstants.kMaxAngle.in(Radian)))),
-                Commands.none(),
-                () ->
-                        pivot.angleWithin(
-                                        PivotConstants.kStartingAngle.in(Radian),
-                                        PivotConstants.kClearAngle.in(Radian))
-                                && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
-    }
-
-    public Command clearElevatorGoingUpNoDownNew(Angle finalPivotAngle) {
-        return Commands.either(
-                Commands.sequence(
-                        Commands.deadline(
-                                elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                                wristCommands.stow()),
-                        pivotCommands.setAngle(
-                                MathUtil.clamp(
-                                        finalPivotAngle.in(Radian),
-                                        PivotConstants.kClearAngle.in(Radian),
-                                        PivotConstants.kMaxAngle.in(Radian)))),
-                Commands.none(),
-                () ->
-                        pivot.angleWithin(
-                                        PivotConstants.kStartingAngle.in(Radian),
-                                        PivotConstants.kClearAngle.in(Radian))
-                                && elevator.getHeight().lt(ElevatorConstants.kClearHeight));
-    }
-
     public Command scoreL4() {
         return Commands.sequence(
-                clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
                 elevatorCommands.setHeight(ElevatorConstants.kLevel4Height),
                 pivotCommands.setAngle(PivotConstants.kL4Prep));
     }
 
     public Command scoreL3() {
         return Commands.sequence(
-                clearElevatorGoingUpNoDown(PivotConstants.kStowAngleUp),
-                elevatorCommands.setHeight(ElevatorConstants.kLevel3Height),
+                elevatorCommands.setHeight(ElevatorConstants.kThreeHeight),
                 pivotCommands.setAngle(PivotConstants.kL3prep));
     }
 
     public Command scoreL2() {
         return Commands.sequence(
-                clearElevatorGoingUpNoDown(PivotConstants.kL2Prep),
                 elevatorCommands.setHeight(ElevatorConstants.kLevel2Height),
                 pivotCommands.setAngle(PivotConstants.kLevel2Angle));
     }
@@ -516,15 +327,6 @@ public abstract class Superstructure implements PeriodicSubsystem{
         return Commands.waitSeconds(0.15)
                 .andThen(coralerCommands.setOpenLoop(-0.3).withTimeout(0.1))
                 .withTimeout(0.3);
-    }
-
-    public Command stowFromL4() {
-        // put it on the reef
-        return Commands.sequence(pivotCommands.setAngle(PivotConstants.kLevel4Angle), poopCoral());
-    }
-
-    public Command stowFromL3() {
-        return Commands.parallel(pivotCommands.setAngle(PivotConstants.kLevel3Angle), poopCoral());
     }
 
     public MutDistance getElevOffset() {
@@ -543,65 +345,17 @@ public abstract class Superstructure implements PeriodicSubsystem{
         return coraler.getMasterCurrent() > algaeCurrentLimit;
     }
 
-    public Command stowFromIntake() {
-        return Commands.sequence(
-                wristCommands
-                        .setAngle(WristConstants.kHandoffAngle)
-                        .alongWith(
-                                pivotCommands.setAngle(PivotConstants.kHandoffAngle),
-                                rollersCommands.setOpenLoop(-0.17).withTimeout(0.1)),
-                Commands.waitSeconds(0.3),
-                elevatorCommands
-                        .setHeight(ElevatorConstants.kStartingHeight)
-                        .alongWith(
-                                coralerCommands
-                                        .setOpenLoop(0.5)
-                                        .until(coralerCommands.current().or(overridePiece))),
-                wristCommands.setAngle(Degree.of(50.14)),
-                elevatorCommands.setHeight(ElevatorConstants.kClearHeight),
-                pivotCommands.setAngle(PivotConstants.kStowAngleUp),
-                elevatorCommands.setHeight(ElevatorConstants.kStowHeight),
-                wristCommands.setAngle(WristConstants.kStowAngle));
-    }
-
-    public Angle getPivotAngleByLevel() {
-        switch (wantedLevel) {
-            case TROUGH:
-                return PivotConstants.KL1Prep;
-            case LOW:
-                return PivotConstants.kL2Prep;
-            case MID:
-                return PivotConstants.kStowAngleUp;
-            case HIGH:
-                return PivotConstants.kStowAngleUp;
-            default:
-                return PivotConstants.kStowAngleUp;
-        }
-    }
-
     public Command stowIntake() {
         return Commands.parallel(
-                Commands.either(
-                        pivotCommands.setAngle(PivotConstants.kStowAngle),
-                        pivotCommands.setAngle(PivotConstants.kStowAngleUp),
-                        pivot::needToClearElevator),
                 wristCommands.setAngle(WristConstants.kStowWithPiece),
-                elevatorCommands.setHeight(ElevatorConstants.kStowHeight),
                 rollersCommands.kill(),
                 coralerCommands.kill());
     }
 
-    // public Command intake(){
-    // return Commands.parallel(
-    // wristcommands.setAngle(kHandoffAngle),
-    // pivotCommands.setAngle(PivotConstants.kIntakeAngle),
-    // rollersCommands.intake()
-    // );
-    // }
-
     public Command autoScoreByLevel() {
-
-        return goToStatePerpendicular(this::getStateScoreAuto, () -> getDelayByLevel(wantedLevel));
+        return goToState(this::getStateScoreAuto);
+        // return goToStatePerpendicular(this::getStateScoreAuto, () ->
+        // getDelayByLevel(wantedLevel));
     }
 
     public double getDelayByLevel(Level level) {
@@ -614,31 +368,10 @@ public abstract class Superstructure implements PeriodicSubsystem{
         }
     }
 
-    public Command stow() {
-        return Commands.either(
-                Commands.sequence(
-                        goToStatePerpendicular(() -> SuperstructureState.ToStow),
-                        Commands.waitSeconds(0.01),
-                        goToStateParalell(() -> SuperstructureState.Stow)),
-                goToStatePerpendicular(() -> SuperstructureState.Stow, () -> 0.3),
-                this::shouldClear);
+    public Command Stow() {
+        return goToState(() -> SuperstructureState.Stow);
     }
 
-    public Command sequencialStow() {
-        return Commands.sequence(
-                goToStateNoWrist(() -> SuperstructureState.ToStow),
-                Commands.waitSeconds(0.5),
-                goToStateParalellNoWrist(() -> SuperstructureState.Stow));
-    }
-
-    public Command paralellStow() {
-        return Commands.either(
-                Commands.sequence(
-                        goToStateNoWrist(() -> SuperstructureState.ToStow),
-                        goToStateParalellNoWrist(() -> SuperstructureState.Stow)),
-                goToStatePerpendicular(() -> SuperstructureState.Stow, () -> 0.3),
-                this::shouldClear);
-    }
 
     public Command killAll() {
         return Commands.parallel(rollersCommands.kill(), coralerCommands.kill());
@@ -680,11 +413,71 @@ public abstract class Superstructure implements PeriodicSubsystem{
         return rollersCommands.seagullCurrentGreater(SeagullCurrentLimit);
     }
 
-    public Command stopIntaking(){
+    public Command stopIntaking() {
         return Commands.none();
     }
+    
+    class GoToState extends Command {
+        Supplier<SuperstructureState> finalState;
+        Supplier<SuperstructureState> getState;
+        SuperstructureState freezeState;
+        BooleanSupplier freeze;
+        boolean frozen;
 
-    public Command ejectCoral(){
-        return Commands.none();
+        GoToState(Supplier<SuperstructureState> finalState, boolean overridden){
+            this.finalState = finalState;
+            freeze = overridden ? () -> false : () -> 
+            {
+                return team3647.frc2025.Util.PoseUtils.inCircle(
+                robotPose.get(),
+                new Pose2d(team3647.frc2025.constants.FieldConstants.kBlueReefOrigin, Rotation2d.kZero),
+                Inch.of(93.5/2.0 + 13.0)) || 
+                team3647.frc2025.Util.PoseUtils.inCircle(robotPose.get(),
+                new Pose2d(AllianceFlip.flip(team3647.frc2025.constants.FieldConstants.kBlueReefOrigin), Rotation2d.kZero),
+                Inch.of(93.5/2.0 + 13.0));
+            };
+
+            getState = overridden ? finalState::get : () -> InverseKinematics.interpolate(()-> getCurrentState(), finalState, robotPose);
+            
+        }
+
+        GoToState(Supplier<SuperstructureState> finalState){
+            this(finalState, false);
+        }
+
+        @Override 
+        public void initialize(){
+        // CommandScheduler.getInstance().schedule(
+        //     goSubsystems(getState)
+        // );
+        }
+        @Override
+        public void execute(){
+            if(!frozen && freeze.getAsBoolean()){
+                freezeState = getCurrentState();
+                frozen = true;
+            } else if(frozen && !freeze.getAsBoolean()){
+                frozen = false;
+            }
+            
+            Logger.recordOutput("Superstructure/Frozen", frozen);
+
+            if (frozen){
+                goSubsystems(freezeState);
+                return;
+            } 
+            goSubsystems(getState.get());
+        }
+        
+        @Override
+            public Set<Subsystem> getRequirements() {
+                return Set.of(elevator, pivot, wrist);
+            }
+
+        public void goSubsystems(SuperstructureState state){
+            pivot.setAngle(state.pivotAngle);
+            elevator.setHeight(state.elevatorHeight);
+            wrist.setAngle(state.wristAngle);
+        }
     }
 }

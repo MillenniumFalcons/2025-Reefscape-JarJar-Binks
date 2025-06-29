@@ -14,14 +14,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import static edu.wpi.first.units.Units.Meter;
+
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.FieldConstants.ScoringPos;
+import team3647.frc2025.constants.FieldConstants;
+import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.frc2025.subsystems.superstructure.Superstructure.Branch;
 import team3647.frc2025.subsystems.superstructure.Superstructure.Side;
-import team3647.frc2025.constants.SwerveDriveConstants;
 import team3647.lib.team6328.VirtualSubsystem;
 import team3647.lib.team9442.AllianceObserver;
 import team3647.lib.vision.AprilTagCamera;
@@ -30,13 +36,14 @@ import team3647.lib.vision.NeuralDetector;
 public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
     private final Supplier<Pose2d> odoPoseFunction;
+    private final BooleanSupplier isSuperstructureGood;
     private ScoringPos wantedScoringPos;
 
     private NeuralDetector detector;
-    private AprilTagCamera frontLL;
+    private AprilTagCamera frontCamera;
 
     private Side wantedSide = Side.A;
-
+ 
     public final PIDController xController;
     public final PIDController yController;
     public final PIDController rotController;
@@ -68,6 +75,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
     public AutoDrive(
             Supplier<Pose2d> odoPoseFunction,
+            BooleanSupplier isSuperstructureGood,
             List<Pose2d> redSourcePoses,
             List<Pose2d> blueSourcePoses,
             PIDController xController,
@@ -76,7 +84,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
             List<Pose2d> redSidePoses,
             List<Pose2d> blueSidePoses,
             NeuralDetector detector,
-            AprilTagCamera frontLL) {
+            AprilTagCamera frontCamera) {
         super();
         this.odoPoseFunction = odoPoseFunction;
         this.xController = xController;
@@ -88,7 +96,8 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         this.redSidePoses = redSidePoses;
         this.blueSidePoses = blueSidePoses;
         this.detector = detector;
-        this.frontLL = frontLL;
+        this.frontCamera = frontCamera;
+        this.isSuperstructureGood = isSuperstructureGood;
 
         this.sidePoses = color == Alliance.Red ? redSidePoses : blueSidePoses;
 
@@ -127,13 +136,13 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     }
 
     public Pose2d getPose() {
-        // var inputs = frontLL.QueueToInputs();
+        // var inputs = frontCamera.QueueToInputs();
         // if (inputs.isPresent()) {
         //    return inputs.get().pose;
-        //     // return frontLL.QueueToInputs().get().pose;
+        //     // return frontCamera.QueueToInputs().get().pose;
         // }
         // DriverStation.reportError(
-        //         "@getposeautodrive " + frontLL.QueueToInputs().isPresent(), false);
+        //         "@getposeautodrive " + frontCamera.QueueToInputs().isPresent(), false);
         return odoPoseFunction.get();
     }
 
@@ -165,7 +174,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 var k =
                         xController.calculate(
                                 getPose().getX(),
-                                AllianceFlip.flip(wantedScoringPos.pose, color).getX());
+                                AllianceFlip.flip(isSuperstructureGood.getAsBoolean() ? wantedScoringPos.pose: wantedScoringPos.safePose, color).getX());
 
                 Logger.recordOutput("DEBUG/autoAlign/kx", k);
 
@@ -198,7 +207,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 var k =
                         yController.calculate(
                                 getPose().getY(),
-                                AllianceFlip.flip(wantedScoringPos.pose, color).getY());
+                                AllianceFlip.flip(isSuperstructureGood.getAsBoolean() ? wantedScoringPos.pose : wantedScoringPos.safePose, color).getY());
 
                 Logger.recordOutput("DEBUG/autoAlign/ky", k);
                 return Math.abs(k) < 0.04 ? 0 : k;
@@ -217,8 +226,9 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         }
     }
 
+
     public double getRot() {
-        switch (wantedMode) {
+        switch (getWantedMode()) {
             case SRCINTAKE:
                 return rotController.calculate(
                         getPose().getRotation().getRadians(),
@@ -227,7 +237,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                 var k =
                         rotController.calculate(
                                 getOdoRot().getRadians(),
-                                AllianceFlip.flip(wantedScoringPos.pose, color)
+                                AllianceFlip.flip(isSuperstructureGood.getAsBoolean() ? wantedScoringPos.pose : wantedScoringPos.safePose, color)
                                         .getRotation()
                                         .getRadians());
 
@@ -249,8 +259,194 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         }
     }
 
+    public double getX(DriveMode mode, ScoringPos pos) {
+        switch (mode) {
+            case SCORE:
+                // xController.setConstraints(scoringConstraints);
+                var k =
+                        xController.calculate(
+                                getPose().getX(),
+                                AllianceFlip.flip(pos.pose, color).getX());
+                Logger.recordOutput("DEBUG/autoAlign/kx", k);
+                return k;
+            case INTAKE:
+
+                var kIntake =
+                        detector.getTY() >= 0
+                                ? intakeXController.calculate(
+                                        Math.toRadians(0), Math.toRadians(detector.getTY()))
+                                : 0;
+                ;
+                return kIntake;
+
+            default:
+                return xController.calculate(
+                        getPose().getX(), AllianceFlip.flip(pos.pose, color).getX());
+        }
+    }
+
+    public double getY(DriveMode mode, ScoringPos pos) {
+        switch (mode) {
+            case SRCINTAKE:
+                return yController.calculate(
+                        getPose().getY(), getPose().nearest(sourcePoses).getY());
+            case SCORE:
+
+                // yController.setConstraints(scoringConstraints);
+                var k =
+                        yController.calculate(
+                                getPose().getY(),
+                                AllianceFlip.flip(pos.pose, color).getY());
+
+                Logger.recordOutput("DEBUG/autoAlign/ky", k);
+                return Math.abs(k) < 0.04 ? 0 : k;
+
+            case INTAKE:
+                var kintake =
+                        detector.getTY() >= 0
+                                ? intakeYController.calculate(Math.toRadians(detector.getTX()), 0)
+                                : 0;
+
+                return kintake;
+
+            default:
+                return yController.calculate(
+                        getPose().getY(), AllianceFlip.flip(pos.pose, color).getY());
+        }
+    }
+
+
+    public double getRot(DriveMode mode, ScoringPos pos) {
+        switch (mode) {
+            case SRCINTAKE:
+                return rotController.calculate(
+                        getPose().getRotation().getRadians(),
+                        getPose().nearest(sourcePoses).getRotation().getRadians());
+            case SCORE:
+                var k =
+                        rotController.calculate(
+                                getOdoRot().getRadians(),
+                                AllianceFlip.flip(pos.pose, color)
+                                        .getRotation()
+                                        .getRadians());
+
+                Logger.recordOutput("DEBUG/autoAlign/kRot", k);
+
+                return Math.abs(k) < 0.03 ? 0 : k;
+
+            case TEST:
+                return rotController.calculate(getPose().getRotation().getRadians(), 0);
+
+            default:
+                return rotController.calculate(
+                        getPose()
+                                .getRotation()
+                                .minus(
+                                        AllianceFlip.flip(pos.pose, color)
+                                                .getRotation())
+                                .getRadians());
+        }
+    }
+
+    public double getXSingleTag(DriveMode mode, ScoringPos pos) {
+        switch (mode) {
+            case SCORE:
+                // xController.setConstraints(scoringConstraints);
+                if (frontCamera.getBotPoseTagRelative().isEmpty()){
+                    return 0;
+                }
+                var k =
+                        xController.calculate(
+                                frontCamera.getBotPoseTagRelative().get().getMeasureZ().in(Meter),
+                                FieldConstants.kRobotToReefA1.getMeasureX().in(Meter)
+                                );
+                Logger.recordOutput("DEBUG/autoAlign/kx", k);
+                return k;
+            case INTAKE:
+
+                var kIntake =
+                        detector.getTY() >= 0
+                                ? intakeXController.calculate(
+                                        Math.toRadians(0), Math.toRadians(detector.getTY()))
+                                : 0;
+                ;
+                return kIntake;
+
+            default:
+                return xController.calculate(
+                        getPose().getX(), AllianceFlip.flip(pos.pose, color).getX());
+        }
+    }
+
+    public double getYSingleTag(DriveMode mode, ScoringPos pos) {
+        switch (mode) {
+            case SRCINTAKE:
+                return yController.calculate(
+                        getPose().getY(), getPose().nearest(sourcePoses).getY());
+            case SCORE:
+
+                // yController.setConstraints(scoringConstraints);
+                if (frontCamera.getBotPoseTagRelative().isEmpty()){
+                    return 0;
+                }
+                var k =
+                        yController.calculate(
+                            frontCamera.getBotPoseTagRelative().get().getMeasureX().in(Meter),
+                            FieldConstants.kRobotToReefA1.getMeasureY().in(Meter));
+
+                Logger.recordOutput("DEBUG/autoAlign/ky", k);
+                return Math.abs(k) < 0.04 ? 0 : k;
+
+            case INTAKE:
+                var kintake =
+                        detector.getTY() >= 0
+                                ? intakeYController.calculate(Math.toRadians(detector.getTX()), 0)
+                                : 0;
+
+                return kintake;
+
+            default:
+                return yController.calculate(
+                        getPose().getY(), AllianceFlip.flip(pos.pose, color).getY());
+        }
+    }
+
+
+    public double getRotSingleTag(DriveMode mode, ScoringPos pos) {
+        switch (mode) {
+            case SRCINTAKE:
+                return rotController.calculate(
+                        getPose().getRotation().getRadians(),
+                        getPose().nearest(sourcePoses).getRotation().getRadians());
+            case SCORE:
+            if (frontCamera.getBotPoseTagRelative().isEmpty()){
+                return 0;
+            }
+                var k =
+                        rotController.calculate(
+                                frontCamera.getBotPoseTagRelative().get().getRotation().getY(),
+                                0
+                                );
+
+                Logger.recordOutput("DEBUG/autoAlign/kRot", k);
+
+                return Math.abs(k) < 0.03 ? 0 : k;
+
+            case TEST:
+                return rotController.calculate(getPose().getRotation().getRadians(), 0);
+
+            default:
+                return rotController.calculate(
+                        getPose()
+                                .getRotation()
+                                .minus(
+                                        AllianceFlip.flip(pos.pose, color)
+                                                .getRotation())
+                                .getRadians());
+        }
+    }
     public boolean hasScoringTarget() {
-        return frontLL.hasTarget();
+        return frontCamera.hasTarget();
     }
 
     public Command pathFindToPose(Pose2d pose) {
@@ -285,6 +481,14 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
         return new Twist2d(getX(), getY(), getRot());
     }
 
+    public Twist2d getAutoVelocities(DriveMode mode, ScoringPos pos){
+        return new Twist2d(
+            getX(mode, pos),
+            getY(mode, pos),
+            getRot(mode, pos)
+        );
+    }
+
     public Command setWantedScoringPos(ScoringPos pos) {
         return Commands.runOnce(() -> wantedScoringPos = pos);
     }
@@ -294,7 +498,8 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
 
         this.color = color;
         // Logger.recordOutput("@autodrive", color);
-        // DriverStation.reportError("MUSTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARD", false);
+        // DriverStation.reportError("MUSTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARD", false); 
+
 
         sourcePoses = color == Alliance.Red ? redSourcePoses : blueSourcePoses;
         sidePoses = color == Alliance.Red ? redSidePoses : blueSidePoses;
@@ -319,6 +524,7 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
     @Override
     public void periodic() {
         wantedSide = poseToSideMap.get(getPose().nearest(sidePoses));
+        Logger.recordOutput("Color", color);
         Logger.recordOutput("wanjted side pose", AllianceFlip.flip(wantedScoringPos.pose, color));
         SmartDashboard.putData("xController", xController);
         SmartDashboard.putData("yController", yController);
