@@ -9,9 +9,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -267,22 +270,23 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
 
     @Override
     public Optional<Pose3d> getBotPoseTagRelative() {
-        var resultList = this.getAllUnreadResults();
-        if (resultList.size() <= 0) {
-            return Optional.empty();
-        }
+        return Optional.empty();
+        // var resultList = this.getAllUnreadResults();
+        // if (resultList.size() <= 0) {
+        //     return Optional.empty();
+        // }
 
-        var result = resultList.get(0);
-        if (!result.hasTargets()) return Optional.empty();
+        // var result = resultList.get(0);
+        // if (!result.hasTargets()) return Optional.empty();
 
-        return Optional.of(
-            result.getBestTarget().getBestCameraToTarget()
-        );
+        // return Optional.of(
+        //     result.getBestTarget().getBestCameraToTarget()
+        // );
     }
 
-    // public void addGyroData(Orientation orientation){
-    //     photonPoseEstimator.addHeadingData(Timer.getTimestamp(),
-    // Rotation2d.fromDegrees(orientation.yaw()));
-    // }
+    public void addGyroData(Orientation orientation){
+        photonPoseEstimator.addHeadingData(Timer.getTimestamp(),
+    Rotation2d.fromDegrees(orientation.yaw()));
+    }
 
 }
