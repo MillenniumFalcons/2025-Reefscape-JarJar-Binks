@@ -3,7 +3,6 @@ package team3647.frc2025.Util;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -217,8 +216,6 @@ public class AutoDrive extends VirtualSubsystem implements AllianceObserver {
                         getPose().getY(), AllianceFlip.flip(wantedScoringPos.pose, color).getY());
         }
     }
-
-
 
     public double getRot() {
         switch (wantedMode) {

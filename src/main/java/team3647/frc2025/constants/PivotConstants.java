@@ -42,7 +42,6 @@ public class PivotConstants {
 
     // -1.402692317215491
     public static final Angle kHandoffAngle = Radian.of(-1.407).minus(Degree.of(1.5));
-	
 
     // public static final Angle kBadAngle = Radian.of(0);
     // public static final Angle kBadTolerance = Radian.of(0);
