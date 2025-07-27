@@ -4,14 +4,13 @@
 
 package team3647.frc2025.robot;
 
+import com.ctre.phoenix6.Utils;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
-import static edu.wpi.first.units.Units.Radians;
-
-import com.ctre.phoenix6.Utils;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -45,12 +44,12 @@ import team3647.frc2025.subsystems.Drivetrain.SwerveDrive;
 import team3647.frc2025.subsystems.Drivetrain.SwerveDriveSim;
 import team3647.frc2025.subsystems.Elevator.Elevator;
 import team3647.frc2025.subsystems.Elevator.SimElevator;
-import team3647.frc2025.subsystems.Superstructure.Branch;
-import team3647.frc2025.subsystems.Superstructure.Level;
 import team3647.frc2025.subsystems.LEDs;
 import team3647.frc2025.subsystems.Rollers;
 import team3647.frc2025.subsystems.Seagull;
 import team3647.frc2025.subsystems.Superstructure;
+import team3647.frc2025.subsystems.Superstructure.Branch;
+import team3647.frc2025.subsystems.Superstructure.Level;
 import team3647.frc2025.subsystems.pivot.Pivot;
 import team3647.frc2025.subsystems.pivot.SimPivot;
 import team3647.frc2025.subsystems.wrist.SimWrist;
@@ -82,7 +81,7 @@ public class RobotContainer {
         pivot.setEncoderAngle(PivotConstants.kStartingAngle);
         wrist.setEncoderAngle(WristConstants.kStartingAngle);
 
-        swerve.resetPose(new Pose2d(2, 2, Rotation2d.k180deg));
+        swerve.setRobotPose(new Pose2d(2, 2, Rotation2d.k180deg));
 
         CommandScheduler.getInstance()
                 .registerSubsystem(

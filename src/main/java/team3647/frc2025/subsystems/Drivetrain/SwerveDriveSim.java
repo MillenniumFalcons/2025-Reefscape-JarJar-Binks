@@ -1,7 +1,6 @@
 package team3647.frc2025.subsystems.Drivetrain;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.MathUtil;
@@ -99,8 +98,6 @@ public class SwerveDriveSim implements SwerveDrive {
         periodicIO.actualSpeeds = simSwerve.getActualSpeedsFieldRelative();
         periodicIO.timestamp = Timer.getFPGATimestamp();
 
-
-
         Logger.processInputs(getName(), periodicIO);
     }
 
@@ -125,7 +122,6 @@ public class SwerveDriveSim implements SwerveDrive {
     public Pose2d getRealPose() {
         return periodicIO.simPose;
     }
-
 
     @Override
     public Orientation getPigeonOrientation() {

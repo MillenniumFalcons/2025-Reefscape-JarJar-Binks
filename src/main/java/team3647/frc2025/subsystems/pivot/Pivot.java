@@ -4,7 +4,7 @@ import edu.wpi.first.units.measure.Angle;
 import team3647.lib.PeriodicSubsystem;
 
 public interface Pivot extends PeriodicSubsystem {
-    
+
     public void setAngle(Angle angle);
 
     public void setAngleRads(double angleRads);

@@ -2,8 +2,6 @@ package team3647.lib.utils;
 
 import static edu.wpi.first.units.Units.Meter;
 
-import org.opencv.core.Mat;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -54,7 +52,8 @@ public class GeomUtil {
     public static boolean aligned(
             Pose2d pose, Pose2d center, double radiusM, double rotThresholdDeg) {
         return Math.abs(pose.getTranslation().getDistance(center.getTranslation())) <= radiusM
-                && Math.abs(pose.getRotation().minus(center.getRotation()).getDegrees()) <= rotThresholdDeg;
+                && Math.abs(pose.getRotation().minus(center.getRotation()).getDegrees())
+                        <= rotThresholdDeg;
     }
 
     public static boolean inCircle(Pose2d pose, Pose2d center, Distance radius) {
@@ -79,18 +78,13 @@ public class GeomUtil {
 
     /**
      * Checks if a point is in a triangle, inclusive of edges
-     * @param pose
-     * The point
-     * @param a
-     * The first point of the triangle
-     * @param b
-     * The second point of the triangle
-     * @param c
-     * The third point of the triangle
-     * @return
-     * If the point is in the triangle
-     * 
-     * Explanation: https://youtu.be/yyJ-hdISgnw?si=2cvLFURBAWFPHvug&t=158
+     *
+     * @param pose The point
+     * @param a The first point of the triangle
+     * @param b The second point of the triangle
+     * @param c The third point of the triangle
+     * @return If the point is in the triangle
+     *     <p>Explanation: https://youtu.be/yyJ-hdISgnw?si=2cvLFURBAWFPHvug&t=158
      */
     public static boolean inTriangle(Pose2d pose, Pose2d a, Pose2d b, Pose2d c) {
 
@@ -102,9 +96,9 @@ public class GeomUtil {
         final Vector<N2> bp = VecBuilder.fill(pose.getX() - b.getX(), (pose.getY() - b.getY()));
         final Vector<N2> cp = VecBuilder.fill(pose.getX() - c.getX(), (pose.getY() - c.getY()));
 
-        double aSign = Math.signum(abPerp.dot(ap) == 0? 1 : abPerp.dot(ap));
-        double bSign = Math.signum(bcPerp.dot(bp) == 0? 1 : bcPerp.dot(bp));
-        double cSign = Math.signum(caPerp.dot(cp) == 0? 1 : caPerp.dot(cp));
+        double aSign = Math.signum(abPerp.dot(ap) == 0 ? 1 : abPerp.dot(ap));
+        double bSign = Math.signum(bcPerp.dot(bp) == 0 ? 1 : bcPerp.dot(bp));
+        double cSign = Math.signum(caPerp.dot(cp) == 0 ? 1 : caPerp.dot(cp));
 
         return aSign == bSign && bSign == cSign;
     }
