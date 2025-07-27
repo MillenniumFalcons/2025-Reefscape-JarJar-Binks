@@ -82,14 +82,14 @@ public class SuperstructureState {
 
     public static SuperstructureState Intake =
             new SuperstructureState(
-                    PivotConstants.kStowAngle,
-                    ElevatorConstants.kHandoffHeight,
+                    PivotConstants.kMaxAngle,
+                    ElevatorConstants.kStartingHeight,
                     WristConstants.kIntakeAngle);
 
     public static SuperstructureState Transfer =
             new SuperstructureState(
                     PivotConstants.kStowAngle,
-                    ElevatorConstants.kHandoffHeight,
+                    ElevatorConstants.kStartingHeight,
                     WristConstants.kHandoffAngle);
 
     public static SuperstructureState Handoff =

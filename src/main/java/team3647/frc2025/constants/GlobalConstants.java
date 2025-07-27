@@ -40,4 +40,9 @@ public class GlobalConstants {
     public class ClimbIds {
         public static final int kMasterId = 26;
     }
+
+    public class KickerIds {
+        // ts is a random guess change to real one later
+        public static final int kMasterId = 28;
+    }
 }

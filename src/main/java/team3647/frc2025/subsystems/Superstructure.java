@@ -39,6 +39,7 @@ public class Superstructure {
     private final Wrist wrist;
     private final Seagull seagull;
     private final Rollers rollers;
+    private final Kicker kicker;
 
     public final CoralerCommands coralerCommands;
     public final ElevatorCommands elevatorCommands;
@@ -97,6 +98,7 @@ public class Superstructure {
             Wrist wrist,
             Rollers rollers,
             Seagull seagull,
+            Kicker kicker,
             Trigger pieceOverride) {
         this.coraler = coraler;
         this.elevator = elevator;
@@ -104,6 +106,7 @@ public class Superstructure {
         this.wrist = wrist;
         this.seagull = seagull;
         this.rollers = rollers;
+        this.kicker = kicker;
 
         this.coralerCommands = new CoralerCommands(this.coraler);
         this.elevatorCommands = new ElevatorCommands(this.elevator);
@@ -522,6 +525,10 @@ public class Superstructure {
 
     public boolean intakeCurrent() {
         return rollers.getMasterCurrent() > currentLimit;
+    }
+
+    public boolean kickerCurrent() {
+        return kicker.getMasterCurrent() > currentLimit;
     }
 
     public boolean coralerAlgaeCurrent() {

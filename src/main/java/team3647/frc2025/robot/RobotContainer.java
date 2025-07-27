@@ -29,6 +29,7 @@ import team3647.frc2025.constants.CoralerConstants;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.FieldConstants;
 import team3647.frc2025.constants.GlobalConstants;
+import team3647.frc2025.constants.KickerConstants;
 import team3647.frc2025.constants.LEDConstants;
 import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.RollersConstants;
@@ -39,6 +40,7 @@ import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.Climb;
 import team3647.frc2025.subsystems.Coraler;
 import team3647.frc2025.subsystems.Elevator;
+import team3647.frc2025.subsystems.Kicker;
 import team3647.frc2025.subsystems.LEDs;
 import team3647.frc2025.subsystems.Pivot;
 import team3647.frc2025.subsystems.Rollers;
@@ -87,6 +89,10 @@ public class RobotContainer {
     } // 0.6324678425924254
 
     private void configureBindings() {
+
+        // redesign command sequences (if needed)
+
+        // ----------------------- old command sequences ------------------------------
 
         // algae stuff
 
@@ -363,9 +369,11 @@ public class RobotContainer {
                     GlobalConstants.kNominalVoltage,
                     GlobalConstants.kDt);
 
+    public static Kicker kicker = new Kicker(KickerConstants.kMaster, 0, 0, GlobalConstants.kNominalVoltage, GlobalConstants.kDt);
+
     public final Superstructure superstructure =
             new Superstructure(
-                    coraler, elevator, pivot, wrist, rollers, seagull, mainController.buttonY);
+                    coraler, elevator, pivot, wrist, rollers, seagull, kicker, mainController.buttonY);
 
     private final LEDTriggers triggers = new LEDTriggers(superstructure);
     private final LEDs leds = new LEDs(LEDConstants.m_candle, triggers);
@@ -468,6 +476,7 @@ public class RobotContainer {
                     .or(coController.buttonY)
                     .and(() -> !DriverStation.isAutonomous());
 
+    Trigger kickerCurrent = new Trigger(() -> superstructure.kickerCurrent());
     Trigger coralerCurrent =
             superstructure
                     .coralerCommands
