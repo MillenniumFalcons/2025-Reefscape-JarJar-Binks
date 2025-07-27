@@ -18,7 +18,7 @@ public class ElevatorConstants {
 
     public static final double kNativeToMeters = (1.21 - 0.85) / 19.855;
 
-    public static final Distance kStartingHeight = Meters.of(0.85);
+    public static final Distance kStartingHeight = Meters.of(0);
     public static final Distance kStowHeight = kStartingHeight.plus(Centimeter.of(5));
     public static final Distance kLowScoreHeight = kStartingHeight.plus(Meters.of(0.03));
 
@@ -28,6 +28,8 @@ public class ElevatorConstants {
 
     public static final double kMaxPossibleHeightM = 1.63;
     public static final double kZeroHeightForAscope = 0.89;
+
+    public static final Distance kStage2Threshold = Inches.of(23.375);
 
     // all heights measured as center dist from the pivot pivoting bar
 
@@ -61,7 +63,7 @@ public class ElevatorConstants {
     public static final double kCarriageMass =
             Units.lbsToKilograms(4.263 + 1.241 + 5.779); // arm & claw + carriage + gearbox
     public static final Pose3d[] kZeroedElevPose =
-            new Pose3d[] {new Pose3d(0.0127, 0, kZeroHeightForAscope, new Rotation3d())};
+            new Pose3d[] {new Pose3d(), new Pose3d()};
 
     // multiply native by this to get meters 121 - 85 cm @ 19.855 native
 

@@ -8,6 +8,9 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 
@@ -18,7 +21,8 @@ public class WristConstants {
 
     public static final Angle kStartingAngle = Degree.of(116); // Units.Degree.of(125.38)
 
-    ;
+    public static final Pose3d kZeroedIntakePose =
+            new Pose3d(-.2816606, 0, .28575, new Rotation3d(0, 0, 0));
 
     public static final Angle kMaxAngle = kStartingAngle;
     public static final Angle kMinAngle = Units.Degree.of(-7);
@@ -38,6 +42,10 @@ public class WristConstants {
     public static final TalonFX kMaster =
             new TalonFX(GlobalConstants.WristIds.kMasterId, GlobalConstants.kSubsystemCanbusName);
     public static final TalonFXConfiguration kMasterConfig = new TalonFXConfiguration();
+    public static final double kGearRatio = 42;
+    public static final double kArmLengthM = 0.40132;
+    public static final double kArmMassKg = 4.876;
+    public static final double kArmMoiKg2M = 0.017847302;
 
     static {
         kMasterConfig.Slot0.kP = 20;

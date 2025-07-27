@@ -1,4 +1,4 @@
-package team3647.frc2025.subsystems;
+package team3647.frc2025.subsystems.wrist;
 
 import static edu.wpi.first.units.Units.Degree;
 
@@ -12,14 +12,14 @@ import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.lib.TalonFXSubsystem;
 
-public class Wrist extends TalonFXSubsystem {
+public class WristReal extends TalonFXSubsystem {
 
     Angle minAngle, maxAngle;
 
     private final Supplier<Angle> getPivotAngle;
     private final Supplier<Distance> getElevHeight;
 
-    public Wrist(
+    public WristReal(
             TalonFX master,
             double velocityConversion,
             double positionConversion,

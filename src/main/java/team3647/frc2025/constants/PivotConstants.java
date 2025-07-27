@@ -8,6 +8,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
 
 public class PivotConstants {
@@ -24,6 +27,9 @@ public class PivotConstants {
     public static final Angle kL3prep = Radian.of(0.601);
 
     public static final Angle klowLevelsStow = Radian.of(-0.045);
+
+    public static final Pose3d kZeroedPivotPose =
+            new Pose3d(0.0991362, 0, .4836414, new Rotation3d(0, 0, 0));
 
     // idk what the low one is so change this
     public static final Angle kAlgaeAngleLow = Radian.of(-0.072);

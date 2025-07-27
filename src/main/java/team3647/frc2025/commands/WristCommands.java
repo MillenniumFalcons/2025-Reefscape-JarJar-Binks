@@ -9,15 +9,15 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.util.Set;
 import java.util.function.Supplier;
 import team3647.frc2025.constants.WristConstants;
-import team3647.frc2025.subsystems.Wrist;
+import team3647.frc2025.subsystems.wrist.Wrist;
 
 public class WristCommands {
     public final Wrist wrist;
 
     private double offset = 0;
 
-    public WristCommands(Wrist wrist) {
-        this.wrist = wrist;
+    public WristCommands(Wrist wrist2) {
+        this.wrist = wrist2;
     }
 
     public Command goToIntake() {
@@ -39,12 +39,12 @@ public class WristCommands {
 
     public Command setAngle(Angle angle) {
         return Commands.run(() -> wrist.setAngle(angle), wrist)
-                .until(() -> wrist.angleReached(angle.in(Degree), 2));
+                .until(() -> wrist.angleReached(angle, Degree.of(2)));
     }
 
     public Command setAngle(Supplier<Angle> angle) {
         return Commands.run(() -> wrist.setAngle(angle.get()), wrist)
-                .until(() -> wrist.angleReached(angle.get().in(Degree), 2));
+                .until(() -> wrist.angleReached(angle.get(), Degree.of(2)));
     }
 
     public Command holdPositionAtCall() {

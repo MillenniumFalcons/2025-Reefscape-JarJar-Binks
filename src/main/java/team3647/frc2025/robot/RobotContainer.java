@@ -7,6 +7,7 @@ package team3647.frc2025.robot;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.Utils;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -44,15 +45,16 @@ import team3647.frc2025.subsystems.Drivetrain.SwerveDrive;
 import team3647.frc2025.subsystems.Drivetrain.SwerveDriveSim;
 import team3647.frc2025.subsystems.Elevator.Elevator;
 import team3647.frc2025.subsystems.Elevator.SimElevator;
+import team3647.frc2025.subsystems.Superstructure.Branch;
+import team3647.frc2025.subsystems.Superstructure.Level;
 import team3647.frc2025.subsystems.LEDs;
 import team3647.frc2025.subsystems.Rollers;
 import team3647.frc2025.subsystems.Seagull;
 import team3647.frc2025.subsystems.Superstructure;
-import team3647.frc2025.subsystems.Superstructure.Branch;
-import team3647.frc2025.subsystems.Superstructure.Level;
-import team3647.frc2025.subsystems.Wrist;
 import team3647.frc2025.subsystems.pivot.Pivot;
 import team3647.frc2025.subsystems.pivot.SimPivot;
+import team3647.frc2025.subsystems.wrist.SimWrist;
+import team3647.frc2025.subsystems.wrist.Wrist;
 import team3647.lib.GroupPrinter;
 import team3647.lib.inputs.Joysticks;
 import team3647.lib.team9442.AllianceChecker;
@@ -80,7 +82,7 @@ public class RobotContainer {
         pivot.setEncoderAngle(PivotConstants.kStartingAngle);
         wrist.setEncoderAngle(WristConstants.kStartingAngle);
 
-        swerve.resetPose(new Pose2d(0, 0, Rotation2d.k180deg));
+        swerve.resetPose(new Pose2d(2, 2, Rotation2d.k180deg));
 
         CommandScheduler.getInstance()
                 .registerSubsystem(
@@ -345,15 +347,10 @@ public class RobotContainer {
     //         mainController.rightTrigger);
 
     public final Wrist wrist =
-            new Wrist(
-                    WristConstants.kMaster,
-                    WristConstants.kNativeToDeg,
-                    WristConstants.kNativeToDeg,
+            new SimWrist(
+                    WristConstants.kMinAngle.in(Radian),
+                    WristConstants.kMaxAngle.in(Radian),
                     GlobalConstants.kNominalVoltage,
-                    WristConstants.kMinAngle,
-                    WristConstants.kMaxAngle,
-                    elevator::getHeight,
-                    pivot::getAngle,
                     GlobalConstants.kDt);
 
     Rollers rollers =

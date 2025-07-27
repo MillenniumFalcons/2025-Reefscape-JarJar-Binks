@@ -1,9 +1,9 @@
-package team3647.frc2025.subsystems.pivot;
+package team3647.frc2025.subsystems.wrist;
 
 import edu.wpi.first.units.measure.Angle;
 import team3647.lib.PeriodicSubsystem;
 
-public interface Pivot extends PeriodicSubsystem {
+public interface Wrist extends PeriodicSubsystem {
     
     public void setAngle(Angle angle);
 
@@ -22,8 +22,6 @@ public interface Pivot extends PeriodicSubsystem {
     public boolean angleReached(Angle angle, Angle tolerance);
 
     public boolean angleWithin(double lowBound, double highBound);
-
-    public boolean needToClearElevator();
 
     public Angle getMaxAngle();
 

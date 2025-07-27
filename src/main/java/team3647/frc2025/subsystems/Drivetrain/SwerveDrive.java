@@ -78,7 +78,7 @@ public interface SwerveDrive extends PeriodicSubsystem, AllianceObserver {
         public ChassisSpeeds outputSpeeds = new ChassisSpeeds();
         public boolean fieldRelative = true;
         public Translation2d centerOfRotation = Translation2d.kZero;
-        public Pose2d simPose = Pose2d.kZero;
+        public Pose2d simPose = new Pose2d(2,2, new Rotation2d());
         public ChassisSpeeds actualSpeeds = new ChassisSpeeds();
     }
 }

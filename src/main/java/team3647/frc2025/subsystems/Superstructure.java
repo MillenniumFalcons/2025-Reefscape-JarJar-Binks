@@ -32,6 +32,7 @@ import team3647.frc2025.constants.PivotConstants;
 import team3647.frc2025.constants.WristConstants;
 import team3647.frc2025.subsystems.Elevator.Elevator;
 import team3647.frc2025.subsystems.pivot.Pivot;
+import team3647.frc2025.subsystems.wrist.Wrist;
 
 public class Superstructure {
 
@@ -660,7 +661,7 @@ public class Superstructure {
     }
 
     public boolean isIntaking() {
-        return wrist.angleReached(WristConstants.kIntakeAngle.in(Degree), 5);
+        return wrist.angleReached(WristConstants.kIntakeAngle, Degree.of(5));
     }
 
     public boolean seagullCurrent() {
