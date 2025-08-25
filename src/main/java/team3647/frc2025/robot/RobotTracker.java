@@ -9,10 +9,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.AutoDrive;
 import team3647.frc2025.Util.SuperstructureState;
-import team3647.frc2025.constants.WristConstants;
-import team3647.frc2025.subsystems.Superstructure;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.PivotConstants;
+import team3647.frc2025.constants.WristConstants;
+import team3647.frc2025.subsystems.Superstructure;
 import team3647.lib.team6328.VirtualSubsystem;
 
 public class RobotTracker extends VirtualSubsystem {
@@ -45,7 +45,10 @@ public class RobotTracker extends VirtualSubsystem {
                     new Pose3d(
                             ElevatorConstants.kZeroedElevPose[0].getX(),
                             ElevatorConstants.kZeroedElevPose[0].getY(),
-                            Math.max(superstructure.elevator.getHeight().in(Meters) - ElevatorConstants.kStage2Threshold.in(Meters), 0),
+                            Math.max(
+                                    superstructure.elevator.getHeight().in(Meters)
+                                            - ElevatorConstants.kStage2Threshold.in(Meters),
+                                    0),
                             Rotation3d.kZero),
                     new Pose3d(
                             ElevatorConstants.kZeroedElevPose[1].getX(),
@@ -53,15 +56,17 @@ public class RobotTracker extends VirtualSubsystem {
                             superstructure.elevator.getHeight().in(Meters),
                             Rotation3d.kZero),
                     new Pose3d(
-                        PivotConstants.kZeroedPivotPose.getX(),
-                        PivotConstants.kZeroedPivotPose.getY(),
-                        superstructure.elevator.getHeight().in(Meters) + PivotConstants.kZeroedPivotPose.getZ(),
-                        new Rotation3d(0, -superstructure.pivot.getAngleRads() + Math.PI / 2, 0)),
+                            PivotConstants.kZeroedPivotPose.getX(),
+                            PivotConstants.kZeroedPivotPose.getY(),
+                            superstructure.elevator.getHeight().in(Meters)
+                                    + PivotConstants.kZeroedPivotPose.getZ(),
+                            new Rotation3d(
+                                    0, -superstructure.pivot.getAngleRads() + Math.PI / 2, 0)),
                     new Pose3d(
-                        WristConstants.kZeroedIntakePose.getX(),
-                        WristConstants.kZeroedIntakePose.getY(),
-                        WristConstants.kZeroedIntakePose.getZ(),
-                        new Rotation3d(0, superstructure.wrist.getAngle().abs(Radians), 0))                    
+                            WristConstants.kZeroedIntakePose.getX(),
+                            WristConstants.kZeroedIntakePose.getY(),
+                            WristConstants.kZeroedIntakePose.getZ(),
+                            new Rotation3d(0, superstructure.wrist.getAngle().abs(Radians), 0))
                 };
         Logger.recordOutput("Superstructure/Components", poses);
 

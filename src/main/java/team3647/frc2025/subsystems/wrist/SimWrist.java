@@ -2,15 +2,8 @@ package team3647.frc2025.subsystems.wrist;
 
 import static edu.wpi.first.units.Units.Radian;
 
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.AutoLog;
-import org.littletonrobotics.junction.AutoLogOutputManager;
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.signals.ControlModeValue;
-
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -18,9 +11,11 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.constants.ElevatorConstants;
 import team3647.frc2025.constants.WristConstants;
 
@@ -68,11 +63,7 @@ public class SimWrist implements Wrist {
 
     PeriodicIOAutoLogged periodicIO = new PeriodicIOAutoLogged();
 
-    public SimWrist(
-            double minAngleRads,
-            double maxAngleRads,
-            double nominalVoltage,
-            double kDt) {
+    public SimWrist(double minAngleRads, double maxAngleRads, double nominalVoltage, double kDt) {
 
         if (!Utils.isSimulation())
             throw new IllegalStateException("Trying to run sim wrist on real RIO!!!");

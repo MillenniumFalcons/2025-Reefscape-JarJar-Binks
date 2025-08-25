@@ -34,8 +34,8 @@ import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.FieldConstants;
 import team3647.frc2025.constants.WristConstants;
-import team3647.frc2025.subsystems.Superstructure;
 import team3647.frc2025.subsystems.Drivetrain.SwerveDrive;
+import team3647.frc2025.subsystems.Superstructure;
 import team3647.lib.team9442.AllianceObserver;
 
 public class AutoCommands implements AllianceObserver {

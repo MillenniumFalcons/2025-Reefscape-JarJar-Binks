@@ -10,7 +10,6 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 
@@ -62,8 +61,7 @@ public class ElevatorConstants {
     public static final double kElevatorDrumRadius = Units.inchesToMeters(1.5);
     public static final double kCarriageMass =
             Units.lbsToKilograms(4.263 + 1.241 + 5.779); // arm & claw + carriage + gearbox
-    public static final Pose3d[] kZeroedElevPose =
-            new Pose3d[] {new Pose3d(), new Pose3d()};
+    public static final Pose3d[] kZeroedElevPose = new Pose3d[] {new Pose3d(), new Pose3d()};
 
     // multiply native by this to get meters 121 - 85 cm @ 19.855 native
 

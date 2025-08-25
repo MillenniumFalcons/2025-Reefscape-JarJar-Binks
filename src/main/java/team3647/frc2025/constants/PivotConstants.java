@@ -8,7 +8,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
@@ -89,8 +88,6 @@ public class PivotConstants {
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
                 kMinAngle.in(Radian) / kNativeToRad;
         kMasterConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-
-        
 
         kMasterConfig.MotionMagic.MotionMagicCruiseVelocity = 120;
         kMasterConfig.MotionMagic.MotionMagicAcceleration = 1200;
