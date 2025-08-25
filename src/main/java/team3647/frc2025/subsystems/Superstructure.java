@@ -3,7 +3,17 @@ package team3647.frc2025.subsystems;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radian;
+
+import java.util.Map;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Angle;
@@ -14,11 +24,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.util.Map;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.commands.CoralerCommands;
@@ -73,6 +78,10 @@ public class Superstructure {
 
     private Map<Level, SuperstructureState> kLevelToScoreMap;
 
+    private final IntakeSimulation intakeSim;
+
+    private final AbstractDriveTrainSimulation driveTrain;
+
     public enum Side {
         A,
         B,
@@ -100,13 +109,15 @@ public class Superstructure {
             Wrist wrist,
             Rollers rollers,
             Seagull seagull,
-            Trigger pieceOverride) {
+            Trigger pieceOverride,
+            AbstractDriveTrainSimulation driveTrain) {
         this.coraler = coraler;
         this.elevator = elevator;
         this.pivot = pivot;
         this.wrist = wrist;
         this.seagull = seagull;
         this.rollers = rollers;
+        this.driveTrain = driveTrain;
 
         this.coralerCommands = new CoralerCommands(this.coraler);
         this.elevatorCommands = new ElevatorCommands(this.elevator);
@@ -139,6 +150,15 @@ public class Superstructure {
                         SuperstructureState.MidScore,
                         Level.HIGH,
                         SuperstructureState.HighScore);
+        
+        this.intakeSim =
+                IntakeSimulation.OverTheBumperIntake(
+                        "Coral",
+                        driveTrain,
+                        Meters.of(0.6604),
+                        Meters.of(0.2),
+                        IntakeSimulation.IntakeSide.BACK,
+                        1);
     }
 
     public enum Level {
@@ -400,7 +420,8 @@ public class Superstructure {
     public Command intake() {
         return Commands.parallel(
                 goToStateParalell(() -> SuperstructureState.Intake),
-                rollersCommands.setOpenLoop(0.25));
+                rollersCommands.setOpenLoop(0.25),
+                Commands.runOnce(() -> intakeSim.startIntake()));
     }
 
     public Command transfer() {
@@ -576,7 +597,8 @@ public class Superstructure {
                 wristCommands.setAngle(WristConstants.kStowWithPiece),
                 elevatorCommands.setHeight(ElevatorConstants.kStowHeight),
                 rollersCommands.kill(),
-                coralerCommands.kill());
+                coralerCommands.kill(),
+                Commands.runOnce(() -> intakeSim.stopIntake()));
     }
 
     // public Command intake(){

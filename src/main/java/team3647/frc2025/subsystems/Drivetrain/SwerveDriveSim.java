@@ -19,6 +19,8 @@ import org.littletonrobotics.junction.Logger;
 import team3647.lib.vision.Orientation;
 import team3647.lib.vision.VisionMeasurement;
 
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
+
 public class SwerveDriveSim implements SwerveDrive {
     private final SelfControlledSwerveDriveSimulation simSwerve;
 
@@ -36,6 +38,10 @@ public class SwerveDriveSim implements SwerveDrive {
                         .withCurrentLimits(Amps.of(60), Amps.of(60));
         this.kDt = kDt;
         SimulatedArena.getInstance().addDriveTrainSimulation(simSwerve.getDriveTrainSimulation());
+    }
+
+    public AbstractDriveTrainSimulation getSim() {
+        return this.simSwerve.getDriveTrainSimulation();
     }
 
     @Override

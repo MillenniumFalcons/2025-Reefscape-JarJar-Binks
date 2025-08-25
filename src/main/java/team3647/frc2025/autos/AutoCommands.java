@@ -2,11 +2,19 @@ package team3647.frc2025.autos;
 
 import static edu.wpi.first.units.Units.Degree;
 
+import java.util.List;
+// import java.lang.invoke.ClassSpecializer.SpeciesData;
+import java.util.function.BiFunction;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
@@ -20,12 +28,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.util.List;
-// import java.lang.invoke.ClassSpecializer.SpeciesData;
-import java.util.function.BiFunction;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import team3647.frc2025.Util.AllianceFlip;
 import team3647.frc2025.Util.PoseUtils;
 import team3647.frc2025.Util.SuperstructureState;
@@ -46,6 +48,16 @@ public class AutoCommands implements AllianceObserver {
     private final Trajectory<SwerveSample> src_to_e2;
     private final Trajectory<SwerveSample> s2_to_d2;
 
+    private final Trajectory<SwerveSample> thing1;
+    private final Trajectory<SwerveSample> thing2;
+    private final Trajectory<SwerveSample> thing3;
+    private final Trajectory<SwerveSample> thing4;
+    private final Trajectory<SwerveSample> thing5;
+    private final Trajectory<SwerveSample> thing6;
+    private final Trajectory<SwerveSample> thing7;
+    private final Trajectory<SwerveSample> thing8;
+    private final Trajectory<SwerveSample> thing9;
+
     private final Rectangle2d BlueLSource =
             new Rectangle2d(
                     new Translation2d(0, FieldConstants.kFieldLengthM),
@@ -62,6 +74,44 @@ public class AutoCommands implements AllianceObserver {
                     AllianceFlip.flip(new Translation2d(2.5893, 1.192)));
 
     private final PIDController rotController = new PIDController(5, 0, 0);
+
+    public Command skibidi() {
+        return Commands.sequence(
+                Commands.parallel(
+                        followChoreoPath(thing1), 
+                        prep()),
+                Commands.sequence(
+                        stow().withTimeout(0.5),
+                        Commands.parallel(
+                                followChoreoPath(thing2)),
+                                superstructure.intake().until(superstructure::intakeCurrent)
+                                ),
+                //Commands.waitSeconds(1),
+                Commands.parallel(
+                        followChoreoPath(thing3), 
+                        prep()),
+                Commands.sequence(
+                        stow().withTimeout(0.5),
+                        followChoreoPath(thing4)),
+                //Commands.waitSeconds(1),
+                Commands.parallel(
+                        followChoreoPath(thing5), 
+                        prep()),
+                Commands.sequence(
+                        stow().withTimeout(0.5),
+                        followChoreoPath(thing6)),
+                //Commands.waitSeconds(1),
+                Commands.parallel(
+                        followChoreoPath(thing7), 
+                        prep()),
+                Commands.sequence(
+                        stow().withTimeout(0.5),
+                        followChoreoPath(thing8)),
+                Commands.parallel(
+                        followChoreoPath(thing9), 
+                        prep()),
+                stow());
+    }
 
     public Command getFour_s3e1f1f2e2() {
         return Commands.sequence(
@@ -120,6 +170,28 @@ public class AutoCommands implements AllianceObserver {
                                                         .withTimeout(1)))
                         .withTimeout(10),
                 Commands.waitSeconds(3),
+                superstructure.stow().alongWith(superstructure.poopCoral()));
+    }
+
+    public Command prep() {
+        return Commands.parallel(
+                        superstructure.goToStatePerpendicular(
+                                () -> SuperstructureState.HighScore, () -> 0),
+                        Commands.sequence(
+                                        superstructure.wristCommands.setAngle(
+                                                Degree.of(15)),
+                                        superstructure.wristCommands.setAngle(
+                                                WristConstants.kStowAngle))
+                                .alongWith(
+                                        superstructure
+                                                .coralerCommands
+                                                .setOpenLoop(0.1)
+                                                .withTimeout(1)))
+                .withTimeout(10);
+    }
+
+    public Command stow() {
+        return Commands.sequence(
                 superstructure.stow().alongWith(superstructure.poopCoral()));
     }
 
@@ -303,6 +375,8 @@ public class AutoCommands implements AllianceObserver {
 
     public final AutoMode redDT_One_s2d2;
 
+    public final AutoMode skibidiMode;
+
     public List<AutoMode> redAutosList;
     public List<AutoMode> blueAutosList;
 
@@ -327,6 +401,17 @@ public class AutoCommands implements AllianceObserver {
         this.f1_to_src = getTraj("f1 to src");
         this.src_to_f1 = getTraj("src to f1");
         this.s2_to_d2 = getTraj("s2 to d2");
+
+        this.thing1 = getTraj("thing1");
+        this.thing2 = getTraj("thing2");
+        this.thing3 = getTraj("thing3");
+        this.thing4 = getTraj("thing4");
+        this.thing5 = getTraj("thing5");
+        this.thing6 = getTraj("thing6");
+        this.thing7 = getTraj("thing7");
+        this.thing8 = getTraj("thing8");
+        this.thing9 = getTraj("thing9");
+        this.skibidiMode = new AutoMode(skibidi(), getInitial(thing1, Alliance.Blue), "well well well");
 
         this.blueOne_s2d2 =
                 new AutoMode(
@@ -354,7 +439,8 @@ public class AutoCommands implements AllianceObserver {
                                 Pose2d.kZero.rotateBy(Rotation2d.k180deg),
                                 "nothingBlue"),
                         blueOne_s2d2,
-                        blueDT_One_s2d2);
+                        blueDT_One_s2d2,
+                        skibidiMode);
         redAutosList =
                 List.of(
                         new AutoMode(Commands.none(), Pose2d.kZero, "nothingRed"),

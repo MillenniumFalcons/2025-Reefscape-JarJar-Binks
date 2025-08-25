@@ -65,6 +65,9 @@ import team3647.lib.vision.NeuralDetectorLimelight;
 import team3647.lib.vision.SimVision;
 import team3647.lib.vision.VisionController;
 
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
+
 public class RobotContainer {
     public final Joysticks mainController = new Joysticks(0);
     public final Joysticks coController = new Joysticks(1);
@@ -82,7 +85,7 @@ public class RobotContainer {
         pivot.setEncoderAngle(PivotConstants.kStartingAngle);
         wrist.setEncoderAngle(WristConstants.kStartingAngle);
 
-        swerve.resetPose(new Pose2d(2, 2, Rotation2d.k180deg));
+        swerve.setRobotPose(new Pose2d(2, 2, Rotation2d.k180deg));
 
         CommandScheduler.getInstance()
                 .registerSubsystem(
@@ -295,7 +298,7 @@ public class RobotContainer {
     }
 
     @SuppressWarnings("unchecked")
-    public final SwerveDrive swerve =
+    public final SwerveDriveSim swerve =
             new SwerveDriveSim(
                     SwerveDriveConstants.driveTrainSimulationConfig, GlobalConstants.kDt);
 
@@ -376,7 +379,7 @@ public class RobotContainer {
 
     public final Superstructure superstructure =
             new Superstructure(
-                    coraler, elevator, pivot, wrist, rollers, seagull, mainController.buttonY);
+                    coraler, elevator, pivot, wrist, rollers, seagull, mainController.buttonY, swerve.getSim());
 
     private final LEDTriggers triggers = new LEDTriggers(superstructure);
     private final LEDs leds = new LEDs(LEDConstants.m_candle, triggers);

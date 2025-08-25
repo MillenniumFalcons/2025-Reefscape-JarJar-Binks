@@ -66,7 +66,7 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
                 robotToCam,
                 baseStdDevs,
                 update -> false,
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
+                AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField));
     }
 
     public AprilTagPhotonVision(String camera, Transform3d robotToCam) {
@@ -75,7 +75,7 @@ public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera
                 robotToCam,
                 VecBuilder.fill(0.05, 0.05, 0.1),
                 update -> false,
-                AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
+                AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField));
     }
 
     public AprilTagId getId(int id) {

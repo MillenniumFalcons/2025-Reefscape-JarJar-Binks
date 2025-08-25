@@ -12,7 +12,13 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotation;
+
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -21,6 +27,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import team3647.lib.ModifiedSignalLogger;
+import team3647.lib.team254.geometry.Pose2d;
+import team3647.lib.team254.geometry.Rotation2d;
 import team3647.lib.team6328.VirtualSubsystem;
 
 public class Robot extends LoggedRobot {
@@ -143,6 +151,11 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationInit() {
         // SimulatedArena.overrideSimulationTimings(Millisecond.of(20), 1);
+        SimulatedArena.getInstance().addGamePiece(new ReefscapeCoralOnField(
+            new edu.wpi.first.math.geometry.Pose2d(1.5, 7.5, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(45))));
+        
+        Logger.recordOutput("FieldSimulation/Coral", 
+            SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     }
 
     @Override
@@ -150,5 +163,6 @@ public class Robot extends LoggedRobot {
         SimulatedArena.getInstance().simulationPeriodic();
         m_robotContainer.simVision.periodic();
         SmartDashboard.putData(m_robotContainer.simVision.getDebugField());
+        
     }
 }
