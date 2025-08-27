@@ -1,7 +1,6 @@
 package team3647.frc2025.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import team3647.lib.TalonFXSubsystem;
 
 public class Kicker extends TalonFXSubsystem {
@@ -27,5 +26,4 @@ public class Kicker extends TalonFXSubsystem {
     public String getName() {
         return "Kicker";
     }
-    
 }

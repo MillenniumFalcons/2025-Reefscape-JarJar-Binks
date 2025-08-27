@@ -12,7 +12,7 @@ public class KickerConstants {
 
     static {
         kMasterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        
+
         // kMasterConfig.Slot0.kP = 0.5;
 
         kMaster.getConfigurator().apply(kMasterConfig);

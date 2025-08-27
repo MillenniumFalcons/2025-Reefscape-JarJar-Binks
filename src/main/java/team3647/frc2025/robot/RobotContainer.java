@@ -369,11 +369,24 @@ public class RobotContainer {
                     GlobalConstants.kNominalVoltage,
                     GlobalConstants.kDt);
 
-    public static Kicker kicker = new Kicker(KickerConstants.kMaster, 0, 0, GlobalConstants.kNominalVoltage, GlobalConstants.kDt);
+    public static Kicker kicker =
+            new Kicker(
+                    KickerConstants.kMaster,
+                    0,
+                    0,
+                    GlobalConstants.kNominalVoltage,
+                    GlobalConstants.kDt);
 
     public final Superstructure superstructure =
             new Superstructure(
-                    coraler, elevator, pivot, wrist, rollers, seagull, kicker, mainController.buttonY);
+                    coraler,
+                    elevator,
+                    pivot,
+                    wrist,
+                    rollers,
+                    seagull,
+                    kicker,
+                    mainController.buttonY);
 
     private final LEDTriggers triggers = new LEDTriggers(superstructure);
     private final LEDs leds = new LEDs(LEDConstants.m_candle, triggers);

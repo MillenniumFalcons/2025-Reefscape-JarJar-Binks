@@ -50,7 +50,7 @@ public class AprilTagLimelight extends VirtualSubsystem implements AprilTagCamer
     private final Vector<N3> baseStdDevs;
 
     AprilTagFieldLayout aprilTagFieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+            AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
     public AprilTagLimelight(
             String name,

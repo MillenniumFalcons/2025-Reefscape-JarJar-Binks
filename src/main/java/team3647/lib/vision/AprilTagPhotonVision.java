@@ -23,7 +23,7 @@ import team3647.lib.vision.old.AprilTagCamera.AprilTagId;
 public class AprilTagPhotonVision extends PhotonCamera implements AprilTagCamera {
 
     AprilTagFieldLayout aprilTagFieldLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+            AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
     PhotonPoseEstimator photonPoseEstimator;
     Transform3d robotToCam;
     private final edu.wpi.first.math.Vector<N3> baseStdDevs;
