@@ -34,8 +34,8 @@ import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.FieldConstants;
 import team3647.frc2025.constants.WristConstants;
-import team3647.frc2025.subsystems.Drivetrain.SwerveDrive;
 import team3647.frc2025.subsystems.Superstructure;
+import team3647.frc2025.subsystems.Drivetrain.SwerveDrive;
 import team3647.lib.team9442.AllianceObserver;
 
 public class AutoCommands implements AllianceObserver {
@@ -77,36 +77,56 @@ public class AutoCommands implements AllianceObserver {
 
     public Command skibidi() {
         return Commands.sequence(
+                //preload
                 Commands.parallel(
                         followChoreoPath(thing1), 
                         prep()),
+                //intake first note
                 Commands.sequence(
                         stow().withTimeout(0.5),
                         Commands.parallel(
-                                followChoreoPath(thing2)),
-                                superstructure.intake().until(superstructure::intakeCurrent)
+                                followChoreoPath(thing2),
+                                superstructure.intake()
+                                        .until(superstructure::isNoteInsideIntake))
                                 ),
-                //Commands.waitSeconds(1),
+                //score first note
                 Commands.parallel(
                         followChoreoPath(thing3), 
                         prep()),
-                Commands.sequence(
                         stow().withTimeout(0.5),
-                        followChoreoPath(thing4)),
-                //Commands.waitSeconds(1),
+                superstructure.spawnPieceSourceSim(),
+                //intake second note
+                Commands.sequence(
+                        Commands.parallel(
+                                followChoreoPath(thing4),
+                                superstructure.intake()
+                                        .until(superstructure::isNoteInsideIntake))
+                                ),
+                //score second note
                 Commands.parallel(
                         followChoreoPath(thing5), 
                         prep()),
-                Commands.sequence(
                         stow().withTimeout(0.5),
-                        followChoreoPath(thing6)),
-                //Commands.waitSeconds(1),
+                superstructure.spawnPieceSourceSim(),
+                //intake third note
+                Commands.sequence(
+                        Commands.parallel(
+                                followChoreoPath(thing6),
+                                superstructure.intake().until(superstructure::isNoteInsideIntake))
+                                ),
+                //score third note
                 Commands.parallel(
                         followChoreoPath(thing7), 
                         prep()),
-                Commands.sequence(
                         stow().withTimeout(0.5),
-                        followChoreoPath(thing8)),
+                superstructure.spawnPieceSourceSim(),
+                //intake fourth note
+                Commands.sequence(
+                        Commands.parallel(
+                                followChoreoPath(thing8),
+                                superstructure.intake().until(superstructure::isNoteInsideIntake))
+                                ),
+                //score fourth note
                 Commands.parallel(
                         followChoreoPath(thing9), 
                         prep()),
@@ -191,8 +211,10 @@ public class AutoCommands implements AllianceObserver {
     }
 
     public Command stow() {
-        return Commands.sequence(
-                superstructure.stow().alongWith(superstructure.poopCoral()));
+        return Commands.parallel(
+                superstructure.stow().alongWith(superstructure.poopCoral()), 
+                superstructure.setNoPiece());
+                
     }
 
     public Command getOneS2_d2() {

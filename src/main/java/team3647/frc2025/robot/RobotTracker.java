@@ -1,5 +1,6 @@
 package team3647.frc2025.robot;
 
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 
@@ -46,22 +47,22 @@ public class RobotTracker extends VirtualSubsystem {
                             ElevatorConstants.kZeroedElevPose[0].getX(),
                             ElevatorConstants.kZeroedElevPose[0].getY(),
                             Math.max(
-                                    superstructure.elevator.getHeight().in(Meters)
+                                    superstructure.elevator.getHeight().in(Meters) + 0.18
                                             - ElevatorConstants.kStage2Threshold.in(Meters),
                                     0),
                             Rotation3d.kZero),
                     new Pose3d(
                             ElevatorConstants.kZeroedElevPose[1].getX(),
                             ElevatorConstants.kZeroedElevPose[1].getY(),
-                            superstructure.elevator.getHeight().in(Meters),
+                            superstructure.elevator.getHeight().in(Meters) + 0.18,
                             Rotation3d.kZero),
                     new Pose3d(
                             PivotConstants.kZeroedPivotPose.getX(),
                             PivotConstants.kZeroedPivotPose.getY(),
                             superstructure.elevator.getHeight().in(Meters)
-                                    + PivotConstants.kZeroedPivotPose.getZ(),
+                                    + PivotConstants.kZeroedPivotPose.getZ() + 0.18,
                             new Rotation3d(
-                                    0, -superstructure.pivot.getAngleRads() + Math.PI / 2, 0)),
+                                    0, -superstructure.pivot.getAngleRads() + Math.PI, 0)),
                     new Pose3d(
                             WristConstants.kZeroedIntakePose.getX(),
                             WristConstants.kZeroedIntakePose.getY(),

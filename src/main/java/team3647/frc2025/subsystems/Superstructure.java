@@ -12,7 +12,9 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnField;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
@@ -597,8 +599,18 @@ public class Superstructure {
                 wristCommands.setAngle(WristConstants.kStowWithPiece),
                 elevatorCommands.setHeight(ElevatorConstants.kStowHeight),
                 rollersCommands.kill(),
-                coralerCommands.kill(),
-                Commands.runOnce(() -> intakeSim.stopIntake()));
+                coralerCommands.kill());
+    }
+
+    public boolean isNoteInsideIntake() {
+        return intakeSim.getGamePiecesAmount() != 0; 
+    }
+
+    public Command setNoPiece() {
+        return Commands.sequence(
+            Commands.runOnce(() -> intakeSim.obtainGamePieceFromIntake()),
+            Commands.runOnce(() -> intakeSim.stopIntake())
+            );
     }
 
     // public Command intake(){
@@ -688,5 +700,15 @@ public class Superstructure {
 
     public boolean seagullCurrent() {
         return rollersCommands.seagullCurrentGreater(SeagullCurrentLimit);
+    }
+
+    public Command spawnPieceSourceSim() {
+        return Commands.runOnce(() -> 
+            SimulatedArena.getInstance().addGamePiece(new ReefscapeCoralOnField(
+                new edu.wpi.first.math.geometry.Pose2d(
+                    1.5, 
+                    7.5, 
+                    edu.wpi.first.math.geometry.Rotation2d.fromDegrees(45))
+                    )));
     }
 }

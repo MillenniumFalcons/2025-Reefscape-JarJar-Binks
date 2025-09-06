@@ -152,7 +152,6 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationInit() {
         // SimulatedArena.overrideSimulationTimings(Millisecond.of(20), 1);
-        SimulatedArena.getInstance().clearGamePieces();
         SimulatedArena.getInstance().addGamePiece(new ReefscapeCoralOnField(
             new edu.wpi.first.math.geometry.Pose2d(1.5, 7.5, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(45))));
         
