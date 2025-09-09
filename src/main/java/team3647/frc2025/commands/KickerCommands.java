@@ -16,6 +16,6 @@ public class KickerCommands {
     }
 
     public Command kill() {
-        return Commands.run(() -> setOpenLoop(0), kicker).withTimeout(0.3);
+        return Commands.run(() -> kicker.setOpenLoop(0), kicker).withTimeout(0.3);
     }
 }

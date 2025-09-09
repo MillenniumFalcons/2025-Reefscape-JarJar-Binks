@@ -37,7 +37,7 @@ public class Elevator extends TalonFXSubsystem {
             double maxLength,
             double kDt) {
         super(master, velocityConversion, positionConversion, nominalVoltage, kDt);
-        super.addFollower(follower, false);
+        super.addFollower(follower, true);
         this.minLength = minLength;
         this.maxLength = maxLength;
         this.kG = kG;

@@ -16,33 +16,35 @@ public class GlobalConstants {
     public static double kNominalVoltage = 11.0;
 
     public class PivotIds {
+        //unknown bc electrical
         public static final int kMasterId = 21;
     }
 
     public class ElevatorIds {
-        public static final int kSlaveId = 23;
-        public static final int kMasterId = 22;
+        public static final int kSlaveId = 31;
+        public static final int kMasterId = 32;
     }
 
     public class CoralerIds {
-        public static final int kMasterId = 20;
+        public static final int kMasterId = 26;
     }
 
     public class WristIds {
-        public static final int kMasterId = 24;
+        public static final int kMasterId = 30;
     }
 
     public class RollersIds {
-        public static final int kMasterId = 25;
-        public static final int kSeagullId = 27;
+        public static final int kMasterId = 36;
+        //public static final int kSeagullId = 40;
     }
 
     public class ClimbIds {
+        //also dont know
         public static final int kMasterId = 26;
     }
 
     public class KickerIds {
         // ts is a random guess change to real one later
-        public static final int kMasterId = 28;
+        public static final int kMasterId = 20;
     }
 }

@@ -13,12 +13,10 @@ import edu.wpi.first.units.measure.Angle;
 
 public class WristConstants {
 
-    public static final Angle kIntakeAngle = Units.Degree.of(2);
-    public static final Angle kStowAngle = Units.Degree.of(85);
+    public static final Angle kIntakeAngle = Units.Degree.of(0);
+    public static final Angle kStowAngle = Units.Degree.of(90);
 
-    public static final Angle kStartingAngle = Degree.of(116); // Units.Degree.of(125.38)
-
-    ;
+    public static final Angle kStartingAngle = Degree.of(115); // Units.Degree.of(125.38)
 
     public static final Angle kMaxAngle = kStartingAngle;
     public static final Angle kMinAngle = Units.Degree.of(-7);
@@ -32,15 +30,15 @@ public class WristConstants {
     // tunnnnnoon
     public static final Angle kSourceIntakeAngle = Degree.of(90);
 
-    // 90 degs/20 revolutions
-    public static final double kNativeToDeg = 90 / 10.9633;
+    // 105 deg / ~16 revs
+    public static final double kNativeToDeg = 115 / 15.992676;
 
     public static final TalonFX kMaster =
             new TalonFX(GlobalConstants.WristIds.kMasterId, GlobalConstants.kSubsystemCanbusName);
     public static final TalonFXConfiguration kMasterConfig = new TalonFXConfiguration();
 
     static {
-        kMasterConfig.Slot0.kP = 20;
+        kMasterConfig.Slot0.kP = 15;
         kMasterConfig.Slot0.kD = 0.2;
         kMasterConfig.Slot0.kS = 0.1;
         kMasterConfig.Slot0.StaticFeedforwardSign = StaticFeedforwardSignValue.UseVelocitySign;

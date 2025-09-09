@@ -363,7 +363,6 @@ public class AutoCommands implements AllianceObserver {
 
         this.coralerCurrent = new Trigger(superstructure.coralerCommands.current()).debounce(0.4);
         this.intakeCurrent = new Trigger(superstructure::intakeCurrent).debounce(0.5);
-        this.seagullCurrent = new Trigger(superstructure::seagullCurrent).debounce(0.5);
     }
 
     public interface ChoreoController extends BiFunction<Pose2d, SwerveSample, ChassisSpeeds> {}

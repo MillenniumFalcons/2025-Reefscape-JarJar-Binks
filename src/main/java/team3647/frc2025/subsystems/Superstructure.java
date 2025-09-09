@@ -1,6 +1,7 @@
 package team3647.frc2025.subsystems;
 
 import static edu.wpi.first.units.Units.Degree;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radian;
@@ -23,6 +24,7 @@ import team3647.frc2025.Util.InverseKinematics;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.commands.CoralerCommands;
 import team3647.frc2025.commands.ElevatorCommands;
+import team3647.frc2025.commands.KickerCommands;
 import team3647.frc2025.commands.PivotCommands;
 import team3647.frc2025.commands.RollersCommands;
 import team3647.frc2025.commands.WristCommands;
@@ -37,7 +39,6 @@ public class Superstructure {
     private final Elevator elevator;
     private final Pivot pivot;
     private final Wrist wrist;
-    private final Seagull seagull;
     private final Rollers rollers;
     private final Kicker kicker;
 
@@ -46,6 +47,7 @@ public class Superstructure {
     public final PivotCommands pivotCommands;
     public final WristCommands wristCommands;
     public final RollersCommands rollersCommands;
+    public final KickerCommands kickerCommands;
 
     private BooleanSupplier isAligned;
 
@@ -64,7 +66,6 @@ public class Superstructure {
     private Trigger overridePiece;
 
     private double currentLimit = 57;
-    private double SeagullCurrentLimit = 30;
     private double algaeCurrentLimit = 47;
 
     private double wristOffset = 0;
@@ -97,22 +98,21 @@ public class Superstructure {
             Pivot pivot,
             Wrist wrist,
             Rollers rollers,
-            Seagull seagull,
             Kicker kicker,
             Trigger pieceOverride) {
         this.coraler = coraler;
         this.elevator = elevator;
         this.pivot = pivot;
         this.wrist = wrist;
-        this.seagull = seagull;
         this.rollers = rollers;
         this.kicker = kicker;
 
         this.coralerCommands = new CoralerCommands(this.coraler);
         this.elevatorCommands = new ElevatorCommands(this.elevator);
         this.pivotCommands = new PivotCommands(this.pivot);
-        this.rollersCommands = new RollersCommands(rollers, seagull);
-        this.wristCommands = new WristCommands(wrist);
+        this.rollersCommands = new RollersCommands(this.rollers);
+        this.wristCommands = new WristCommands(this.wrist);
+        this.kickerCommands = new KickerCommands(this.kicker);
 
         this.elevOffset = Meter.of(0).mutableCopy();
         this.pivotOffset = Radian.of(0).mutableCopy();
@@ -397,16 +397,29 @@ public class Superstructure {
                 && elevator.getHeight().lt(ElevatorConstants.kClearHeight);
     }
 
+    // REMOVED THIS WHILE THE ELEVATOR WASNT SPOOLED AND PIVOT MOTOR WASNT WIRED
+    // public Command intake() {
+    //     return Commands.parallel(
+    //             goToStateParalell(() -> SuperstructureState.Intake),
+    //             rollersCommands.setOpenLoop(0.25));
+    // }
+
     public Command intake() {
         return Commands.parallel(
-                goToStateParalell(() -> SuperstructureState.Intake),
-                rollersCommands.setOpenLoop(0.25));
+            wristCommands.setAngle(WristConstants.kIntakeAngle),
+            rollersCommands.setOpenLoop(-0.7),
+            kick()
+        );
+    }
+
+    public Command kick() {
+        return kickerCommands.setOpenLoop(0.4);
     }
 
     public Command transfer() {
         return Commands.parallel(
                 goToStateParalell(() -> SuperstructureState.Transfer),
-                rollersCommands.setOpenLoop(0.6, -0.1));
+                rollersCommands.setOpenLoop(1));
     }
 
     public Command handoff() {
@@ -665,9 +678,5 @@ public class Superstructure {
 
     public boolean isIntaking() {
         return wrist.angleReached(WristConstants.kIntakeAngle.in(Degree), 5);
-    }
-
-    public boolean seagullCurrent() {
-        return rollersCommands.seagullCurrentGreater(SeagullCurrentLimit);
     }
 }

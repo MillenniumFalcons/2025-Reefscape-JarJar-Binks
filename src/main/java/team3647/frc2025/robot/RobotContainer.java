@@ -22,6 +22,7 @@ import team3647.frc2025.Util.LEDTriggers;
 import team3647.frc2025.Util.SuperstructureState;
 import team3647.frc2025.autos.AutoCommands;
 import team3647.frc2025.commands.ClimbCommands;
+import team3647.frc2025.commands.KickerCommands;
 import team3647.frc2025.commands.SwerveDriveCommands;
 import team3647.frc2025.constants.AutoConstants;
 import team3647.frc2025.constants.ClimbConstants;
@@ -80,7 +81,7 @@ public class RobotContainer {
 
         CommandScheduler.getInstance()
                 .registerSubsystem(
-                        swerve, elevator, pivot, coraler, wrist, rollers, climb, seagull);
+                        swerve, elevator, pivot, coraler, wrist, rollers, climb, kicker);
     }
 
     private void configureAllianceObservers() {
@@ -124,7 +125,12 @@ public class RobotContainer {
         // real stuff
 
         mainController.leftBumper.whileTrue(superstructure.intake());
-        intakeUp.onTrue(superstructure.transfer()).onTrue(autoDrive.setDriveMode(DriveMode.NONE));
+        // intakeUp.onTrue(superstructure.transfer()).onTrue(autoDrive.setDriveMode(DriveMode.NONE));
+
+        //elevator testing stuff
+        
+        mainController.buttonY.whileTrue(superstructure.elevatorCommands.setOpenLoop(() -> 0.2));
+
         mainController.buttonB.whileTrue(superstructure.transfer());
         mainController
                 .buttonA
@@ -132,10 +138,10 @@ public class RobotContainer {
                 .whileTrue(autoDrive.setDriveMode(DriveMode.SCORE));
         mainController.buttonA.and(mainController.dPadLeft).onFalse(autoDrive.clearDriveMode());
 
-        seagullCurrent
-                .and(() -> !superstructure.intakeCurrent())
-                .and(mainController.rightBumper.negate())
-                .onTrue(superstructure.handoff().alongWith(superstructure.setPeice()));
+        // seagullCurrent
+        //         .and(() -> !superstructure.intakeCurrent())
+        //         .and(mainController.rightBumper.negate())
+        //         .onTrue(superstructure.handoff().alongWith(superstructure.setPeice()));
         coralerCurrent.and(mainController.rightBumper.negate()).onTrue(superstructure.stow());
 
         mainController.leftBumper.onFalse(
@@ -159,7 +165,7 @@ public class RobotContainer {
                                         superstructure.coralerCommands.setOpenLoop(0.1),
                                         superstructure
                                                 .rollersCommands
-                                                .setOpenLoop(0.1, 0)
+                                                .setOpenLoop(0.1)
                                                 .withTimeout(1)));
         mainController.rightTrigger.onFalse(
                 superstructure
@@ -174,8 +180,8 @@ public class RobotContainer {
 
         mainController
                 .buttonX
-                .whileTrue(superstructure.rollersCommands.setOpenLoop(-0.3, 0.3))
-                .onFalse(superstructure.rollersCommands.setOpenLoop(0, 0));
+                .whileTrue(superstructure.rollersCommands.setOpenLoop(-0.3))
+                .onFalse(superstructure.rollersCommands.setOpenLoop(0));
 
         coController.buttonB.whileTrue(
                 superstructure
@@ -281,6 +287,7 @@ public class RobotContainer {
         coraler.setDefaultCommand(superstructure.coralerCommands.kill());
         wrist.setDefaultCommand(superstructure.wristCommands.stow());
         climb.setDefaultCommand(climbCommands.kill());
+        kicker.setDefaultCommand(superstructure.kickerCommands.kill());
     }
 
     public Command getAutonomousCommand() {
@@ -348,7 +355,7 @@ public class RobotContainer {
                     pivot::getAngle,
                     GlobalConstants.kDt);
 
-    Rollers rollers =
+    public final Rollers rollers =
             new Rollers(
                     RollersConstants.kMaster,
                     0,
@@ -356,20 +363,15 @@ public class RobotContainer {
                     GlobalConstants.kNominalVoltage,
                     GlobalConstants.kDt);
 
-    Climb climb =
+    public final Climb climb =
             new Climb(
                     ClimbConstants.kMaster,
                     0,
                     0,
                     GlobalConstants.kNominalVoltage,
                     GlobalConstants.kDt);
-    Seagull seagull =
-            new Seagull(
-                    RollersConstants.kSeagull,
-                    GlobalConstants.kNominalVoltage,
-                    GlobalConstants.kDt);
 
-    public static Kicker kicker =
+    public final Kicker kicker =
             new Kicker(
                     KickerConstants.kMaster,
                     0,
@@ -384,7 +386,6 @@ public class RobotContainer {
                     pivot,
                     wrist,
                     rollers,
-                    seagull,
                     kicker,
                     mainController.buttonY);
 
@@ -478,18 +479,7 @@ public class RobotContainer {
                                 || mainController.buttonY.getAsBoolean()));
                     });
 
-    Trigger intakeUp =
-            new Trigger(() -> superstructure.intakeCurrent() && wrist.getAngleDegs() < 20)
-                    .debounce(0.5)
-                    .or(mainController.buttonB)
-                    .and(() -> !DriverStation.isAutonomous());
-    Trigger seagullCurrent =
-            new Trigger(() -> superstructure.seagullCurrent())
-                    .debounce(0.5)
-                    .or(coController.buttonY)
-                    .and(() -> !DriverStation.isAutonomous());
-
-    Trigger kickerCurrent = new Trigger(() -> superstructure.kickerCurrent());
+    
     Trigger coralerCurrent =
             superstructure
                     .coralerCommands

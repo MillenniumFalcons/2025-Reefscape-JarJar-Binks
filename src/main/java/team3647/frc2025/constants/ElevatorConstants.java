@@ -98,5 +98,10 @@ public class ElevatorConstants {
 
         // diff inverts should be handled by follower code
         kSlave.getConfigurator().apply(kSlaveConfig);
+
+        //NOTES: 
+        //MASTER: COUNTERCLOCKWISE
+        //SLAVE: CLOCKWISE
+        //CONTROLMODE: STRICTFOLLOWER
     }
 }
